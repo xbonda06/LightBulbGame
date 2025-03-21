@@ -1,8 +1,8 @@
 package game;
 
-import ija.ija2024.homework1.common.GameNode;
-import ija.ija2024.homework1.common.Position;
-import ija.ija2024.homework1.common.Side;
+import common.GameNode;
+import common.Position;
+import common.Side;
 
 public class Game {
     private final int rows;
