@@ -7,6 +7,8 @@ import ija.ija2024.tool.common.Observable;
 import ija.ija2024.tool.common.ToolEnvironment;
 import ija.ija2024.tool.common.ToolField;
 
+import java.util.*;
+
 public class Game implements ToolEnvironment, Observable.Observer {
     private final int rows;
     private final int cols;
@@ -166,6 +168,117 @@ public class Game implements ToolEnvironment, Observable.Observer {
         nodes[p.getRow() - 1][p.getCol() - 1] = node;
         return node;
     }
+
+    public static Game generate(int rows, int cols) {
+        if (rows <= 0 || cols <= 0)
+            throw new IllegalArgumentException("Invalid game size.");
+
+        Game game = new Game(rows, cols);
+        Random random = new Random();
+
+        // Set power to random position
+        Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
+        game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
+
+        // Generate connection tree
+        game.generateFullConnections(powerPos);
+
+        game.init();
+
+        return game;
+    }
+
+    private void generateFullConnections(Position start) {
+        Random random = new Random();
+        boolean[][] visited = new boolean[rows][cols];
+        Stack<Position> stack = new Stack<>();
+        stack.push(start);
+        visited[start.getRow() - 1][start.getCol() - 1] = true;
+
+        while (!stack.isEmpty()) {
+            Position current = stack.peek();
+            List<Side> sides = new ArrayList<>(Arrays.asList(Side.values()));
+            Collections.shuffle(sides);
+
+            boolean moved = false;
+            for (Side side : sides) {
+                Position neighbor = neighbor(current, side);
+                if (neighbor != null && !visited[neighbor.getRow() - 1][neighbor.getCol() - 1]) {
+                    connectNodes(current, neighbor, side);
+                    visited[neighbor.getRow() - 1][neighbor.getCol() - 1] = true;
+                    stack.push(neighbor);
+                    moved = true;
+                    break;
+                }
+            }
+            if (!moved) {
+                stack.pop();
+            }
+        }
+
+        // Set bulbs on leaves of the tree (cells with one connection)
+        for (int r = 1; r <= rows; r++) {
+            for (int c = 1; c <= cols; c++) {
+                Position p = new Position(r, c);
+                GameNode node = node(p);
+                if (!node.isPower() && connectedSides(node).size() == 1) {
+                    List<Side> sides = connectedSides(node);
+                    createBulbNode(p, sides.getFirst());
+                } else if (!node.isPower() && connectedSides(node).size() >= 2) {
+                    createLinkNode(p, connectedSides(node).toArray(new Side[0]));
+                }
+            }
+        }
+    }
+
+    private void randomizeRotations() {
+        Random random = new Random();
+        for (int r = 1; r <= rows; r++) {
+            for (int c = 1; c <= cols; c++) {
+                GameNode node = node(new Position(r, c));
+                int turns = random.nextInt(4);
+                for (int t = 0; t < turns; t++) {
+                    node.turn();
+                }
+            }
+        }
+    }
+
+    private Position neighbor(Position p, Side side) {
+        int r = p.getRow(), c = p.getCol();
+        return switch (side) {
+            case NORTH -> (r > 1) ? new Position(r - 1, c) : null;
+            case SOUTH -> (r < rows) ? new Position(r + 1, c) : null;
+            case EAST -> (c < cols) ? new Position(r, c + 1) : null;
+            case WEST -> (c > 1) ? new Position(r, c - 1) : null;
+        };
+    }
+
+    private void connectNodes(Position from, Position to, Side direction) {
+        Side opposite = switch (direction) {
+            case NORTH -> Side.SOUTH;
+            case SOUTH -> Side.NORTH;
+            case EAST -> Side.WEST;
+            case WEST -> Side.EAST;
+        };
+
+        GameNode fromNode = node(from);
+        GameNode toNode = node(to);
+
+        fromNode.setLink(direction);
+        toNode.setLink(opposite);
+    }
+
+    private List<Side> connectedSides(GameNode node) {
+        List<Side> sides = new ArrayList<>();
+        for (Side side : Side.values()) {
+            if (node.containsConnector(side)) {
+                sides.add(side);
+            }
+        }
+        return sides;
+    }
+
 
     @Override
     public ToolField fieldAt(int i, int i1) {
