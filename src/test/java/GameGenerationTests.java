@@ -30,6 +30,25 @@ public class GameGenerationTests {
     }
 
     @Test
+    public void testPowerIsAlwaysGenerated() {
+        // Check that power is generated in the game
+        for (int i = 0; i < 50; i++) {
+            Game game = Game.generate(i/10 + 1, i/10 + 1);
+            boolean powerFound = false;
+            for (int r = 1; r <= game.rows(); r++) {
+                for (int c = 1; c <= game.cols(); c++) {
+                    if (game.node(new Position(r, c)).isPower()) {
+                        powerFound = true;
+                        break;
+                    }
+                }
+                if (powerFound) break;
+            }
+            assertTrue(powerFound, "Power node must be generated in the game.");
+        }
+    }
+
+    @Test
     public void testAllNodesConnected() {
         Game game = Game.generate(5, 5); // Generate an easy mode game
 

@@ -133,7 +133,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
     }
 
     public GameNode createPowerNode(Position p, Side... sides) {
-        if (p.getRow() < 1 || p.getRow() >= this.rows || p.getCol() < 1 || p.getCol() >= this.cols) {
+        if (p.getRow() < 1 || p.getRow() > this.rows || p.getCol() < 1 || p.getCol() > this.cols) {
             return null;
         }
 
