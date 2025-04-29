@@ -1,10 +1,13 @@
 package gui.controllers;
 
+import game.Game;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -28,7 +31,21 @@ public class GameBoardController {
     // Game constants
     private static final int FIELD_SIZE = 400;
     private static final String BULB_OFF_IMAGE = "/images/bulb_off.png";
+    private static final String BULB_ON_IMAGE = "/images/bulb_on.png";
     private static final String POWER_ON_IMAGE = "/images/power_on.png";
+
+    private static final String CROSS_OFF_IMAGE = "/images/connectors_off/cross.png";
+    private static final String HALF_CROSS_OFF_IMAGE = "/images/connectors_off/half_cross.png";
+    private static final String CORNER_OFF_IMAGE = "/images/connectors_off/corner.png";
+    private static final String LONG_OFF_IMAGE = "/images/connectors_off/long.png";
+    private static final String SHORT_OFF_IMAGE = "/images/connectors_off/short.png";
+
+    private static final String CROSS_ON_IMAGE = "/images/connectors_on/cross.png";
+    private static final String HALF_CROSS_ON_IMAGE = "/images/connectors_on/half_cross.png";
+    private static final String CORNER_ON_IMAGE = "/images/connectors_on/corner.png";
+    private static final String LONG_ON_IMAGE = "/images/connectors_on/long.png";
+    private static final String SHORT_ON_IMAGE = "/images/connectors_on/short.png";
+
 
     // Game state
     private int boardSize = 5;
@@ -49,6 +66,7 @@ public class GameBoardController {
     //temporary
     @FXML private Button addBulbButton;
     @FXML private Button addPowerButton;
+    private Game game;
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -79,6 +97,7 @@ public class GameBoardController {
     private void loadImages() {
         try {
             imageCache.put("bulb_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_OFF_IMAGE))));
+            imageCache.put("bulb_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_ON_IMAGE))));
             imageCache.put("power_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_ON_IMAGE))));
         } catch (NullPointerException e) {
             System.err.println("Error loading images: " + e.getMessage());
@@ -92,6 +111,9 @@ public class GameBoardController {
     }
 
     private void createGameBoard() {
+        this.game = Game.create(boardSize, boardSize);
+        game.init();
+
         clearGameGrid();
         setupGridConstraints();
         createCells();
@@ -184,6 +206,8 @@ public class GameBoardController {
         Image image = imageCache.get(imageKey);
         if (image != null) {
             ImageView imageView = createImageView(image);
+            GridPane.setHalignment(imageView, HPos.CENTER);
+            GridPane.setValignment(imageView, VPos.CENTER);
             gameGrid.add(imageView, col, row);
         }
     }
@@ -198,8 +222,8 @@ public class GameBoardController {
     private ImageView createImageView(Image image) {
         int cellSize = FIELD_SIZE / boardSize;
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(cellSize - 10);
-        imageView.setFitHeight(cellSize - 10);
+        imageView.setFitWidth(cellSize - 20);
+        imageView.setFitHeight(cellSize - 20);
         imageView.setPreserveRatio(true);
         return imageView;
     }
