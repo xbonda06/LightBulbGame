@@ -231,7 +231,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
-    private void randomizeRotations() {
+    public void randomizeRotations() {
         Random random = new Random();
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
