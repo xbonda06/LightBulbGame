@@ -180,6 +180,13 @@ public class Game implements ToolEnvironment, Observable.Observer {
         Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
         game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
 
+        for (Side side : Side.values()) {
+            Position neighbor = game.neighbor(powerPos, side);
+            if (neighbor != null) {
+                game.connectNodes(powerPos, neighbor, side);
+            }
+        }
+
         // Generate connection tree
         game.generateFullConnections(powerPos);
 
