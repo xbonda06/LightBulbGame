@@ -1,5 +1,7 @@
 package gui.controllers;
 
+import common.GameNode;
+import common.Position;
 import game.Game;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -99,6 +101,11 @@ public class GameBoardController {
             imageCache.put("bulb_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_OFF_IMAGE))));
             imageCache.put("bulb_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_ON_IMAGE))));
             imageCache.put("power_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_ON_IMAGE))));
+            imageCache.put("cross_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CROSS_OFF_IMAGE))));
+            imageCache.put("half_cross_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HALF_CROSS_OFF_IMAGE))));
+            imageCache.put("corner_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CORNER_OFF_IMAGE))));
+            imageCache.put("long_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(LONG_OFF_IMAGE))));
+            imageCache.put("short_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(SHORT_OFF_IMAGE))));
         } catch (NullPointerException e) {
             System.err.println("Error loading images: " + e.getMessage());
         }
@@ -111,8 +118,9 @@ public class GameBoardController {
     }
 
     private void createGameBoard() {
-        this.game = Game.create(boardSize, boardSize);
-        game.init();
+        this.game = Game.generate(boardSize, boardSize);
+        //this.game.randomizeRotations();
+        //game.init();
 
         clearGameGrid();
         setupGridConstraints();
@@ -149,16 +157,95 @@ public class GameBoardController {
                 final int currentCol = col;
                 final Rectangle cell = new Rectangle(cellSize - 2, cellSize - 2);
 
-                cell.setFill(Color.WHITE);
+                cell.setFill(Color.web("#1D1033"));
                 cell.setStroke(Color.BLACK);
-
                 cell.setOnMouseClicked(event -> handleCellClick(currentRow, currentCol, cell));
 
+                // Get the Node
+                GameNode node = game.node(new Position(row + 1, col + 1));
+
                 gameGrid.add(cell, col, row);
+
+                if (node.isBulb() || node.isPower()) {
+                    String imagePath = POWER_ON_IMAGE;
+                    if(node.isBulb()) {
+                        imagePath = node.light() ? BULB_ON_IMAGE : BULB_OFF_IMAGE;
+                    }
+                    ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
+                    imageView.setFitWidth(cellSize * 0.7);
+                    imageView.setFitHeight(cellSize * 0.7);
+                    GridPane.setHalignment(imageView, HPos.CENTER);
+                    GridPane.setValignment(imageView, VPos.CENTER);
+                    gameGrid.add(imageView, col, row);
+                }
+                else {
+                    String imagePath = SHORT_OFF_IMAGE;
+                    double rotationAngle = 0;
+                    double sizeX = 1;
+                    double sizeY = 1;
+                    HPos hAlign = HPos.CENTER;
+                    VPos vAlign = VPos.CENTER;
+
+                    if (node.isCross()) {
+                        imagePath = CROSS_OFF_IMAGE;
+                    } else if (node.isHalfCross()) {
+                        imagePath = HALF_CROSS_OFF_IMAGE;
+                        sizeX = 0.5;
+                        if (node.north() && node.south() && node.east()) {
+                            rotationAngle = 0;
+                            hAlign = HPos.RIGHT;
+                        } else if (node.north() && node.south() && node.west()) {
+                            rotationAngle = 180;
+                            hAlign = HPos.LEFT;
+                        } else if (node.east() && node.west() && node.north()) {
+                            rotationAngle = 270;
+                            vAlign = VPos.TOP;
+                        } else if (node.east() && node.west() && node.south()) {
+                            rotationAngle = 90;
+                            vAlign = VPos.BOTTOM;
+                        }
+                    } else if (node.isCorner()) {
+                        imagePath = CORNER_OFF_IMAGE;
+                        if (node.north() && node.east()) {
+                            rotationAngle = 0;
+                            hAlign = HPos.RIGHT;
+                            vAlign = VPos.TOP;
+                        }
+                        else if (node.east() && node.south()) {
+                            rotationAngle = 90;
+                            hAlign = HPos.RIGHT;
+                            vAlign = VPos.BOTTOM;
+                        }
+                        else if (node.south() && node.west()) {
+                            rotationAngle = 180;
+                            hAlign = HPos.LEFT;
+                            vAlign = VPos.BOTTOM;
+                        }
+                        else if (node.west() && node.north()) {
+                            rotationAngle = 270;
+                            hAlign = HPos.LEFT;
+                            vAlign = VPos.TOP;
+                        }
+                        sizeY = 0.5;
+                        sizeX = 0.5;
+                    } else if (node.isLong()) {
+                        imagePath = LONG_OFF_IMAGE;
+                        if (node.east() && node.west()) rotationAngle = 90;
+                        else if (node.north() && node.south()) rotationAngle = 0;
+                    }
+
+                    ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
+                    imageView.setPreserveRatio(true);
+                    imageView.setFitWidth(cellSize * sizeX);
+                    imageView.setFitHeight(cellSize * sizeY);
+                    GridPane.setHalignment(imageView, hAlign);
+                    GridPane.setValignment(imageView, vAlign);
+                    imageView.setRotate(rotationAngle);
+                    gameGrid.add(imageView, col, row);
+                }
             }
         }
     }
-
 
     private void handleCellClick(int row, int col, Rectangle cell) {
         selectedRow = row;
