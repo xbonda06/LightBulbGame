@@ -1,6 +1,8 @@
 package common;
 
 import ija.ija2024.tool.common.AbstractObservableField;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameNode extends AbstractObservableField {
     private boolean bulb;
@@ -61,6 +63,22 @@ public class GameNode extends AbstractObservableField {
     public Position getPosition() {return this.position;}
     public boolean containsConnector(Side side) {return this.connectors[side.ordinal()];}
 
+    /** Returns a list of sides that have connectors on this node. */
+    public List<Side> getConnectors() {
+        List<Side> list = new ArrayList<>();
+        for (Side s : Side.values()) {
+            if (this.containsConnector(s)) {
+                list.add(s);
+            }
+        }
+        return list;
+    }
+
+    /** Getter for the `lit` flag used by copy(). */
+    public boolean isLit() {
+        return this.lit;
+    }
+
     @Override
     public String toString() {
         String type;
@@ -81,5 +99,22 @@ public class GameNode extends AbstractObservableField {
         }
 
         return "{" + type + "[" + position.getRow() + "@" + position.getCol() + "][" + connectorsStr + "]}";
+    }
+
+    public GameNode copy() {
+        GameNode clone = new GameNode(
+                new Position(getPosition().getRow(),
+                        getPosition().getCol()));
+        if (isPower()) {
+            clone.setPower(getConnectors().toArray(new Side[0]));
+        } else if (isBulb()) {
+            clone.setBulb(getConnectors().get(0));   // у лампочки ровно 1 коннектор
+        } else if (!getConnectors().isEmpty()) {
+            clone.setLink(getConnectors().toArray(new Side[0]));
+        }
+
+        clone.setLit(isLit());
+
+        return clone;
     }
 }
