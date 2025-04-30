@@ -6,7 +6,7 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.shape.Circle?>
 
-<Pane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<Pane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
     <Circle centerX="100" centerY="100" layoutX="-36.0" layoutY="90.0" radius="50">
         <fill>
             <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
