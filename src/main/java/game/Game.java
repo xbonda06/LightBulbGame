@@ -13,7 +13,8 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class Game implements ToolEnvironment, Observable.Observer {
-    private final String gameId;
+    private static long nextId = 1;
+    private final long gameId;
     private final int rows;
     private final int cols;
 
@@ -23,12 +24,12 @@ public class Game implements ToolEnvironment, Observable.Observer {
     private boolean isPower = false;
 
     private int moveCount = 0;
-    private final Stack<GameState> undoStack = new Stack<>();
-    private final Stack<GameState> redoStack = new Stack<>();
+    private final Stack<Position> undoStack = new Stack<>();
+    private final Stack<Position> redoStack = new Stack<>();
 
 
-    private Game(String gameId, int rows, int cols) {
-        this.gameId = gameId;
+    private Game(int rows, int cols) {
+        this.gameId = nextId++;
         this.rows = rows;
         this.cols = cols;
         this.nodes = new GameNode[rows][cols];
@@ -40,11 +41,11 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
-    public static Game create(String gameId, int rows, int cols) {
+    public static Game create(int rows, int cols) {
         if (rows <= 0 || cols <= 0) {
             throw new IllegalArgumentException("Invalid game size.");
         }
-        return new Game(gameId, rows, cols);
+        return new Game(rows, cols);
     }
 
     public void init() {
@@ -187,7 +188,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         if (rows <= 0 || cols <= 0)
             throw new IllegalArgumentException("Invalid game size.");
 
-        Game game = new Game(gameId, rows, cols);
+        Game game = new Game(rows, cols);
         Random random = new Random();
 
         // Set power to random position
@@ -317,65 +318,46 @@ public class Game implements ToolEnvironment, Observable.Observer {
     /*--------------------------------------------------*
      *  Undo / Redo support                             *
      *--------------------------------------------------*/
+    public void makeMove(Position p) {
+        // actually rotate the node
+        node(p).turn();
+        updatePowerPropagation();
 
-    /** Immutable snapshot of every node on the board. */
-    private static class GameState {
-        private final GameNode[][] snapshot;
-
-        private GameState(GameNode[][] original) {
-            int r = original.length;
-            int c = original[0].length;
-            this.snapshot = new GameNode[r][c];
-            for (int i = 0; i < r; i++) {
-                for (int j = 0; j < c; j++) {
-                    this.snapshot[i][j] = original[i][j].copy();
-                }
-            }
-        }
-    }
-
-    /** Push current position onto undoStack and clear redoStack. */
-    public void commitMove() {
-        undoStack.push(createSnapshot());
+        // record the move
+        undoStack.push(p);
         redoStack.clear();
         moveCount++;
         logger.log(this, moveCount);
     }
 
-    /** Undo the last move; returns {@code true} if something was undone. */
     public boolean undo() {
-        if (undoStack.size() <= 1) {
-            return false;            // nothing to undo (or only initial state)
-        }
-        redoStack.push(undoStack.pop());   // current → redo
-        restore(undoStack.peek());         // previous ← current
+        if (undoStack.isEmpty()) return false;
+        Position last = undoStack.pop();
+
+        GameNode n = node(last);
+        n.turnBack();
+        updatePowerPropagation();
+
+        // record for redo
+        redoStack.push(last);
         return true;
     }
 
-    /** Redo the most recently undone move; returns {@code true} if something was redone. */
     public boolean redo() {
-        if (redoStack.isEmpty()) {
-            return false;            // nothing to redo
-        }
-        GameState next = redoStack.pop();  // next ← redo
-        undoStack.push(next);              // next → undo (current)
-        restore(next);
+        if (redoStack.isEmpty()) return false;
+        Position next = redoStack.pop();
+        // re‐apply the original single 90° turn
+        GameNode n = node(next);
+        n.turn();
+        updatePowerPropagation();
+        // push back onto undo
+        undoStack.push(next);
         return true;
     }
 
 
-    /** Create a deep snapshot of the current board. */
-    private GameState createSnapshot() {
-        return new GameState(this.nodes);
-    }
 
-    /** Replace the board with the nodes stored in {@code state}. */
-    private void restore(GameState state) {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                this.nodes[i][j] = state.snapshot[i][j].copy();
-            }
-        }
-        updatePowerPropagation();       // relight bulbs after restoring
-    }
+
+
+
 }
