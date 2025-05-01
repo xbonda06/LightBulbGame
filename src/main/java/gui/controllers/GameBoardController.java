@@ -18,6 +18,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
@@ -185,6 +186,7 @@ public class GameBoardController {
                     double sizeY = 1;
                     HPos hAlign = HPos.CENTER;
                     VPos vAlign = VPos.CENTER;
+                    ImageView imageView;
 
                     if (node.isCross()) {
                         imagePath = CROSS_OFF_IMAGE;
@@ -234,13 +236,20 @@ public class GameBoardController {
                         else if (node.north() && node.south()) rotationAngle = 0;
                     }
 
-                    ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
-                    imageView.setPreserveRatio(true);
+                    imageView = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
                     imageView.setFitWidth(cellSize * sizeX);
                     imageView.setFitHeight(cellSize * sizeY);
+                    imageView.setRotate(rotationAngle);
                     GridPane.setHalignment(imageView, hAlign);
                     GridPane.setValignment(imageView, vAlign);
-                    imageView.setRotate(rotationAngle);
+                    imageView.setPreserveRatio(true);
+                    if (node.isHalfCross()){
+                        if (node.east() && node.west() && node.south())
+                            imageView.setTranslateY(cellSize * 0.25);
+                        else if (node.east() && node.west() && node.north())
+                            imageView.setTranslateY(-cellSize * 0.25);
+                    }
+
                     gameGrid.add(imageView, col, row);
                 }
             }
