@@ -18,13 +18,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +33,12 @@ public class GameBoardController {
     private static final int FIELD_SIZE = 400;
     private static final String BULB_OFF_IMAGE = "/images/bulb_off.png";
     private static final String BULB_ON_IMAGE = "/images/bulb_on.png";
-    private static final String POWER_ON_IMAGE = "/images/power_on.png";
+    private static final String POWER_1_IMAGE = "/images/power/power_1.png";
+    private static final String POWER_2_IMAGE = "/images/power/power_2.png";
+    private static final String POWER_2ud_IMAGE = "/images/power/power_2ud.png";
+    private static final String POWER_3_IMAGE = "/images/power/power_3.png";
+    private static final String POWER_4_IMAGE = "/images/power/power_4.png";
+
 
     private static final String CROSS_OFF_IMAGE = "/images/connectors_off/cross.png";
     private static final String HALF_CROSS_OFF_IMAGE = "/images/connectors_off/half_cross.png";
@@ -59,7 +62,7 @@ public class GameBoardController {
     private int stepsTaken = 0;
     private int selectedRow = -1;
     private int selectedCol = -1;
-    private Map<String, Image> imageCache = new HashMap<>();
+    private final Map<String, Image> imageCache = new HashMap<>();
 
     // UI components
     @FXML private GridPane gameGrid;
@@ -101,12 +104,24 @@ public class GameBoardController {
         try {
             imageCache.put("bulb_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_OFF_IMAGE))));
             imageCache.put("bulb_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_ON_IMAGE))));
-            imageCache.put("power_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_ON_IMAGE))));
+
+            imageCache.put("power_1", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_1_IMAGE))));
+            imageCache.put("power_2", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_2_IMAGE))));
+            imageCache.put("power_2ud", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_2ud_IMAGE))));
+            imageCache.put("power_3", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_3_IMAGE))));
+            imageCache.put("power_4", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_4_IMAGE))));
+
             imageCache.put("cross_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CROSS_OFF_IMAGE))));
             imageCache.put("half_cross_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HALF_CROSS_OFF_IMAGE))));
             imageCache.put("corner_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CORNER_OFF_IMAGE))));
             imageCache.put("long_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(LONG_OFF_IMAGE))));
             imageCache.put("short_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(SHORT_OFF_IMAGE))));
+
+            imageCache.put("cross_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CROSS_ON_IMAGE))));
+            imageCache.put("half_cross_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HALF_CROSS_ON_IMAGE))));
+            imageCache.put("corner_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CORNER_ON_IMAGE))));
+            imageCache.put("long_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(LONG_ON_IMAGE))));
+            imageCache.put("short_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(SHORT_ON_IMAGE))));
         } catch (NullPointerException e) {
             System.err.println("Error loading images: " + e.getMessage());
         }
@@ -120,7 +135,7 @@ public class GameBoardController {
 
     private void createGameBoard() {
         this.game = Game.generate(boardSize, boardSize);
-        //this.game.randomizeRotations();
+        this.game.randomizeRotations();
         //game.init();
 
         clearGameGrid();
@@ -168,13 +183,52 @@ public class GameBoardController {
                 gameGrid.add(cell, col, row);
 
                 if (node.isBulb() || node.isPower()) {
-                    String imagePath = POWER_ON_IMAGE;
+                    String imagePath = "";
+                    double rotationAngle = 0;
+                    if(node.isPower()) {
+                        int count = 0;
+                        if (node.north()) count++;
+                        if (node.south()) count++;
+                        if (node.east()) count++;
+                        if (node.west()) count++;
+
+                        if (count == 4) {
+                            imagePath = POWER_4_IMAGE;
+                        } else if (count == 3) {
+                            imagePath = POWER_3_IMAGE;
+                            if (!node.north())
+                                rotationAngle = 180;
+                            else if (!node.south())
+                                rotationAngle = 0;
+                            else if (!node.east())
+                                rotationAngle = 270;
+                            else
+                                rotationAngle = 90;
+                        } else if (count == 1) {
+                            imagePath = POWER_1_IMAGE;
+                            if (node.north()) rotationAngle = 0;
+                            else if (node.south()) rotationAngle = 180;
+                            else if(node.east()) rotationAngle = 90;
+                            else rotationAngle = 270;
+                        } else if ((node.north() && node.south()) || (node.east() && node.west())) {
+                            imagePath = POWER_2ud_IMAGE;
+                            if (node.north()) rotationAngle = 0;
+                            else rotationAngle = 90;
+                        } else if ((node.north() || node.south()) && (node.east() || node.west())) {
+                            imagePath = POWER_2_IMAGE;
+                            if (node.north() && node.east()) rotationAngle = 0;
+                            else if (node.north() && node.west()) rotationAngle = 270;
+                            else if (node.south() && node.east()) rotationAngle = 90;
+                            else rotationAngle = 180;
+                        }
+                    }
                     if(node.isBulb()) {
                         imagePath = node.light() ? BULB_ON_IMAGE : BULB_OFF_IMAGE;
                     }
-                    ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
-                    imageView.setFitWidth(cellSize * 0.7);
-                    imageView.setFitHeight(cellSize * 0.7);
+                    ImageView imageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
+                    imageView.setFitWidth(cellSize);
+                    imageView.setFitHeight(cellSize);
+                    imageView.setRotate(rotationAngle);
                     GridPane.setHalignment(imageView, HPos.CENTER);
                     GridPane.setValignment(imageView, VPos.CENTER);
                     gameGrid.add(imageView, col, row);
@@ -182,74 +236,49 @@ public class GameBoardController {
                 else {
                     String imagePath = SHORT_OFF_IMAGE;
                     double rotationAngle = 0;
-                    double sizeX = 1;
-                    double sizeY = 1;
                     HPos hAlign = HPos.CENTER;
                     VPos vAlign = VPos.CENTER;
                     ImageView imageView;
 
                     if (node.isCross()) {
-                        imagePath = CROSS_OFF_IMAGE;
+                        imagePath = node.light() ? CROSS_ON_IMAGE : CROSS_OFF_IMAGE;
                     } else if (node.isHalfCross()) {
-                        imagePath = HALF_CROSS_OFF_IMAGE;
-                        sizeX = 0.5;
+                        imagePath = node.light() ? HALF_CROSS_ON_IMAGE : HALF_CROSS_OFF_IMAGE;
                         if (node.north() && node.south() && node.east()) {
                             rotationAngle = 0;
-                            hAlign = HPos.RIGHT;
                         } else if (node.north() && node.south() && node.west()) {
                             rotationAngle = 180;
-                            hAlign = HPos.LEFT;
                         } else if (node.east() && node.west() && node.north()) {
                             rotationAngle = 270;
-                            vAlign = VPos.TOP;
                         } else if (node.east() && node.west() && node.south()) {
                             rotationAngle = 90;
-                            vAlign = VPos.BOTTOM;
                         }
                     } else if (node.isCorner()) {
-                        imagePath = CORNER_OFF_IMAGE;
+                        imagePath = node.light() ? CORNER_ON_IMAGE : CORNER_OFF_IMAGE;
                         if (node.north() && node.east()) {
                             rotationAngle = 0;
-                            hAlign = HPos.RIGHT;
-                            vAlign = VPos.TOP;
                         }
                         else if (node.east() && node.south()) {
                             rotationAngle = 90;
-                            hAlign = HPos.RIGHT;
-                            vAlign = VPos.BOTTOM;
                         }
                         else if (node.south() && node.west()) {
                             rotationAngle = 180;
-                            hAlign = HPos.LEFT;
-                            vAlign = VPos.BOTTOM;
                         }
                         else if (node.west() && node.north()) {
                             rotationAngle = 270;
-                            hAlign = HPos.LEFT;
-                            vAlign = VPos.TOP;
                         }
-                        sizeY = 0.5;
-                        sizeX = 0.5;
                     } else if (node.isLong()) {
-                        imagePath = LONG_OFF_IMAGE;
+                        imagePath = node.light() ? LONG_ON_IMAGE : LONG_OFF_IMAGE;
                         if (node.east() && node.west()) rotationAngle = 90;
                         else if (node.north() && node.south()) rotationAngle = 0;
                     }
 
-                    imageView = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
-                    imageView.setFitWidth(cellSize * sizeX);
-                    imageView.setFitHeight(cellSize * sizeY);
+                    imageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
+                    imageView.setFitWidth(cellSize);
+                    imageView.setFitHeight(cellSize);
                     imageView.setRotate(rotationAngle);
                     GridPane.setHalignment(imageView, hAlign);
                     GridPane.setValignment(imageView, vAlign);
-                    imageView.setPreserveRatio(true);
-                    if (node.isHalfCross()){
-                        if (node.east() && node.west() && node.south())
-                            imageView.setTranslateY(cellSize * 0.25);
-                        else if (node.east() && node.west() && node.north())
-                            imageView.setTranslateY(-cellSize * 0.25);
-                    }
-
                     gameGrid.add(imageView, col, row);
                 }
             }
