@@ -7,21 +7,32 @@ import ija.ija2024.tool.common.Observable;
 import ija.ija2024.tool.common.ToolEnvironment;
 import ija.ija2024.tool.common.ToolField;
 
+import logging.GameLogger;
+import java.nio.file.Paths;
+
 import java.util.*;
 
 public class Game implements ToolEnvironment, Observable.Observer {
+    private final String gameId;
     private final int rows;
     private final int cols;
+
+    private final GameLogger logger;
+
     private final GameNode[][] nodes;
     private boolean isPower = false;
 
+    private int moveCount = 0;
     private final Stack<GameState> undoStack = new Stack<>();
     private final Stack<GameState> redoStack = new Stack<>();
 
-    private Game(int rows, int cols) {
+
+    private Game(String gameId, int rows, int cols) {
+        this.gameId = gameId;
         this.rows = rows;
         this.cols = cols;
         this.nodes = new GameNode[rows][cols];
+        this.logger = new GameLogger(Paths.get("logs", gameId + ".json"));
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
                 this.nodes[r - 1][c - 1] = new GameNode(new Position(r, c));
@@ -29,11 +40,11 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
-    public static Game create(int rows, int cols) {
+    public static Game create(String gameId, int rows, int cols) {
         if (rows <= 0 || cols <= 0) {
             throw new IllegalArgumentException("Invalid game size.");
         }
-        return new Game(rows, cols);
+        return new Game(gameId, rows, cols);
     }
 
     public void init() {
@@ -172,11 +183,11 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return node;
     }
 
-    public static Game generate(int rows, int cols) {
+    public static Game generate(String gameId, int rows, int cols) {
         if (rows <= 0 || cols <= 0)
             throw new IllegalArgumentException("Invalid game size.");
 
-        Game game = new Game(rows, cols);
+        Game game = new Game(gameId, rows, cols);
         Random random = new Random();
 
         // Set power to random position
@@ -327,6 +338,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
     public void commitMove() {
         undoStack.push(createSnapshot());
         redoStack.clear();
+        moveCount++;
+        logger.log(this, moveCount);
     }
 
     /** Undo the last move; returns {@code true} if something was undone. */
