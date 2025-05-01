@@ -74,11 +74,6 @@ public class GameNode extends AbstractObservableField {
         return list;
     }
 
-    /** Getter for the `lit` flag used by copy(). */
-    public boolean isLit() {
-        return this.lit;
-    }
-
     @Override
     public String toString() {
         String type;
@@ -113,7 +108,7 @@ public class GameNode extends AbstractObservableField {
             clone.setLink(getConnectors().toArray(new Side[0]));
         }
 
-        clone.setLit(isLit());
+        clone.setLit(light());
 
         return clone;
     }
