@@ -69,6 +69,16 @@ public class GameNode extends AbstractObservableField {
         notifyObservers();
     }
 
+    public void turnBack() {
+        boolean[] rotated = new boolean[4];
+        for (int i = 0; i < 4; i++) {
+            rotated[(i + 1) % 4] = connectors[i];
+        }
+        this.connectors = rotated;
+        notifyObservers();
+    }
+
+
     public void setLit(boolean lit) {
         this.lit = lit;
     }
@@ -145,7 +155,7 @@ public class GameNode extends AbstractObservableField {
         if (isPower()) {
             clone.setPower(getConnectors().toArray(new Side[0]));
         } else if (isBulb()) {
-            clone.setBulb(getConnectors().get(0));   // у лампочки ровно 1 коннектор
+            clone.setBulb(getConnectors().getFirst());
         } else if (!getConnectors().isEmpty()) {
             clone.setLink(getConnectors().toArray(new Side[0]));
         }
