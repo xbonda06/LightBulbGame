@@ -28,7 +28,6 @@ public class GameLogger {
         GameSnapshotDto snapshot = new GameSnapshotDto(game, moveCount, Instant.now());
         String json = gson.toJson(snapshot);
 
-        // Открываем FileWriter в режиме перезаписи (append = false):
         try (FileWriter fw = new FileWriter(logFile.toFile(), false)) {
             fw.write(json);
             fw.write(System.lineSeparator());

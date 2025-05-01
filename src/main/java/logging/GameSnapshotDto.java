@@ -21,7 +21,6 @@ public class GameSnapshotDto {
         this.cols = game.cols();
         this.nodes = new ArrayList<>();
 
-        // собираем все узлы
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
                 nodes.add(new NodeDto(game.node(new Position(r, c))));
