@@ -202,6 +202,7 @@ public class GameBoardController {
     // Waits for 0.7 seconds and then displays a modal dialog with a "YOU WON!" message
     private void gameWin() {
         stopTimer();
+        closeHintsAndCenterMain();
         PauseTransition pause = new PauseTransition(Duration.millis(700));
         pause.setOnFinished(e -> showVictoryDialog());
         pause.play();
@@ -262,17 +263,7 @@ public class GameBoardController {
                 hintsStage.setX(startX.get() + 800 + 10);
                 hintsStage.setY(centerY.get());
 
-                hintsStage.setOnCloseRequest(e -> {
-                    hintsStage = null;
-                    hintsController = null;
-                    totalWidth.set((double) (800 + 10));
-                    startX.set((screenWidth - totalWidth.get()) / 2.0);
-                    centerY.set((screenHeight - mainStage.getHeight()) / 2.0);
-
-                    mainStage.setX(startX.get());
-                    mainStage.setY(centerY.get());
-                    hints_on = false;
-                });
+                hintsStage.setOnCloseRequest(e -> closeHintsAndCenterMain());
 
                 hintsStage.show();
                 this.hints_on = true;
@@ -284,12 +275,14 @@ public class GameBoardController {
 
     @FXML
     private void resetBoard() {
+        closeHintsAndCenterMain();
         resetGame();
     }
 
     @FXML
     private void toMainMenu() {
         stopTimer();
+        closeHintsAndCenterMain();
         loadMainMenu();
     }
 
@@ -335,5 +328,27 @@ public class GameBoardController {
 
     private void updateHintsDisplay() {
         hintButton.setText(String.format("HINT %d/2", hintsUsed));
+    }
+
+    private void closeHintsAndCenterMain() {
+        if (hintsStage != null) {
+            hintsStage.close();
+            hintsStage = null;
+            hintsController = null;
+            hints_on = false;
+        }
+
+        Stage mainStage = (Stage) gameGrid.getScene().getWindow();
+        double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
+        double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
+
+        double mainWidth = mainStage.getWidth();
+        double mainHeight = mainStage.getHeight();
+
+        double centerX = (screenWidth - mainWidth) / 2.0;
+        double centerY = (screenHeight - mainHeight) / 2.0;
+
+        mainStage.setX(centerX);
+        mainStage.setY(centerY);
     }
 }

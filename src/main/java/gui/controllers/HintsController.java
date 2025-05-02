@@ -51,14 +51,14 @@ public class HintsController {
 
     private void updateHint(int row, int col){
         GameNode node = game.node(new Position(row + 1, col + 1));
-        Image img = null;
+        Image img;
         int hints = node.getHint();
         System.out.println("Hint at (" + row + "," + col + "): " + hints);
         img = switch (hints) {
             case 1 -> imageCache.get("hint1");
             case 2 -> imageCache.get("hint2");
             case 3 -> imageCache.get("hint3");
-            default -> img;
+            default -> null;
         };
 
         if (img != null) {
