@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.swing.*;
 
 public class GameBoardController {
     // Game constants
@@ -285,6 +286,9 @@ public class GameBoardController {
             gameGrid.add(connectorView, col, row);
         }
         gameGrid.add(imageView, col, row);
+
+        if (node.isBulb() && game.checkWin())
+            gameWin();
     }
 
     // Rotate the clicked node by 90 degrees and refresh the game board to reflect the change
@@ -297,6 +301,16 @@ public class GameBoardController {
                 fillCell(r, c);
             }
         }
+    }
+
+    // // Waits for 0.7 seconds and then displays a modal dialog with a "YOU WON!" message
+    private void gameWin() {
+        stopTimer();
+        Timer timer = new Timer(700, e -> {
+            JOptionPane.showMessageDialog(null, "YOU WON!", "Victory", JOptionPane.INFORMATION_MESSAGE);
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
 
     @FXML
