@@ -136,7 +136,6 @@ public class GameBoardController {
     private void createGameBoard() {
         this.game = Game.generate(boardSize, boardSize);
         this.game.randomizeRotations();
-        //game.init();
 
         clearGameGrid();
         setupGridConstraints();
@@ -191,6 +190,7 @@ public class GameBoardController {
         double rotationAngle = 0;
         HPos hAlign = HPos.CENTER;
         VPos vAlign = VPos.CENTER;
+        ImageView connectorView = null;
 
         if (node.isBulb() || node.isPower()) {
             if (node.isPower()) {
@@ -225,7 +225,28 @@ public class GameBoardController {
                     else rotationAngle = 180;
                 }
             } else {
-                imagePath = node.light() ? BULB_ON_IMAGE : BULB_OFF_IMAGE;
+                if (node.north()) {
+                    rotationAngle = 0;
+                } else if (node.south()) {
+                    rotationAngle = 180;
+                } else if (node.east()) {
+                    rotationAngle = 90;
+                } else if (node.west()) {
+                    rotationAngle = 270;
+                }
+                if (!node.light()){
+                    connectorView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_OFF_IMAGE))));
+                    imagePath = SHORT_OFF_IMAGE;
+                }
+                else {
+                    connectorView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(SHORT_ON_IMAGE))));
+                    imagePath = BULB_ON_IMAGE;
+                    connectorView.setRotate(rotationAngle);
+                    rotationAngle = 0;
+                }
+                connectorView.setFitWidth(cellSize);
+                connectorView.setFitHeight(cellSize);
+                connectorView.setPreserveRatio(false);
             }
         } else {
             if (node.isCross()) {
@@ -266,7 +287,8 @@ public class GameBoardController {
                         GridPane.getRowIndex(child) == row &&
                         GridPane.getColumnIndex(child) == col
         );
-
+        if (connectorView != null)
+            gameGrid.add(connectorView, col, row);
         gameGrid.add(imageView, col, row);
     }
 
