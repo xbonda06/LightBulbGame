@@ -25,8 +25,6 @@
          <GridPane fx:id="gameGrid" gridLinesVisible="true" maxHeight="400" maxWidth="400" minHeight="400" minWidth="400" prefHeight="400" prefWidth="400" />
 
         <VBox alignment="CENTER" spacing="20" style="-fx-padding: 10;">
-          <Button fx:id="addBulbButton" onAction="#addBulb" prefWidth="150" style="-fx-font-size: 14;" text="Add Bulb" />
-          <Button fx:id="addPowerButton" onAction="#addPowerSource" prefWidth="150" style="-fx-font-size: 14;" text="Add Power" />
           <Button fx:id="hintButton" onAction="#useHint" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="HINT 0/2" />
           <Button onAction="#resetBoard" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="RESET" />
           <Button onAction="#toMainMenu" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="TO THE MAIN MENU" />
