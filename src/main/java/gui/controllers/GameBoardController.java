@@ -278,8 +278,12 @@ public class GameBoardController {
                         GridPane.getRowIndex(child) == row &&
                         GridPane.getColumnIndex(child) == col
         );
-        if (connectorView != null)
+        imageView.setOnMouseClicked(event -> handleCellClick(node));
+
+        if (connectorView != null) {
+            connectorView.setOnMouseClicked(event -> handleCellClick(node));
             gameGrid.add(connectorView, col, row);
+        }
         gameGrid.add(imageView, col, row);
     }
 
