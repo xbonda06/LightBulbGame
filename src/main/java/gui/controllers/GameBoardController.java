@@ -66,6 +66,7 @@ public class GameBoardController {
     private Stage primaryStage;
     private Timeline gameTimer;
     private Game game;
+    private boolean hints_on = false;
 
     private Stage hintsStage = null;
     private HintsController hintsController = null;
@@ -183,6 +184,8 @@ public class GameBoardController {
 
             }
         }
+        if (this.hints_on)
+            hintsController.reloadHints(game);
         if (game.checkWin()){
             gameWin();
         }
@@ -231,8 +234,7 @@ public class GameBoardController {
                 Parent root = loader.load();
 
                 hintsController = loader.getController();
-                hintsController.init(game);
-                hintsController.reloadHints(game);
+                hintsController.init(game, cellSize, boardSize, imageCache);
 
                 hintsStage = new Stage();
                 hintsStage.setTitle("Hints");
@@ -261,18 +263,14 @@ public class GameBoardController {
 
                     mainStage.setX(startX.get());
                     mainStage.setY(centerY.get());
+                    hints_on = false;
                 });
 
                 hintsStage.show();
+                this.hints_on = true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private void reloadHint() {
-        if (hintsController != null && hintsStage != null && hintsStage.isShowing()) {
-            hintsController.reloadHints(game);
         }
     }
 

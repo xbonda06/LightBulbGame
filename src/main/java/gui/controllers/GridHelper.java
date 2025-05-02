@@ -21,7 +21,9 @@ public class GridHelper {
                 Rectangle cell = new Rectangle(cellSize - 2, cellSize - 2);
                 cell.setFill(Color.web("#1D1033"));
                 cell.setStroke(Color.BLACK);
-                cell.setOnMouseClicked(event -> clickHandler.accept(node));
+                if (clickHandler != null)
+                    cell.setOnMouseClicked(event -> clickHandler.accept(node));
+
                 grid.add(cell, col, row);
                 fillCell(game, grid, cellSize, imageCache, row, col, clickHandler);
             }
@@ -124,10 +126,15 @@ public class GridHelper {
                         GridPane.getRowIndex(child) == row &&
                         GridPane.getColumnIndex(child) == col
         );
-        imageView.setOnMouseClicked(event -> clickHandler.accept(node));
+
+        if (clickHandler != null)
+            imageView.setOnMouseClicked(event -> clickHandler.accept(node));
 
         if (connectorView != null) {
-            connectorView.setOnMouseClicked(event -> clickHandler.accept(node));
+            connectorView.setOnMouseClicked(event -> {
+                assert clickHandler != null;
+                clickHandler.accept(node);
+            });
             grid.add(connectorView, col, row);
         }
         grid.add(imageView, col, row);
