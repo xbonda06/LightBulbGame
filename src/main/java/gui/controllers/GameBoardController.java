@@ -5,6 +5,7 @@ import common.Position;
 import game.Game;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,13 +20,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import javax.swing.*;
 
 public class GameBoardController {
     // Game constants
@@ -286,9 +287,6 @@ public class GameBoardController {
             gameGrid.add(connectorView, col, row);
         }
         gameGrid.add(imageView, col, row);
-
-        if (node.isBulb() && game.checkWin())
-            gameWin();
     }
 
     // Rotate the clicked node by 90 degrees and refresh the game board to reflect the change
@@ -301,16 +299,44 @@ public class GameBoardController {
                 fillCell(r, c);
             }
         }
+        if (game.checkWin()){
+            gameWin();
+        }
     }
 
-    // // Waits for 0.7 seconds and then displays a modal dialog with a "YOU WON!" message
+    // Waits for 0.7 seconds and then displays a modal dialog with a "YOU WON!" message
     private void gameWin() {
         stopTimer();
-        Timer timer = new Timer(700, e -> {
-            JOptionPane.showMessageDialog(null, "YOU WON!", "Victory", JOptionPane.INFORMATION_MESSAGE);
-        });
-        timer.setRepeats(false);
-        timer.start();
+        PauseTransition pause = new PauseTransition(Duration.millis(700));
+        pause.setOnFinished(e -> showVictoryDialog());
+        pause.play();
+    }
+
+    // Displays a modal victory dialog window when the player wins.
+    // Sets up the controller with appropriate actions
+    // (resetting the game or returning to the main menu), and shows the dialog as a blocking window.
+    private void showVictoryDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/victory_dialog.fxml"));
+            Parent root = loader.load();
+
+            VictoryDialogController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            controller.setDialogStage(dialogStage);
+
+            controller.setOnYesAction(this::resetGame);
+            controller.setOnNoAction(this::loadMainMenu);
+
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(primaryStage);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setTitle("You Win!");
+            dialogStage.show();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @FXML

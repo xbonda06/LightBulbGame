@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox alignment="CENTER" prefHeight="202.0" prefWidth="223.0" spacing="10.0" style="-fx-background-color: #170E27;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.VictoryDialogController">
+    <Label alignment="CENTER" prefHeight="45.0" prefWidth="109.0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="You Win!" />
+   <Label alignment="CENTER" layoutX="67.0" layoutY="55.0" prefHeight="41.0" prefWidth="157.0" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;" text="Play Again ?">
+      <font>
+         <Font size="14.0" />
+      </font>
+   </Label>
+   <HBox alignment="CENTER" prefHeight="63.0" prefWidth="223.0" spacing="10.0">
+      <opaqueInsets>
+         <Insets/>
+      </opaqueInsets>
+      <VBox.margin>
+         <Insets/>
+      </VBox.margin>
+      <Button fx:id="YesButton" onAction="#handleYesButton" prefHeight="46.0" prefWidth="100.0"
+              style="-fx-background-color: green;" styleClass="buttonVictory" stylesheets="@../css/styles.css"
+              text="Yes"/>
+      <Button fx:id="NoButton" alignment="CENTER" contentDisplay="CENTER" onAction="#handleNoButton"
+              style="-fx-background-color: red;" styleClass="buttonVictory" stylesheets="@../css/styles.css" text="No"/>
+   </HBox>
+</VBox>
