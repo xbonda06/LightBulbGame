@@ -50,6 +50,27 @@ public class GameNode extends AbstractObservableField {
         this.lit = lit;
     }
 
+    public boolean isCross(){
+        return north() && south() && east() && west();
+    }
+
+    public boolean isHalfCross() {
+        return (north() && south() && (east() ^ west())) ||
+                (east() && west() && (north() ^ south()));
+    }
+
+    public boolean isCorner() {
+        return (north() && east() && !south() && !west()) ||
+                (north() && west() && !south() && !east()) ||
+                (south() && east() && !north() && !west()) ||
+                (south() && west() && !north() && !east());
+    }
+
+    public boolean isLong(){
+        return (north() && south() && !east() && !west()) ||
+                (east() && west() && !north() && !south());
+    }
+
     @Override public boolean north() {return this.connectors[Side.NORTH.ordinal()];}
     @Override public boolean south() {return this.connectors[Side.SOUTH.ordinal()];}
     @Override public boolean east() {return this.connectors[Side.EAST.ordinal()];}

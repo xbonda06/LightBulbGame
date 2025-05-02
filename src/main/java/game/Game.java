@@ -49,6 +49,19 @@ public class Game implements ToolEnvironment, Observable.Observer {
         propagateLight(powerNode);
     }
 
+    // Checks whether all bulbs in the game are lit
+    public boolean checkWin() {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                GameNode node = nodes[r][c];
+                if (node.isBulb() && !node.light()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private void propagateLight(GameNode start) {
         boolean[][] visited = new boolean[rows][cols];
         dfs(start.getPosition(), visited);
@@ -285,7 +298,6 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
         return sides;
     }
-
 
     @Override
     public ToolField fieldAt(int i, int i1) {
