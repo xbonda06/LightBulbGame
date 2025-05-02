@@ -1,7 +1,12 @@
+/*
+* Author: Olha Tomylko (xtomylo00)
+*
+* Description:
+*/
+
 package gui.controllers;
 
 import common.GameNode;
-import common.Position;
 import game.Game;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -14,19 +19,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GameBoardController {
     // Game constants
@@ -62,6 +66,9 @@ public class GameBoardController {
     private Stage primaryStage;
     private Timeline gameTimer;
     private Game game;
+
+    private Stage hintsStage = null;
+    private HintsController hintsController = null;
 
     // UI components
     @FXML private GridPane gameGrid;
@@ -135,10 +142,11 @@ public class GameBoardController {
     private void createGameBoard() {
         this.game = Game.generate(boardSize, boardSize);
         this.game.randomizeRotations();
+        this.cellSize = FIELD_SIZE / boardSize;
 
         clearGameGrid();
         setupGridConstraints();
-        createCells();
+        GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick, imageCache);
     }
 
     // Delete game
@@ -163,132 +171,6 @@ public class GameBoardController {
         }
     }
 
-    // Create empty cells, set their appearance and click behavior, then fill it with images
-    private void createCells() {
-        this.cellSize = FIELD_SIZE / boardSize;
-
-        for (int row = 0; row < boardSize; row++) {
-            for (int col = 0; col < boardSize; col++) {
-                GameNode node = game.node(new Position(row + 1, col + 1));
-
-                Rectangle cell = new Rectangle(cellSize - 2, cellSize - 2);
-                cell.setFill(Color.web("#1D1033"));
-                cell.setStroke(Color.BLACK);
-                cell.setOnMouseClicked(event -> handleCellClick(node));
-
-                gameGrid.add(cell, col, row);
-                fillCell(row, col);
-            }
-        }
-    }
-
-    // Fill cells with images based on GameNode type
-    // Apply correct rotation for orientation
-    private void fillCell(int row, int col) {
-        GameNode node = game.node(new Position(row + 1, col + 1));
-        double rotationAngle = 0;
-        ImageView connectorView = null;
-        Image img = null;
-
-        if (node.isPower()) {
-            int count = 0;
-            if (node.north()) count++;
-            if (node.south()) count++;
-            if (node.east()) count++;
-            if (node.west()) count++;
-
-            if (count == 4) {
-                img = imageCache.get("power_4");
-            } else if (count == 3) {
-                img = imageCache.get("power_3");
-                if (!node.north()) rotationAngle = 180;
-                else if (!node.south()) rotationAngle = 0;
-                else if (!node.east()) rotationAngle = 270;
-                else rotationAngle = 90;
-            } else if (count == 1) {
-                img = imageCache.get("power_1");
-                if (node.north()) rotationAngle = 0;
-                else if (node.south()) rotationAngle = 180;
-                else if (node.east()) rotationAngle = 90;
-                else rotationAngle = 270;
-            } else if ((node.north() && node.south()) || (node.east() && node.west())) {
-                img = imageCache.get("power_2ud");
-                rotationAngle = node.north() ? 0 : 90;
-            } else if ((node.north() || node.south()) && (node.east() || node.west())) {
-                img = imageCache.get("power_2");
-                if (node.north() && node.east()) rotationAngle = 0;
-                else if (node.north() && node.west()) rotationAngle = 270;
-                else if (node.south() && node.east()) rotationAngle = 90;
-                else rotationAngle = 180;
-            }
-        } else if (node.isBulb()) {
-            if (node.north()) {
-                rotationAngle = 0;
-            } else if (node.south()) {
-                rotationAngle = 180;
-            } else if (node.east()) {
-                rotationAngle = 90;
-            } else if (node.west()) {
-                rotationAngle = 270;
-            }
-            if (!node.light()){
-                connectorView = new ImageView(imageCache.get("bulb_off"));
-                img = imageCache.get("short_off");
-            }
-            else {
-                connectorView = new ImageView(imageCache.get("short_on"));
-                img = imageCache.get("bulb_on");
-                connectorView.setRotate(rotationAngle);
-                rotationAngle = 0;
-            }
-            connectorView.setFitWidth(cellSize);
-            connectorView.setFitHeight(cellSize);
-            connectorView.setPreserveRatio(false);
-        } else {
-            if (node.isCross()) {
-                img = node.light() ? imageCache.get("cross_on") : imageCache.get("cross_off");
-            } else if (node.isHalfCross()) {
-                img = node.light() ? imageCache.get("half_cross_on") : imageCache.get("half_cross_off");
-                if (node.north() && node.south() && node.east()) rotationAngle = 0;
-                else if (node.north() && node.south() && node.west()) rotationAngle = 180;
-                else if (node.east() && node.west() && node.north()) rotationAngle = 270;
-                else if (node.east() && node.west() && node.south()) rotationAngle = 90;
-            } else if (node.isCorner()) {
-                img = node.light() ? imageCache.get("corner_on") : imageCache.get("corner_off");
-                if (node.north() && node.east()) rotationAngle = 0;
-                else if (node.east() && node.south()) rotationAngle = 90;
-                else if (node.south() && node.west()) rotationAngle = 180;
-                else if (node.west() && node.north()) rotationAngle = 270;
-            } else if (node.isLong()) {
-                img = node.light() ? imageCache.get("long_on") : imageCache.get("long_off");
-                rotationAngle = node.east() && node.west() ? 90 : 0;
-            } else {
-                img = imageCache.get("short_off");
-            }
-        }
-
-        ImageView imageView = new ImageView(img);
-        imageView.setFitWidth(cellSize);
-        imageView.setFitHeight(cellSize);
-        imageView.setRotate(rotationAngle);
-        imageView.setPreserveRatio(false);
-
-        gameGrid.getChildren().removeIf(child ->
-                child instanceof ImageView &&
-                        GridPane.getRowIndex(child) != null &&
-                        GridPane.getColumnIndex(child) != null &&
-                        GridPane.getRowIndex(child) == row &&
-                        GridPane.getColumnIndex(child) == col
-        );
-        imageView.setOnMouseClicked(event -> handleCellClick(node));
-
-        if (connectorView != null) {
-            connectorView.setOnMouseClicked(event -> handleCellClick(node));
-            gameGrid.add(connectorView, col, row);
-        }
-        gameGrid.add(imageView, col, row);
-    }
-
     // Rotate the clicked node by 90 degrees and refresh the game board to reflect the change
     private void handleCellClick(GameNode node) {
         stepsTaken++;
@@ -296,7 +178,9 @@ public class GameBoardController {
         node.turn();
         for (int r = 0; r < boardSize; r++) {
             for (int c = 0; c < boardSize; c++) {
-                fillCell(r, c);
+                //fillCell(r, c);
+                GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick);
+
             }
         }
         if (game.checkWin()){
@@ -341,9 +225,54 @@ public class GameBoardController {
 
     @FXML
     private void useHint() {
-        if (hintsUsed < 2) {
-            hintsUsed++;
-            updateHintsDisplay();
+        if (hintsStage == null || !hintsStage.isShowing()) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/hints.fxml"));
+                Parent root = loader.load();
+
+                hintsController = loader.getController();
+                hintsController.init(game);
+                hintsController.reloadHints(game);
+
+                hintsStage = new Stage();
+                hintsStage.setTitle("Hints");
+                hintsStage.setScene(new Scene(root, 600, 600));
+                hintsStage.setResizable(false);
+
+                Stage mainStage = (Stage) gameGrid.getScene().getWindow();
+                double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
+                double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
+
+                AtomicReference<Double> totalWidth = new AtomicReference<>((double) 800 + 600 + 10);
+                AtomicReference<Double> startX = new AtomicReference<>((screenWidth - totalWidth.get()) / 2.0);
+                AtomicReference<Double> centerY = new AtomicReference<>((screenHeight - mainStage.getHeight()) / 2.0);
+
+                mainStage.setX(startX.get());
+                mainStage.setY(centerY.get());
+                hintsStage.setX(startX.get() + 800 + 10);
+                hintsStage.setY(centerY.get());
+
+                hintsStage.setOnCloseRequest(e -> {
+                    hintsStage = null;
+                    hintsController = null;
+                    totalWidth.set((double) (800 + 10));
+                    startX.set((screenWidth - totalWidth.get()) / 2.0);
+                    centerY.set((screenHeight - mainStage.getHeight()) / 2.0);
+
+                    mainStage.setX(startX.get());
+                    mainStage.setY(centerY.get());
+                });
+
+                hintsStage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void reloadHint() {
+        if (hintsController != null && hintsStage != null && hintsStage.isShowing()) {
+            hintsController.reloadHints(game);
         }
     }
 
