@@ -56,6 +56,10 @@ public class GameBoardController {
     private static final String LONG_ON_IMAGE = "/images/connectors_on/long.png";
     private static final String SHORT_ON_IMAGE = "/images/connectors_on/short.png";
 
+    private static final String HINT1_IMAGE = "/images/hint/hint1.png";
+    private static final String HINT2_IMAGE = "/images/hint/hint2.png";
+    private static final String HINT3_IMAGE = "/images/hint/hint3.png";
+
     // Game state
     private int boardSize = 5;
     private int cellSize;
@@ -127,6 +131,10 @@ public class GameBoardController {
             imageCache.put("corner_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CORNER_ON_IMAGE))));
             imageCache.put("long_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(LONG_ON_IMAGE))));
             imageCache.put("short_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(SHORT_ON_IMAGE))));
+
+            imageCache.put("hint1", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HINT1_IMAGE))));
+            imageCache.put("hint2", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HINT2_IMAGE))));
+            imageCache.put("hint3", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HINT3_IMAGE))));
         } catch (NullPointerException e) {
             System.err.println("Error loading images: " + e.getMessage());
         }
