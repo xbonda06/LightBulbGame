@@ -10,6 +10,11 @@ public class GameNode extends AbstractObservableField {
     private final Position position;
     private boolean[] connectors;
 
+    private int correctRotation = 0;  // How many times the node needs to be rotated to reach the solved position
+
+    private int currentRotation = 0;  // How many times the node has been rotated
+
+
     public GameNode(Position position) {
         this.position = position;
         this.connectors = new boolean[]{false, false, false, false};
@@ -37,12 +42,28 @@ public class GameNode extends AbstractObservableField {
         }
     }
 
+    public void setCorrectRotation(int turns) {
+        this.correctRotation = turns % 4;
+    }
+
+    public void resetCurrentRotation() {
+        this.currentRotation = 0;
+    }
+
+    /// Returns the number of turns needed to reach the correct rotation
+    public int getHint() {
+        return (4 - (currentRotation - correctRotation + 4) % 4) % 4;
+    }
+
     public void turn() {
         boolean[] rotated = new boolean[4];
         for (int i = 0; i < 4; i++) {
             rotated[(i + 3) % 4] = connectors[i];
         }
         this.connectors = rotated;
+
+        currentRotation = (currentRotation + 1) % 4;
+
         notifyObservers();
     }
 
