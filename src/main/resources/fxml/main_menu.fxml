@@ -22,31 +22,31 @@
             </font>
         </Label>
 
-        <Button fx:id="easyButton" onAction="#handleEasy" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Easy">
+        <Button fx:id="easyButton" onAction="#handleDifficulty" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Easy">
             <font>
                 <Font size="21.0" />
             </font>
         </Button>
 
-        <Button fx:id="mediumButton" onAction="#handleMedium" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Medium">
+        <Button fx:id="mediumButton" onAction="#handleDifficulty" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Medium">
             <font>
                 <Font size="22.0" />
             </font>
         </Button>
 
-        <Button fx:id="hardButton" onAction="#handleHard" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Hard">
+        <Button fx:id="hardButton" onAction="#handleDifficulty" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Hard">
             <font>
                 <Font size="22.0" />
             </font>
         </Button>
 
-        <Button fx:id="multiplayerButton" onAction="#handleEasy" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Multiplayer">
+        <Button fx:id="multiplayerButton" onAction="#handleDifficulty" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Multiplayer">
             <font>
                 <Font size="22.0" />
             </font>
         </Button>
 
-        <Button fx:id="archiveButton" onAction="#handleEasy" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Archive">
+        <Button fx:id="archiveButton" onAction="#handleDifficulty" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Archive">
             <font>
                 <Font size="22.0" />
             </font>
