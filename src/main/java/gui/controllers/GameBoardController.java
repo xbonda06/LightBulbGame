@@ -135,7 +135,7 @@ public class GameBoardController {
 
     private void createGameBoard() {
         this.game = Game.generate(boardSize, boardSize);
-        //this.game.randomizeRotations();
+        this.game.randomizeRotations();
         //game.init();
 
         clearGameGrid();
@@ -171,11 +171,12 @@ public class GameBoardController {
             for (int col = 0; col < boardSize; col++) {
                 final int currentRow = row;
                 final int currentCol = col;
+                GameNode node = game.node(new Position(row + 1, col + 1));
 
                 Rectangle cell = new Rectangle(cellSize - 2, cellSize - 2);
                 cell.setFill(Color.web("#1D1033"));
                 cell.setStroke(Color.BLACK);
-                cell.setOnMouseClicked(event -> handleCellClick(currentRow, currentCol, cell));
+                cell.setOnMouseClicked(event -> handleCellClick(currentRow, currentCol, cell, node));
 
                 gameGrid.add(cell, col, row);
 
@@ -257,17 +258,32 @@ public class GameBoardController {
 
         GridPane.setHalignment(imageView, hAlign);
         GridPane.setValignment(imageView, vAlign);
+
+        gameGrid.getChildren().removeIf(child ->
+                child instanceof ImageView &&
+                        GridPane.getRowIndex(child) != null &&
+                        GridPane.getColumnIndex(child) != null &&
+                        GridPane.getRowIndex(child) == row &&
+                        GridPane.getColumnIndex(child) == col
+        );
+
         gameGrid.add(imageView, col, row);
     }
 
-    private void handleCellClick(int row, int col, Rectangle cell) {
+    private void handleCellClick(int row, int col, Rectangle cell, GameNode node) {
         selectedRow = row;
         selectedCol = col;
         stepsTaken++;
+        int cellSize = FIELD_SIZE / boardSize;
 
         updateStepsDisplay();
         updateButtonStates();
-        cell.setFill(cell.getFill() == Color.WHITE ? Color.LIGHTGRAY : Color.WHITE);
+        node.turn();
+        for (int r = 0; r < boardSize; r++) {
+            for (int c = 0; c < boardSize; c++) {
+                fillCell(r, c, cellSize);
+            }
+        }
     }
 
     private void setupButtonStates() {
