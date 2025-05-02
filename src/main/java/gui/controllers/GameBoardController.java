@@ -29,6 +29,7 @@ import java.util.Objects;
 public class GameBoardController {
     // Game constants
     private static final int FIELD_SIZE = 400;
+
     private static final String BULB_OFF_IMAGE = "/images/bulb_off.png";
     private static final String BULB_ON_IMAGE = "/images/bulb_on.png";
     private static final String POWER_1_IMAGE = "/images/power/power_1.png";
@@ -36,7 +37,6 @@ public class GameBoardController {
     private static final String POWER_2ud_IMAGE = "/images/power/power_2ud.png";
     private static final String POWER_3_IMAGE = "/images/power/power_3.png";
     private static final String POWER_4_IMAGE = "/images/power/power_4.png";
-
 
     private static final String CROSS_OFF_IMAGE = "/images/connectors_off/cross.png";
     private static final String HALF_CROSS_OFF_IMAGE = "/images/connectors_off/half_cross.png";
@@ -50,24 +50,22 @@ public class GameBoardController {
     private static final String LONG_ON_IMAGE = "/images/connectors_on/long.png";
     private static final String SHORT_ON_IMAGE = "/images/connectors_on/short.png";
 
-
     // Game state
     private int boardSize = 5;
-    private Stage primaryStage;
-    private Timeline gameTimer;
+    private int cellSize;
     private int secondsElapsed = 0;
     private int hintsUsed = 0;
     private int stepsTaken = 0;
     private final Map<String, Image> imageCache = new HashMap<>();
+    private Stage primaryStage;
+    private Timeline gameTimer;
+    private Game game;
 
     // UI components
     @FXML private GridPane gameGrid;
     @FXML private Label timerLabel;
     @FXML private Label stepsLabel;
     @FXML private Button hintButton;
-
-    private Game game;
-    private int cellSize;
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -79,11 +77,13 @@ public class GameBoardController {
         loadImages();
     }
 
+    // Sets size based on the selected game (passed from MainMenuController)
     public void setBoardSize(int size) {
         this.boardSize = size;
         resetGame();
     }
 
+    // Initializes a timer that updates the display every second to track elapsed game time.
     private void setupTimer() {
         gameTimer = new Timeline(
                 new KeyFrame(Duration.seconds(1), event -> {
@@ -94,6 +94,7 @@ public class GameBoardController {
         gameTimer.setCycleCount(Animation.INDEFINITE);
     }
 
+    // Load images to cache
     private void loadImages() {
         try {
             imageCache.put("bulb_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_OFF_IMAGE))));
@@ -121,12 +122,14 @@ public class GameBoardController {
         }
     }
 
+    // Start new game
     private void resetGame() {
         stopTimer();
         createGameBoard();
         startTimer();
     }
 
+    // Initialize a new game with a ready board and randomly rotated connectors
     private void createGameBoard() {
         this.game = Game.generate(boardSize, boardSize);
         this.game.randomizeRotations();
@@ -136,12 +139,14 @@ public class GameBoardController {
         createCells();
     }
 
+    // Delete game
     private void clearGameGrid() {
         gameGrid.getChildren().clear();
         gameGrid.getColumnConstraints().clear();
         gameGrid.getRowConstraints().clear();
     }
 
+    // Configure grid size and set fixed cell dimensions based on the board size
     private void setupGridConstraints() {
         int cellSize = FIELD_SIZE / boardSize;
         gameGrid.setMinSize(FIELD_SIZE, FIELD_SIZE);
@@ -156,6 +161,7 @@ public class GameBoardController {
         }
     }
 
+    // Create empty cells, set their appearance and click behavior, then fill it with images
     private void createCells() {
         this.cellSize = FIELD_SIZE / boardSize;
 
@@ -174,6 +180,8 @@ public class GameBoardController {
         }
     }
 
+    // Fill cells with images based on GameNode type
+    // Apply correct rotation for orientation
     private void fillCell(int row, int col) {
         GameNode node = game.node(new Position(row + 1, col + 1));
         double rotationAngle = 0;
@@ -275,6 +283,7 @@ public class GameBoardController {
         gameGrid.add(imageView, col, row);
     }
 
+    // Rotate the clicked node by 90 degrees and refresh the game board to reflect the change
     private void handleCellClick(GameNode node) {
         stepsTaken++;
         updateStepsDisplay();
@@ -305,6 +314,7 @@ public class GameBoardController {
         loadMainMenu();
     }
 
+    // Switch to the Main Menu scene
     private void loadMainMenu() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_menu.fxml"));
@@ -317,7 +327,6 @@ public class GameBoardController {
             System.err.println("Error loading main menu: " + e.getMessage());
         }
     }
-
 
     private void startTimer() {
         secondsElapsed = 0;
