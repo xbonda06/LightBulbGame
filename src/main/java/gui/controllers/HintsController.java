@@ -31,11 +31,12 @@ public class HintsController {
         showHints();
     }
 
-    public void reloadHints(Game game) {
+    public void reloadHints(Game game, int r, int c) {
         this.game = game;
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
-                GridHelper.fillCell(game, gameGrid, cellSize, imageCache, row, col, null);
+                boolean animate = (r == row && c == col); //for smooth rotation
+                GridHelper.fillCell(game, gameGrid, cellSize, imageCache, row, col, null, animate);
                 updateHint(row, col);
             }
         }

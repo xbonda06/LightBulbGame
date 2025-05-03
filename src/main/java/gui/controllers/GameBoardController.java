@@ -185,15 +185,18 @@ public class GameBoardController {
         stepsTaken++;
         updateStepsDisplay();
         node.turn();
+        int row = node.getPosition().getRow() - 1;
+        int col = node.getPosition().getCol() - 1;
         for (int r = 0; r < boardSize; r++) {
             for (int c = 0; c < boardSize; c++) {
-                //fillCell(r, c);
-                GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick);
+                boolean animate = (r == row && c == col); //for smooth rotation
+                GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
+                        animate);
 
             }
         }
         if (this.hints_on)
-            hintsController.reloadHints(game);
+            hintsController.reloadHints(game, row, col);
         if (game.checkWin()){
             gameWin();
         }

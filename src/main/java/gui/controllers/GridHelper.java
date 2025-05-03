@@ -3,11 +3,13 @@ package gui.controllers;
 import common.GameNode;
 import common.Position;
 import game.Game;
+import javafx.animation.RotateTransition;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -25,12 +27,12 @@ public class GridHelper {
                     cell.setOnMouseClicked(event -> clickHandler.accept(node));
 
                 grid.add(cell, col, row);
-                fillCell(game, grid, cellSize, imageCache, row, col, clickHandler);
+                fillCell(game, grid, cellSize, imageCache, row, col, clickHandler, false);
             }
         }
     }
 
-    public static void fillCell(Game game, GridPane grid, int cellSize, Map<String, Image> imageCache, int row, int col, Consumer<GameNode> clickHandler) {
+    public static void fillCell(Game game, GridPane grid, int cellSize, Map<String, Image> imageCache, int row, int col, Consumer<GameNode> clickHandler, boolean animate) {
         GameNode node = game.node(new Position(row + 1, col + 1));
         double rotationAngle = 0;
         ImageView connectorView = null;
@@ -116,9 +118,21 @@ public class GridHelper {
         ImageView imageView = new ImageView(img);
         imageView.setFitWidth(cellSize);
         imageView.setFitHeight(cellSize);
-        imageView.setRotate(rotationAngle);
-        imageView.setPreserveRatio(false);
 
+        // if this cell was clicked, smooth rotation
+        if (animate && !(node.isBulb() && node.light())) {
+            double previousRotation = (rotationAngle - 90 + 360) % 360;
+            RotateTransition rotate = new RotateTransition(Duration.millis(300), imageView);
+            rotate.setFromAngle(previousRotation);
+            rotate.setByAngle(90);
+            rotate.setCycleCount(1);
+            rotate.setAutoReverse(false);
+            rotate.play();
+        } else {
+            imageView.setRotate(rotationAngle);
+        }
+
+        imageView.setPreserveRatio(false);
         grid.getChildren().removeIf(child ->
                 child instanceof ImageView &&
                         GridPane.getRowIndex(child) != null &&
