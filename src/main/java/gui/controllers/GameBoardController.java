@@ -21,9 +21,10 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.stage.Modality;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.*;
 import javafx.util.Duration;
 import java.io.IOException;
 import java.util.HashMap;
@@ -70,6 +71,7 @@ public class GameBoardController {
     private Timeline gameTimer;
     private Game game;
     private boolean hints_on = false;
+    private boolean disableGame = false;
 
     private Stage hintsStage = null;
     private HintsController hintsController = null;
@@ -79,6 +81,7 @@ public class GameBoardController {
     @FXML private Label timerLabel;
     @FXML private Label stepsLabel;
     @FXML private Button hintButton;
+    @FXML public StackPane rootPane;
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -144,6 +147,7 @@ public class GameBoardController {
         stopTimer();
         createGameBoard();
         startTimer();
+        this.disableGame = false;
     }
 
     // Initialize a new game with a ready board and randomly rotated connectors
@@ -181,23 +185,24 @@ public class GameBoardController {
 
     // Rotate the clicked node by 90 degrees and refresh the game board to reflect the change
     private void handleCellClick(GameNode node) {
-        stepsTaken++;
-        updateStepsDisplay();
-        node.turn();
-        int row = node.getPosition().getRow() - 1;
-        int col = node.getPosition().getCol() - 1;
-        for (int r = 0; r < boardSize; r++) {
-            for (int c = 0; c < boardSize; c++) {
-                boolean animate = (r == row && c == col); //for smooth rotation
-                GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
-                        animate);
-
+        if(!disableGame){
+            stepsTaken++;
+            updateStepsDisplay();
+            node.turn();
+            int row = node.getPosition().getRow() - 1;
+            int col = node.getPosition().getCol() - 1;
+            for (int r = 0; r < boardSize; r++) {
+                for (int c = 0; c < boardSize; c++) {
+                    boolean animate = (r == row && c == col); //for smooth rotation
+                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
+                            animate);
+                }
             }
-        }
-        if (this.hints_on)
-            hintsController.reloadHints(game, row, col);
-        if (game.checkWin()){
-            gameWin();
+            if (this.hints_on)
+                hintsController.reloadHints(game, row, col);
+            if (game.checkWin()){
+                gameWin();
+            }
         }
     }
 
@@ -205,6 +210,7 @@ public class GameBoardController {
     private void gameWin() {
         stopTimer();
         closeHintsAndCenterMain();
+        this.disableGame = true;
         PauseTransition pause = new PauseTransition(Duration.millis(700));
         pause.setOnFinished(e -> showVictoryDialog());
         pause.play();
@@ -215,22 +221,31 @@ public class GameBoardController {
     // (resetting the game or returning to the main menu), and shows the dialog as a blocking window.
     private void showVictoryDialog() {
         try {
+            Rectangle overlay = new Rectangle(rootPane.getWidth(), rootPane.getHeight(), Color.rgb(0, 0, 0, 0.7));
+            overlay.widthProperty().bind(rootPane.widthProperty());
+            overlay.heightProperty().bind(rootPane.heightProperty());
+            rootPane.getChildren().add(overlay);
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/victory_dialog.fxml"));
             Parent root = loader.load();
 
             VictoryDialogController controller = loader.getController();
 
-            Stage dialogStage = new Stage();
+            Stage dialogStage = new Stage(StageStyle.UNDECORATED);
             controller.setDialogStage(dialogStage);
 
             controller.setOnYesAction(this::resetGame);
             controller.setOnNoAction(this::loadMainMenu);
 
             dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.initOwner(primaryStage);
             dialogStage.setScene(new Scene(root));
-            dialogStage.setTitle("You Win!");
             dialogStage.show();
+            double centerX = primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2;
+            double centerY = primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2;
+            dialogStage.setX(centerX);
+            dialogStage.setY(centerY);
+
+            dialogStage.setOnHidden(e -> rootPane.getChildren().remove(overlay));
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -361,12 +376,11 @@ public class GameBoardController {
         stageX.addListener((obs, oldVal, newVal) -> mainStage.setX(newVal.doubleValue()));
         stageY.addListener((obs, oldVal, newVal) -> mainStage.setY(newVal.doubleValue()));
 
-        Timeline moveMain = new Timeline(
+        return new Timeline(
                 new KeyFrame(Duration.millis(300),
                         new KeyValue(stageX, centerX),
                         new KeyValue(stageY, centerY)
                 )
         );
-        return moveMain;
     }
 }
