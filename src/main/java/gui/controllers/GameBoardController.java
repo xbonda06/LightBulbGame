@@ -8,10 +8,9 @@ package gui.controllers;
 
 import common.GameNode;
 import game.Game;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.PauseTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -261,14 +260,13 @@ public class GameBoardController {
                 AtomicReference<Double> startX = new AtomicReference<>((screenWidth - totalWidth.get()) / 2.0);
                 AtomicReference<Double> centerY = new AtomicReference<>((screenHeight - mainStage.getHeight()) / 2.0);
 
-                mainStage.setX(startX.get());
-                mainStage.setY(centerY.get());
+                Timeline moveMain = getTimeline(mainStage, startX.get(), centerY.get());
+                moveMain.play();
+
                 hintsStage.setX(startX.get() + 800 + 10);
                 hintsStage.setY(centerY.get());
-
-                hintsStage.setOnCloseRequest(e -> closeHintsAndCenterMain());
-
                 hintsStage.show();
+                hintsStage.setOnCloseRequest(e -> closeHintsAndCenterMain());
                 this.hints_on = true;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -351,7 +349,24 @@ public class GameBoardController {
         double centerX = (screenWidth - mainWidth) / 2.0;
         double centerY = (screenHeight - mainHeight) / 2.0;
 
-        mainStage.setX(centerX);
-        mainStage.setY(centerY);
+        //Smooth aligning 
+        Timeline moveMain = getTimeline(mainStage, centerX, centerY);
+        moveMain.play();
+    }
+
+    private static Timeline getTimeline(Stage mainStage, double centerX, double centerY) {
+        DoubleProperty stageX = new SimpleDoubleProperty(mainStage.getX());
+        DoubleProperty stageY = new SimpleDoubleProperty(mainStage.getY());
+
+        stageX.addListener((obs, oldVal, newVal) -> mainStage.setX(newVal.doubleValue()));
+        stageY.addListener((obs, oldVal, newVal) -> mainStage.setY(newVal.doubleValue()));
+
+        Timeline moveMain = new Timeline(
+                new KeyFrame(Duration.millis(300),
+                        new KeyValue(stageX, centerX),
+                        new KeyValue(stageY, centerY)
+                )
+        );
+        return moveMain;
     }
 }
