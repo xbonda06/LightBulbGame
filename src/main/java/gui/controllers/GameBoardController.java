@@ -389,7 +389,8 @@ public class GameBoardController {
 
     //TODO
     @FXML public void getUndo() {
-        boolean undo = game.undo();{
+        boolean undo = game.undo();
+        if (undo){
             int row = game.getLastTurnedNode().getRow() - 1;
             int col = game.getLastTurnedNode().getCol() - 1;
             for (int r = 0; r < boardSize; r++) {
