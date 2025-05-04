@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GameUndoRedoAdvancedTest {
+class GameUndoRedoTest {
 
     private Game g;
     private Stack<Position> undo;
