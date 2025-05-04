@@ -122,7 +122,7 @@ public class GridHelper {
         // if this cell was clicked, smooth rotation
         if (animate && !(node.isBulb() && node.light())) {
             double previousRotation = (rotationAngle - 90 + 360) % 360;
-            RotateTransition rotate = new RotateTransition(Duration.millis(300), imageView);
+            RotateTransition rotate = new RotateTransition(Duration.millis(220), imageView);
             rotate.setFromAngle(previousRotation);
             rotate.setByAngle(90);
             rotate.setCycleCount(1);
