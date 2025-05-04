@@ -237,7 +237,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
                 }
             }
 
-            if (bulbCount >= 1) {
+            if ((bulbCount >= 1 && game.cols() <= 4 && game.rows() <= 4) ||
+                (bulbCount >= 3 && game.cols() >= 5 && game.rows() >= 5)){
                 game.init();
                 game.clearHistory();
                 return game;
