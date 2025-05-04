@@ -1,4 +1,4 @@
-package logging;
+package json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -8,11 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 
-public class GameLogger {
+public class GameSerializer  {
     private final Path logFile;
     private final Gson gson;
 
-    public GameLogger(Path logFile) {
+    public GameSerializer (Path logFile) {
         this.logFile = logFile;
         this.gson = new GsonBuilder()
                 .setPrettyPrinting()
@@ -24,7 +24,7 @@ public class GameLogger {
         }
     }
 
-    public void log(game.Game game, int moveCount) {
+    public void serialize(game.Game game, int moveCount) {
         GameSnapshotDto snapshot = new GameSnapshotDto(game, moveCount, Instant.now());
         String json = gson.toJson(snapshot);
 

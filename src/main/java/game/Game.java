@@ -7,7 +7,8 @@ import ija.ija2024.tool.common.Observable;
 import ija.ija2024.tool.common.ToolEnvironment;
 import ija.ija2024.tool.common.ToolField;
 
-import logging.GameLogger;
+import json.GameSerializer;
+
 import java.nio.file.Paths;
 
 import java.util.*;
@@ -18,12 +19,13 @@ public class Game implements ToolEnvironment, Observable.Observer {
     private final int rows;
     private final int cols;
 
-    private final GameLogger logger;
+    private final GameSerializer serializer;
 
     private final GameNode[][] nodes;
     private boolean isPower = false;
 
     private int moveCount = 0;
+    private Position lastGetNode;
     private final Stack<Position> undoStack = new Stack<>();
     private final Stack<Position> redoStack = new Stack<>();
 
@@ -33,7 +35,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         this.rows = rows;
         this.cols = cols;
         this.nodes = new GameNode[rows][cols];
-        this.logger = new GameLogger(Paths.get("logs", gameId + ".json"));
+        this.serializer = new GameSerializer(Paths.get("logs", gameId + ".json"));
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
                 this.nodes[r - 1][c - 1] = new GameNode(new Position(r, c));
@@ -146,6 +148,17 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
+    public int rows() {
+        return this.rows;
+    }
+    public int cols() {
+        return this.cols;
+    }
+    public GameNode node(Position p) {
+        lastGetNode = p;
+        return this.nodes[p.getRow() - 1][p.getCol() - 1];
+    }
+
     public GameNode createBulbNode(Position p, Side s) {
         if (p.getRow() < 1 || p.getRow() > this.rows || p.getCol() < 1 || p.getCol() > this.cols) {
             return null;
@@ -200,6 +213,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         dfs(start.getPosition(), visited);
     }
     public static Game generate(String gameId, int rows, int cols) {
+    public static Game generate(int rows, int cols) {
         if (rows <= 0 || cols <= 0)
             throw new IllegalArgumentException("Invalid game size.");
 
@@ -334,22 +348,15 @@ public class Game implements ToolEnvironment, Observable.Observer {
     @Override
     public void update(Observable observable) {
         updatePowerPropagation();
+        undoStack.push(lastGetNode);
+        redoStack.clear();
+        moveCount++;
+        serializer.serialize(this, moveCount);
     }
 
     /*--------------------------------------------------*
      *  Undo / Redo support                             *
      *--------------------------------------------------*/
-    public void makeMove(Position p) {
-        // actually rotate the node
-        node(p).turn();
-        updatePowerPropagation();
-
-        // record the move
-        undoStack.push(p);
-        redoStack.clear();
-        moveCount++;
-        logger.log(this, moveCount);
-    }
 
     public boolean undo() {
         if (undoStack.isEmpty()) return false;
@@ -357,28 +364,27 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
         GameNode n = node(last);
         n.turnBack();
-        updatePowerPropagation();
 
-        // record for redo
         redoStack.push(last);
+        serializer.serialize(this, moveCount);
         return true;
     }
 
     public boolean redo() {
         if (redoStack.isEmpty()) return false;
         Position next = redoStack.pop();
-        // re‐apply the original single 90° turn
+
         GameNode n = node(next);
         n.turn();
-        updatePowerPropagation();
-        // push back onto undo
         undoStack.push(next);
+        serializer.serialize(this, moveCount);
         return true;
     }
 
-
-
-
-
+    public void clearHistory() {
+        undoStack.clear();
+        redoStack.clear();
+        moveCount = 0;
+    }
 
 }

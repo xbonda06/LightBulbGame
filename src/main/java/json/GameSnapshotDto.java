@@ -1,4 +1,4 @@
-package logging;
+package json;
 
 import game.Game;
 import common.GameNode;
