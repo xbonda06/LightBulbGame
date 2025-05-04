@@ -271,7 +271,6 @@ public class Game implements ToolEnvironment, Observable.Observer {
     }
 
     public void randomizeRotations() {
-        clearHistory();
         Random random = new Random();
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
@@ -283,6 +282,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
             }
         }
         moveCount = 0;
+        clearHistory();
     }
 
     // Checks whether all bulbs in the game are lit
