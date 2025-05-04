@@ -19,13 +19,15 @@ public class Game implements ToolEnvironment, Observable.Observer {
     private final int rows;
     private final int cols;
 
+    private boolean suppressRecording = false;
+
     private final GameSerializer serializer;
 
     private final GameNode[][] nodes;
     private boolean isPower = false;
 
     private int moveCount = 0;
-    private Position lastGetNode;
+    private Position lastTurnedNode;
     private final Stack<Position> undoStack = new Stack<>();
     private final Stack<Position> redoStack = new Stack<>();
 
@@ -44,10 +46,14 @@ public class Game implements ToolEnvironment, Observable.Observer {
     }
 
     public static Game create(int rows, int cols) {
+
         if (rows <= 0 || cols <= 0) {
             throw new IllegalArgumentException("Invalid game size.");
         }
-        return new Game(rows, cols);
+        //return new Game(rows, cols);
+        Game g = new Game(rows, cols);
+        g.clearHistory();
+        return g;
     }
 
     public void init() {
@@ -134,8 +140,16 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return this.cols;
     }
     public GameNode node(Position p) {
-        lastGetNode = p;
         return this.nodes[p.getRow() - 1][p.getCol() - 1];
+    }
+
+    // Is called in GameBoardController when click before turn
+    public void setLastTurnedNode(Position p){
+        lastTurnedNode = p;
+    }
+
+    public Position getLastTurnedNode(){
+        return lastTurnedNode;
     }
 
     public GameNode createBulbNode(Position p, Side s) {
@@ -209,7 +223,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         game.generateFullConnections(powerPos);
 
         game.init();
-
+        game.clearHistory();
         return game;
     }
 
@@ -257,6 +271,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
     }
 
     public void randomizeRotations() {
+        clearHistory();
         Random random = new Random();
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
@@ -330,10 +345,20 @@ public class Game implements ToolEnvironment, Observable.Observer {
     @Override
     public void update(Observable observable) {
         updatePowerPropagation();
-        undoStack.push(lastGetNode);
-        redoStack.clear();
-        moveCount++;
-        serializer.serialize(this, moveCount);
+
+        if (!suppressRecording && observable instanceof GameNode changed) {
+            Position pos = changed.getPosition();
+            if (undoStack.isEmpty() || !undoStack.peek().equals(pos)) {
+                undoStack.push(pos);
+            }
+            lastTurnedNode = pos;
+        }
+
+        if (!suppressRecording) {
+            redoStack.clear();
+            moveCount++;
+            serializer.serialize(this, moveCount);
+        }
     }
 
     /*--------------------------------------------------*
@@ -345,10 +370,17 @@ public class Game implements ToolEnvironment, Observable.Observer {
         Position last = undoStack.pop();
 
         GameNode n = node(last);
-        n.turnBack();
 
+        suppressRecording = true;
+        n.turnBack();
+        suppressRecording = false;
+
+        lastTurnedNode = last;
         redoStack.push(last);
         serializer.serialize(this, moveCount);
+
+        //System.out.println("UNDO → undo=" + formatStack(undoStack)
+                //+ ", redo=" + formatStack(redoStack));
         return true;
     }
 
@@ -357,10 +389,33 @@ public class Game implements ToolEnvironment, Observable.Observer {
         Position next = redoStack.pop();
 
         GameNode n = node(next);
+
+        suppressRecording = true;
         n.turn();
+        suppressRecording = false;
+
+        lastTurnedNode = next;
         undoStack.push(next);
         serializer.serialize(this, moveCount);
+
+        //System.out.println("REDO → undo=" + formatStack(undoStack)
+                //+ ", redo=" + formatStack(redoStack));
         return true;
+    }
+
+    /** Helper to render a Position stack as “[(r1,c1),(r2,c2),…]” */
+    private String formatStack(Stack<Position> stack) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < stack.size(); i++) {
+            Position p = stack.get(i);
+            sb.append("(")
+                    .append(p.getRow()).append(",")
+                    .append(p.getCol())
+                    .append(")");
+            if (i < stack.size() - 1) sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     public void clearHistory() {
