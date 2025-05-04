@@ -44,6 +44,10 @@ public class GameNode extends AbstractObservableField {
         }
     }
 
+    public void deleteConnector(Side side) {
+        this.connectors[side.ordinal()] = false;
+    }
+
     public void setCorrectRotation(int turns) {
         this.correctRotation = turns % 4;
     }

@@ -210,7 +210,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
         // Set power to random position
         Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
-        game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
+        GameNode power = game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
+        validatePowerConnections(power, ++rows, ++cols);
 
         for (Side side : Side.values()) {
             Position neighbor = game.neighbor(powerPos, side);
@@ -225,6 +226,19 @@ public class Game implements ToolEnvironment, Observable.Observer {
         game.init();
         game.clearHistory();
         return game;
+    }
+
+    private static void validatePowerConnections(GameNode node, int rows, int cols) {
+        int row = node.getPosition().getRow();
+        int col = node.getPosition().getCol();
+        if (row == 1 && node.containsConnector(Side.NORTH))
+            node.deleteConnector(Side.NORTH);
+        else if (row == rows && node.containsConnector(Side.SOUTH))
+            node.deleteConnector(Side.SOUTH);
+        else if (col == 1 && node.containsConnector(Side.WEST))
+            node.deleteConnector(Side.WEST);
+        else if (col == cols && node.containsConnector(Side.EAST))
+            node.deleteConnector(Side.EAST);
     }
 
     private void generateFullConnections(Position start) {
