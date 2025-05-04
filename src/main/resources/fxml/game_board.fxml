@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane style="-fx-background-color: #1D1033;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.GameBoardController">
+<StackPane fx:id="rootPane" style="-fx-background-color: #1D1033;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.GameBoardController">
 
   <fx:include source="background_pane.fxml" />
 
@@ -25,8 +25,14 @@
          <GridPane fx:id="gameGrid" gridLinesVisible="true" maxHeight="400" maxWidth="400" minHeight="400" minWidth="400" prefHeight="400" prefWidth="400" />
 
         <VBox alignment="CENTER" spacing="20" style="-fx-padding: 10;">
-          <Button fx:id="hintButton" onAction="#useHint" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="HINT 0/2" />
-          <Button onAction="#resetBoard" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="RESET" />
+          <Button fx:id="hintButton" onAction="#useHint" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="HINT" />
+          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+            <Button fx:id="undoButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#getUndo"
+                    prefHeight="122.0" styleClass="buttonUndoRedo" stylesheets="@../css/styles.css" text="&lt;"/>
+            <Button fx:id="redoButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#getRedo"
+                    styleClass="buttonUndoRedo" stylesheets="@../css/styles.css" text="&gt;"/>
+          </HBox>
+               <Button layoutX="20.0" layoutY="319.0" onAction="#resetBoard" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="NEW GAME" />
           <Button onAction="#toMainMenu" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="TO THE MAIN MENU" />
         </VBox>
       </HBox>

@@ -49,6 +49,58 @@ public class Game implements ToolEnvironment, Observable.Observer {
         propagateLight(powerNode);
     }
 
+    public int rows() {
+        return this.rows;
+    }
+    public int cols() {
+        return this.cols;
+    }
+    public GameNode node(Position p) {
+        return this.nodes[p.getRow() - 1][p.getCol() - 1];
+    }
+
+    public static Game generate(int rows, int cols) {
+        if (rows <= 0 || cols <= 0)
+            throw new IllegalArgumentException("Invalid game size.");
+
+        Game game = new Game(rows, cols);
+        Random random = new Random();
+
+        // Set power to random position
+        Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
+        game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
+
+        for (Side side : Side.values()) {
+            Position neighbor = game.neighbor(powerPos, side);
+            if (neighbor != null) {
+                game.connectNodes(powerPos, neighbor, side);
+            }
+        }
+
+        // Generate connection tree
+        game.generateFullConnections(powerPos);
+
+        game.init();
+
+        return game;
+    }
+
+    public void randomizeRotations() {
+        Random random = new Random();
+        for (int r = 1; r <= rows; r++) {
+            for (int c = 1; c <= cols; c++) {
+                Position pos = new Position(r, c);
+                GameNode node = node(pos);
+                int turns = random.nextInt(4);
+                for (int i = 0; i < turns; i++) {
+                    node.turn();
+                }
+                node.setCorrectRotation(turns);
+                node.resetCurrentRotation();
+            }
+        }
+    }
+
     // Checks whether all bulbs in the game are lit
     public boolean checkWin() {
         for (int r = 0; r < rows; r++) {
@@ -60,50 +112,6 @@ public class Game implements ToolEnvironment, Observable.Observer {
             }
         }
         return true;
-    }
-
-    private void propagateLight(GameNode start) {
-        boolean[][] visited = new boolean[rows][cols];
-        dfs(start.getPosition(), visited);
-    }
-
-    private void dfs(Position pos, boolean[][] visited) {
-        int r = pos.getRow() - 1;
-        int c = pos.getCol() - 1;
-
-        if (r < 0 || r >= rows || c < 0 || c >= cols || visited[r][c]) return;
-        GameNode node = nodes[r][c];
-        visited[r][c] = true;
-
-        node.setLit(true);
-
-        for (Side side : Side.values()) {
-            if (!node.containsConnector(side)) continue;
-
-            Position neighborPos = switch (side) {
-                case NORTH -> new Position(pos.getRow() - 1, pos.getCol());
-                case SOUTH -> new Position(pos.getRow() + 1, pos.getCol());
-                case EAST  -> new Position(pos.getRow(), pos.getCol() + 1);
-                case WEST  -> new Position(pos.getRow(), pos.getCol() - 1);
-            };
-
-            int nr = neighborPos.getRow() - 1;
-            int nc = neighborPos.getCol() - 1;
-
-            if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
-
-            GameNode neighbor = nodes[nr][nc];
-            Side opposite = switch (side) {
-                case NORTH -> Side.SOUTH;
-                case SOUTH -> Side.NORTH;
-                case EAST  -> Side.WEST;
-                case WEST  -> Side.EAST;
-            };
-
-            if (neighbor.containsConnector(opposite)) {
-                dfs(neighborPos, visited);
-            }
-        }
     }
 
     public void updatePowerPropagation() {
@@ -121,16 +129,6 @@ public class Game implements ToolEnvironment, Observable.Observer {
                 }
             }
         }
-    }
-
-    public int rows() {
-        return this.rows;
-    }
-    public int cols() {
-        return this.cols;
-    }
-    public GameNode node(Position p) {
-        return this.nodes[p.getRow() - 1][p.getCol() - 1];
     }
 
     public GameNode createBulbNode(Position p, Side s) {
@@ -182,30 +180,48 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return node;
     }
 
-    public static Game generate(int rows, int cols) {
-        if (rows <= 0 || cols <= 0)
-            throw new IllegalArgumentException("Invalid game size.");
+    private void propagateLight(GameNode start) {
+        boolean[][] visited = new boolean[rows][cols];
+        dfs(start.getPosition(), visited);
+    }
 
-        Game game = new Game(rows, cols);
-        Random random = new Random();
+    private void dfs(Position pos, boolean[][] visited) {
+        int r = pos.getRow() - 1;
+        int c = pos.getCol() - 1;
 
-        // Set power to random position
-        Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
-        game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
+        if (r < 0 || r >= rows || c < 0 || c >= cols || visited[r][c]) return;
+        GameNode node = nodes[r][c];
+        visited[r][c] = true;
+
+        node.setLit(true);
 
         for (Side side : Side.values()) {
-            Position neighbor = game.neighbor(powerPos, side);
-            if (neighbor != null) {
-                game.connectNodes(powerPos, neighbor, side);
+            if (!node.containsConnector(side)) continue;
+
+            Position neighborPos = switch (side) {
+                case NORTH -> new Position(pos.getRow() - 1, pos.getCol());
+                case SOUTH -> new Position(pos.getRow() + 1, pos.getCol());
+                case EAST  -> new Position(pos.getRow(), pos.getCol() + 1);
+                case WEST  -> new Position(pos.getRow(), pos.getCol() - 1);
+            };
+
+            int nr = neighborPos.getRow() - 1;
+            int nc = neighborPos.getCol() - 1;
+
+            if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+
+            GameNode neighbor = nodes[nr][nc];
+            Side opposite = switch (side) {
+                case NORTH -> Side.SOUTH;
+                case SOUTH -> Side.NORTH;
+                case EAST  -> Side.WEST;
+                case WEST  -> Side.EAST;
+            };
+
+            if (neighbor.containsConnector(opposite)) {
+                dfs(neighborPos, visited);
             }
         }
-
-        // Generate connection tree
-        game.generateFullConnections(powerPos);
-
-        game.init();
-
-        return game;
     }
 
     private void generateFullConnections(Position start) {
@@ -246,19 +262,6 @@ public class Game implements ToolEnvironment, Observable.Observer {
                     createBulbNode(p, sides.getFirst());
                 } else if (!node.isPower() && connectedSides(node).size() >= 2) {
                     createLinkNode(p, connectedSides(node).toArray(new Side[0]));
-                }
-            }
-        }
-    }
-
-    public void randomizeRotations() {
-        Random random = new Random();
-        for (int r = 1; r <= rows; r++) {
-            for (int c = 1; c <= cols; c++) {
-                GameNode node = node(new Position(r, c));
-                int turns = random.nextInt(4);
-                for (int t = 0; t < turns; t++) {
-                    node.turn();
                 }
             }
         }
