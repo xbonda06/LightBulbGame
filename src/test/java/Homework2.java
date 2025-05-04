@@ -56,7 +56,7 @@ public class Homework2 {
      */
     public static void main(String... args) {
         
-        Game game = Game.create(String.valueOf(10), 12, 12);
+        Game game = Game.create(12, 12);
 
         for (Object[] n : def) {
             String type = (String)n[0];

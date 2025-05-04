@@ -15,7 +15,7 @@ public class GameGenerationAdvancedTests {
 
     @Test
     public void testNoDuplicatePowerNodes() {
-        Game game = Game.generate("default", 6, 6);
+        Game game = Game.generate( 6, 6);
         game.init();
         game.init();
 
@@ -32,7 +32,7 @@ public class GameGenerationAdvancedTests {
 
     @Test
     public void testEachNodeHasCorrectConnections() {
-        Game game = Game.generate("default", 6, 6);
+        Game game = Game.generate(6, 6);
 
         for (int r = 1; r <= game.rows(); r++) {
             for (int c = 1; c <= game.cols(); c++) {
@@ -58,7 +58,7 @@ public class GameGenerationAdvancedTests {
 
     @Test
     public void testPowerReachableFromEveryNode() {
-        Game game = Game.generate("default", 5, 5);
+        Game game = Game.generate(5, 5);
 
         Position powerPos = findPowerPosition(game);
         assertNotNull(powerPos, "Power node must exist.");
@@ -74,7 +74,7 @@ public class GameGenerationAdvancedTests {
 
     @Test
     public void testRandomizeRotationsDoesNotChangeConnectionsCount() {
-        Game game = Game.generate("default", 5, 5);
+        Game game = Game.generate( 5, 5);
 
         int[][] originalConnections = new int[game.rows()][game.cols()];
         for (int r = 1; r <= game.rows(); r++) {

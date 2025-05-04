@@ -24,14 +24,12 @@ class GameLoggerTest {
     @Test
     void loggerShouldWriteSnapshotsAfterEachMove() throws IOException {
         // 1) Create a new game with our test ID
-        Game game = Game.create(GAME_ID, 4, 4);
+        Game game = Game.create(4, 4);
 
         // 2) Perform a few moves and commit each one
         game.createLinkNode(new Position(1, 1), Side.NORTH, Side.EAST);
-        game.commitMove();
 
         game.createLinkNode(new Position(2, 2), Side.SOUTH, Side.WEST);
-        game.commitMove();
 
         // 3) Verify the log file was created
         assertTrue(Files.exists(LOG_PATH), "Log file should exist: " + LOG_PATH);

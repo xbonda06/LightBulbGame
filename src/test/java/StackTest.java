@@ -34,9 +34,8 @@ class GameUndoRedoTest {
 
     @Test
     void undoRedoRestoresBoard() {
-        Game g = Game.generate("default", 3, 3);
+        Game g = Game.generate(3, 3);
         g.randomizeRotations();
-        g.commitMove();                  // snapshot #1
 
         Position rot = null;
         outer:
@@ -52,7 +51,6 @@ class GameUndoRedoTest {
         assertNotNull(rot, "No rotatable cell found");
 
         g.node(rot).turn();
-        g.commitMove();                  // snapshot #2
 
         String afterMove = dump(g);
 
@@ -80,9 +78,8 @@ class GameUndoRedoTest {
 
     @Test
     void undoAllThenRedoAll() {
-        Game g = Game.generate("default", 4, 4);
+        Game g = Game.generate(4, 4);
         g.randomizeRotations();
-        g.commitMove();                           // snapshot0
 
         java.util.List<String> snap = new java.util.ArrayList<>();
         snap.add(dump(g));                        // 0
@@ -93,7 +90,6 @@ class GameUndoRedoTest {
             Position p = firstRotatable(g, used);
             used.add(p);
             g.node(p).turn();
-            g.commitMove();
             snap.add(dump(g));                    // 1,2,3
         }
 
@@ -136,21 +132,19 @@ class GameUndoRedoTest {
 
     @Test
     void snapshotOnUndoStackMatchesRecorded() throws Exception {
-        Game g = Game.generate("default", 3, 3);
+        Game g = Game.generate(3, 3);
         g.randomizeRotations();
-        g.commitMove();                       // snapshot0
         String snapshot0 = dump(g);
 
         Position p = firstRotatable(g, java.util.Set.of());
         g.node(p).turn();
-        g.commitMove();
 
         assertTrue(g.undo());
         assertEquals(snapshot0, dump(g));
 
         var fUndo = Game.class.getDeclaredField("undoStack");
         fUndo.setAccessible(true);
-        @SuppressWarnings("unchecked")
+
         java.util.Stack<?> undo = (java.util.Stack<?>) fUndo.get(g);
 
         Object state = undo.peek();
@@ -187,18 +181,15 @@ class GameUndoRedoTest {
 
     @Test
     void printStackStates() throws Exception {
-        Game g = Game.generate("default", 3, 3);
+        Game g = Game.generate(3, 3);
         g.randomizeRotations();
-        g.commitMove();   // snapshot0
 
         var fUndo = Game.class.getDeclaredField("undoStack");
         var fRedo = Game.class.getDeclaredField("redoStack");
         fUndo.setAccessible(true);
         fRedo.setAccessible(true);
 
-        @SuppressWarnings("unchecked")
         java.util.Stack<?> undo = (java.util.Stack<?>) fUndo.get(g);
-        @SuppressWarnings("unchecked")
         java.util.Stack<?> redo = (java.util.Stack<?>) fRedo.get(g);
 
         var topSnapshot = (java.util.function.Function<Object,String>) state -> {
@@ -218,7 +209,6 @@ class GameUndoRedoTest {
 
         Position p = firstRotatable(g, java.util.Set.of());
         g.node(p).turn();
-        g.commitMove();
 
         System.out.println("\n=== After move & commit ===");
         System.out.printf("undo size=%d, redo size=%d%n", undo.size(), redo.size());
