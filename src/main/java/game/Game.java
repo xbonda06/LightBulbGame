@@ -7,18 +7,35 @@ import ija.ija2024.tool.common.Observable;
 import ija.ija2024.tool.common.ToolEnvironment;
 import ija.ija2024.tool.common.ToolField;
 
+import json.GameSerializer;
+
+import java.nio.file.Paths;
+
 import java.util.*;
 
 public class Game implements ToolEnvironment, Observable.Observer {
+    private static long nextId = 1;
+    private final long gameId;
     private final int rows;
     private final int cols;
+
+    private final GameSerializer serializer;
+
     private final GameNode[][] nodes;
     private boolean isPower = false;
 
+    private int moveCount = 0;
+    private Position lastGetNode;
+    private final Stack<Position> undoStack = new Stack<>();
+    private final Stack<Position> redoStack = new Stack<>();
+
+
     private Game(int rows, int cols) {
+        this.gameId = nextId++;
         this.rows = rows;
         this.cols = cols;
         this.nodes = new GameNode[rows][cols];
+        this.serializer = new GameSerializer(Paths.get("logs", gameId + ".json"));
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
                 this.nodes[r - 1][c - 1] = new GameNode(new Position(r, c));
@@ -49,69 +66,48 @@ public class Game implements ToolEnvironment, Observable.Observer {
         propagateLight(powerNode);
     }
 
-    public int rows() {
-        return this.rows;
-    }
-    public int cols() {
-        return this.cols;
-    }
-    public GameNode node(Position p) {
-        return this.nodes[p.getRow() - 1][p.getCol() - 1];
+    private void propagateLight(GameNode start) {
+        boolean[][] visited = new boolean[rows][cols];
+        dfs(start.getPosition(), visited);
     }
 
-    public static Game generate(int rows, int cols) {
-        if (rows <= 0 || cols <= 0)
-            throw new IllegalArgumentException("Invalid game size.");
+    private void dfs(Position pos, boolean[][] visited) {
+        int r = pos.getRow() - 1;
+        int c = pos.getCol() - 1;
 
-        Game game = new Game(rows, cols);
-        Random random = new Random();
+        if (r < 0 || r >= rows || c < 0 || c >= cols || visited[r][c]) return;
+        GameNode node = nodes[r][c];
+        visited[r][c] = true;
 
-        // Set power to random position
-        Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
-        game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
+        node.setLit(true);
 
         for (Side side : Side.values()) {
-            Position neighbor = game.neighbor(powerPos, side);
-            if (neighbor != null) {
-                game.connectNodes(powerPos, neighbor, side);
+            if (!node.containsConnector(side)) continue;
+
+            Position neighborPos = switch (side) {
+                case NORTH -> new Position(pos.getRow() - 1, pos.getCol());
+                case SOUTH -> new Position(pos.getRow() + 1, pos.getCol());
+                case EAST  -> new Position(pos.getRow(), pos.getCol() + 1);
+                case WEST  -> new Position(pos.getRow(), pos.getCol() - 1);
+            };
+
+            int nr = neighborPos.getRow() - 1;
+            int nc = neighborPos.getCol() - 1;
+
+            if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+
+            GameNode neighbor = nodes[nr][nc];
+            Side opposite = switch (side) {
+                case NORTH -> Side.SOUTH;
+                case SOUTH -> Side.NORTH;
+                case EAST  -> Side.WEST;
+                case WEST  -> Side.EAST;
+            };
+
+            if (neighbor.containsConnector(opposite)) {
+                dfs(neighborPos, visited);
             }
         }
-
-        // Generate connection tree
-        game.generateFullConnections(powerPos);
-
-        game.init();
-
-        return game;
-    }
-
-    public void randomizeRotations() {
-        Random random = new Random();
-        for (int r = 1; r <= rows; r++) {
-            for (int c = 1; c <= cols; c++) {
-                Position pos = new Position(r, c);
-                GameNode node = node(pos);
-                int turns = random.nextInt(4);
-                for (int i = 0; i < turns; i++) {
-                    node.turn();
-                }
-                node.setCorrectRotation(turns);
-                node.resetCurrentRotation();
-            }
-        }
-    }
-
-    // Checks whether all bulbs in the game are lit
-    public boolean checkWin() {
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                GameNode node = nodes[r][c];
-                if (node.isBulb() && !node.light()) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     public void updatePowerPropagation() {
@@ -129,6 +125,17 @@ public class Game implements ToolEnvironment, Observable.Observer {
                 }
             }
         }
+    }
+
+    public int rows() {
+        return this.rows;
+    }
+    public int cols() {
+        return this.cols;
+    }
+    public GameNode node(Position p) {
+        lastGetNode = p;
+        return this.nodes[p.getRow() - 1][p.getCol() - 1];
     }
 
     public GameNode createBulbNode(Position p, Side s) {
@@ -180,48 +187,30 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return node;
     }
 
-    private void propagateLight(GameNode start) {
-        boolean[][] visited = new boolean[rows][cols];
-        dfs(start.getPosition(), visited);
-    }
+    public static Game generate(int rows, int cols) {
+        if (rows <= 0 || cols <= 0)
+            throw new IllegalArgumentException("Invalid game size.");
 
-    private void dfs(Position pos, boolean[][] visited) {
-        int r = pos.getRow() - 1;
-        int c = pos.getCol() - 1;
+        Game game = new Game(rows, cols);
+        Random random = new Random();
 
-        if (r < 0 || r >= rows || c < 0 || c >= cols || visited[r][c]) return;
-        GameNode node = nodes[r][c];
-        visited[r][c] = true;
-
-        node.setLit(true);
+        // Set power to random position
+        Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
+        game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
 
         for (Side side : Side.values()) {
-            if (!node.containsConnector(side)) continue;
-
-            Position neighborPos = switch (side) {
-                case NORTH -> new Position(pos.getRow() - 1, pos.getCol());
-                case SOUTH -> new Position(pos.getRow() + 1, pos.getCol());
-                case EAST  -> new Position(pos.getRow(), pos.getCol() + 1);
-                case WEST  -> new Position(pos.getRow(), pos.getCol() - 1);
-            };
-
-            int nr = neighborPos.getRow() - 1;
-            int nc = neighborPos.getCol() - 1;
-
-            if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
-
-            GameNode neighbor = nodes[nr][nc];
-            Side opposite = switch (side) {
-                case NORTH -> Side.SOUTH;
-                case SOUTH -> Side.NORTH;
-                case EAST  -> Side.WEST;
-                case WEST  -> Side.EAST;
-            };
-
-            if (neighbor.containsConnector(opposite)) {
-                dfs(neighborPos, visited);
+            Position neighbor = game.neighbor(powerPos, side);
+            if (neighbor != null) {
+                game.connectNodes(powerPos, neighbor, side);
             }
         }
+
+        // Generate connection tree
+        game.generateFullConnections(powerPos);
+
+        game.init();
+
+        return game;
     }
 
     private void generateFullConnections(Position start) {
@@ -267,6 +256,33 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
+    public void randomizeRotations() {
+        Random random = new Random();
+        for (int r = 1; r <= rows; r++) {
+            for (int c = 1; c <= cols; c++) {
+                GameNode node = node(new Position(r, c));
+                int turns = random.nextInt(4);
+                for (int t = 0; t < turns; t++) {
+                    node.turn();
+                }
+            }
+        }
+        moveCount = 0;
+    }
+
+    // Checks whether all bulbs in the game are lit
+    public boolean checkWin() {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                GameNode node = nodes[r][c];
+                if (node.isBulb() && !node.light()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private Position neighbor(Position p, Side side) {
         int r = p.getRow(), c = p.getCol();
         return switch (side) {
@@ -302,6 +318,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return sides;
     }
 
+
     @Override
     public ToolField fieldAt(int i, int i1) {
         if (i < 0 || i >= this.rows || i1 < 0 || i1 >= this.cols) {
@@ -313,5 +330,43 @@ public class Game implements ToolEnvironment, Observable.Observer {
     @Override
     public void update(Observable observable) {
         updatePowerPropagation();
+        undoStack.push(lastGetNode);
+        redoStack.clear();
+        moveCount++;
+        serializer.serialize(this, moveCount);
     }
+
+    /*--------------------------------------------------*
+     *  Undo / Redo support                             *
+     *--------------------------------------------------*/
+
+    public boolean undo() {
+        if (undoStack.isEmpty()) return false;
+        Position last = undoStack.pop();
+
+        GameNode n = node(last);
+        n.turnBack();
+
+        redoStack.push(last);
+        serializer.serialize(this, moveCount);
+        return true;
+    }
+
+    public boolean redo() {
+        if (redoStack.isEmpty()) return false;
+        Position next = redoStack.pop();
+
+        GameNode n = node(next);
+        n.turn();
+        undoStack.push(next);
+        serializer.serialize(this, moveCount);
+        return true;
+    }
+
+    public void clearHistory() {
+        undoStack.clear();
+        redoStack.clear();
+        moveCount = 0;
+    }
+
 }
