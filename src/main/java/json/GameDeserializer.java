@@ -29,7 +29,7 @@ public class GameDeserializer {
             for (NodeState ns : state.nodes) {
                 Position p = new Position(ns.row, ns.col);
 
-                if(!(ns.isLink && ns.isBulb && ns.isPower))
+                if(!(ns.isLink || ns.isBulb || ns.isPower))
                     throw new MalformedJsonException("ERROR: Node cannot be empty");
 
                 Side[] sides = ns.connectors.stream()
