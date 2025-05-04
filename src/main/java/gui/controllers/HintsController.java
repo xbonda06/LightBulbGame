@@ -36,7 +36,7 @@ public class HintsController {
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
                 boolean animate = (r == row && c == col); //for smooth rotation
-                GridHelper.fillCell(game, gameGrid, cellSize, imageCache, row, col, null, animate);
+                GridHelper.fillCell(game, gameGrid, cellSize, imageCache, row, col, null, animate, false);
                 updateHint(row, col);
             }
         }
