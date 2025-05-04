@@ -205,27 +205,48 @@ public class Game implements ToolEnvironment, Observable.Observer {
         if (rows <= 0 || cols <= 0)
             throw new IllegalArgumentException("Invalid game size.");
 
-        Game game = new Game(rows, cols);
-        Random random = new Random();
+        final int maxAttempts = 10;
+        int attempt = 0;
 
-        // Set power to random position
-        Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
-        GameNode power = game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
-        validatePowerConnections(power, ++rows, ++cols);
+        while (attempt < maxAttempts) {
+            Game game = new Game(rows, cols);
+            Random random = new Random();
 
-        for (Side side : Side.values()) {
-            Position neighbor = game.neighbor(powerPos, side);
-            if (neighbor != null) {
-                game.connectNodes(powerPos, neighbor, side);
+            // Set power to random position
+            Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
+            GameNode power = game.createPowerNode(powerPos, Side.NORTH);
+            validatePowerConnections(power, rows + 1, cols + 1);
+
+            for (Side side : Side.values()) {
+                Position neighbor = game.neighbor(powerPos, side);
+                if (neighbor != null) {
+                    game.connectNodes(powerPos, neighbor, side);
+                }
             }
+
+            // Generate tree of connections and fill the grid
+            game.generateFullConnections(powerPos);
+
+            // Count number of bulbs
+            int bulbCount = 0;
+            for (int r = 1; r <= rows; r++) {
+                for (int c = 1; c <= cols; c++) {
+                    if (game.node(new Position(r, c)).isBulb()) {
+                        bulbCount++;
+                    }
+                }
+            }
+
+            if (bulbCount >= 1) {
+                game.init();
+                game.clearHistory();
+                return game;
+            }
+
+            attempt++;
         }
 
-        // Generate connection tree
-        game.generateFullConnections(powerPos);
-
-        game.init();
-        game.clearHistory();
-        return game;
+        throw new IllegalStateException("Unable to generate valid game with at least one bulb after " + maxAttempts + " attempts.");
     }
 
     private static void validatePowerConnections(GameNode node, int rows, int cols) {
