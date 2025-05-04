@@ -57,9 +57,20 @@ public class GameNode extends AbstractObservableField {
     }
 
     /// Returns the number of turns needed to reach the correct rotation
+    /** Returns how many clockwise turns are needed to return to the solved position. */
     public int getHint() {
-        return (4 - (currentRotation - correctRotation + 4) % 4) % 4;
+        int delta = (4 + currentRotation - correctRotation) % 4;
+
+        if (isCross()) {
+            return 0; // No orientation matters
+        }
+        if (isLong()) {
+            return (delta % 2 == 0) ? 0 : 1; // I-shape has 180° symmetry
+        }
+        // For corner (L-shape) or half-cross (T-shape)
+        return (4 - delta) % 4;
     }
+
 
     public void turn() {
         boolean[] rotated = new boolean[4];
