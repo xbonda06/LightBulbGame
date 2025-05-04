@@ -1,6 +1,8 @@
 package common;
 
 import ija.ija2024.tool.common.AbstractObservableField;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameNode extends AbstractObservableField {
     private boolean bulb;
@@ -42,6 +44,10 @@ public class GameNode extends AbstractObservableField {
         }
     }
 
+    public void deleteConnector(Side side) {
+        this.connectors[side.ordinal()] = false;
+    }
+
     public void setCorrectRotation(int turns) {
         this.correctRotation = turns % 4;
     }
@@ -51,9 +57,20 @@ public class GameNode extends AbstractObservableField {
     }
 
     /// Returns the number of turns needed to reach the correct rotation
+    /** Returns how many clockwise turns are needed to return to the solved position. */
     public int getHint() {
-        return (4 - (currentRotation - correctRotation + 4) % 4) % 4;
+        int delta = (4 + currentRotation - correctRotation) % 4;
+
+        if (isCross()) {
+            return 0; // No orientation matters
+        }
+        if (isLong()) {
+            return (delta % 2 == 0) ? 0 : 1; // I-shape has 180° symmetry
+        }
+        // For corner (L-shape) or half-cross (T-shape)
+        return (4 - delta) % 4;
     }
+
 
     public void turn() {
         boolean[] rotated = new boolean[4];
@@ -66,6 +83,16 @@ public class GameNode extends AbstractObservableField {
 
         notifyObservers();
     }
+
+    public void turnBack() {
+        boolean[] rotated = new boolean[4];
+        for (int i = 0; i < 4; i++) {
+            rotated[(i + 1) % 4] = connectors[i];
+        }
+        this.connectors = rotated;
+        notifyObservers();
+    }
+
 
     public void setLit(boolean lit) {
         this.lit = lit;
@@ -103,6 +130,17 @@ public class GameNode extends AbstractObservableField {
     public Position getPosition() {return this.position;}
     public boolean containsConnector(Side side) {return this.connectors[side.ordinal()];}
 
+    /** Returns a list of sides that have connectors on this node. */
+    public List<Side> getConnectors() {
+        List<Side> list = new ArrayList<>();
+        for (Side s : Side.values()) {
+            if (this.containsConnector(s)) {
+                list.add(s);
+            }
+        }
+        return list;
+    }
+
     @Override
     public String toString() {
         String type;
@@ -123,5 +161,22 @@ public class GameNode extends AbstractObservableField {
         }
 
         return "{" + type + "[" + position.getRow() + "@" + position.getCol() + "][" + connectorsStr + "]}";
+    }
+
+    public GameNode copy() {
+        GameNode clone = new GameNode(
+                new Position(getPosition().getRow(),
+                        getPosition().getCol()));
+        if (isPower()) {
+            clone.setPower(getConnectors().toArray(new Side[0]));
+        } else if (isBulb()) {
+            clone.setBulb(getConnectors().getFirst());
+        } else if (!getConnectors().isEmpty()) {
+            clone.setLink(getConnectors().toArray(new Side[0]));
+        }
+
+        clone.setLit(light());
+
+        return clone;
     }
 }

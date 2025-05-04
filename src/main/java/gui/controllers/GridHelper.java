@@ -27,12 +27,12 @@ public class GridHelper {
                     cell.setOnMouseClicked(event -> clickHandler.accept(node));
 
                 grid.add(cell, col, row);
-                fillCell(game, grid, cellSize, imageCache, row, col, clickHandler, false);
+                fillCell(game, grid, cellSize, imageCache, row, col, clickHandler, false, false);
             }
         }
     }
 
-    public static void fillCell(Game game, GridPane grid, int cellSize, Map<String, Image> imageCache, int row, int col, Consumer<GameNode> clickHandler, boolean animate) {
+    public static void fillCell(Game game, GridPane grid, int cellSize, Map<String, Image> imageCache, int row, int col, Consumer<GameNode> clickHandler, boolean animate, boolean isUndo) {
         GameNode node = game.node(new Position(row + 1, col + 1));
         double rotationAngle = 0;
         ImageView connectorView = null;
@@ -121,10 +121,11 @@ public class GridHelper {
 
         // if this cell was clicked, smooth rotation
         if (animate && !(node.isBulb() && node.light())) {
-            double previousRotation = (rotationAngle - 90 + 360) % 360;
+            double previousRotation = isUndo ? (rotationAngle + 90 + 360) % 360 : (rotationAngle - 90) % 360;
             RotateTransition rotate = new RotateTransition(Duration.millis(220), imageView);
             rotate.setFromAngle(previousRotation);
-            rotate.setByAngle(90);
+            double rotation = isUndo ? -90 : 90;
+            rotate.setByAngle(rotation);
             rotate.setCycleCount(1);
             rotate.setAutoReverse(false);
             rotate.play();
