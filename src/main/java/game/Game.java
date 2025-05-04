@@ -384,7 +384,6 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
         if (!suppressRecording && observable instanceof GameNode changed) {
             Position pos = changed.getPosition();
-            // record every turn, even if it's the same cell
             undoStack.push(pos);
             lastTurnedNode = pos;
         }
@@ -414,8 +413,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
         redoStack.push(last);
         serializer.serialize(this, moveCount);
 
-        System.out.println("UNDO → undo=" + formatStack(undoStack)
-                + ", redo=" + formatStack(redoStack));
+        //System.out.println("UNDO → undo=" + formatStack(undoStack)
+                //+ ", redo=" + formatStack(redoStack));
         return true;
     }
 
@@ -433,8 +432,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
         undoStack.push(next);
         serializer.serialize(this, moveCount);
 
-        System.out.println("REDO → undo=" + formatStack(undoStack)
-                + ", redo=" + formatStack(redoStack));
+        //System.out.println("REDO → undo=" + formatStack(undoStack)
+                //+ ", redo=" + formatStack(redoStack));
         return true;
     }
 
