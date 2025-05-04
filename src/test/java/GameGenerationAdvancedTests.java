@@ -15,7 +15,8 @@ public class GameGenerationAdvancedTests {
 
     @Test
     public void testNoDuplicatePowerNodes() {
-        Game game = Game.generate("default", 6, 6);
+        // Check that even after generation and several init calls there is no second power source
+        Game game = Game.generate(6, 6);
         game.init();
         game.init();
 
@@ -32,7 +33,8 @@ public class GameGenerationAdvancedTests {
 
     @Test
     public void testEachNodeHasCorrectConnections() {
-        Game game = Game.generate("default", 6, 6);
+        // Check that connections between neighbors are correct
+        Game game = Game.generate(6, 6);
 
         for (int r = 1; r <= game.rows(); r++) {
             for (int c = 1; c <= game.cols(); c++) {
@@ -58,7 +60,7 @@ public class GameGenerationAdvancedTests {
 
     @Test
     public void testPowerReachableFromEveryNode() {
-        Game game = Game.generate("default", 5, 5);
+        Game game = Game.generate(5, 5);
 
         Position powerPos = findPowerPosition(game);
         assertNotNull(powerPos, "Power node must exist.");
@@ -74,7 +76,7 @@ public class GameGenerationAdvancedTests {
 
     @Test
     public void testRandomizeRotationsDoesNotChangeConnectionsCount() {
-        Game game = Game.generate("default", 5, 5);
+        Game game = Game.generate(5, 5);
 
         int[][] originalConnections = new int[game.rows()][game.cols()];
         for (int r = 1; r <= game.rows(); r++) {
@@ -87,13 +89,13 @@ public class GameGenerationAdvancedTests {
 
         for (int r = 1; r <= game.rows(); r++) {
             for (int c = 1; c <= game.cols(); c++) {
-                assertEquals(originalConnections[r-1][c-1],
-                        countConnections(game.node(new Position(r, c))),
+                assertEquals(originalConnections[r-1][c-1], countConnections(game.node(new Position(r, c))),
                         "Number of connections at (" + r + "," + c + ") must not change after rotation.");
             }
         }
     }
 
+    // Helper methods
     private int countConnections(GameNode node) {
         int count = 0;
         for (Side side : Side.values()) {
@@ -162,4 +164,5 @@ public class GameGenerationAdvancedTests {
 
         return false;
     }
+
 }
