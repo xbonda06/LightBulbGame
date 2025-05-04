@@ -82,6 +82,8 @@ public class GameBoardController {
     @FXML private Label stepsLabel;
     @FXML private Button hintButton;
     @FXML public StackPane rootPane;
+    @FXML public Button undoButton;
+    @FXML public Button redoButton;
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -188,6 +190,7 @@ public class GameBoardController {
         if(!disableGame){
             stepsTaken++;
             updateStepsDisplay();
+            game.setLastTurnedNode(node.getPosition());
             node.turn();
             int row = node.getPosition().getRow() - 1;
             int col = node.getPosition().getCol() - 1;
@@ -195,7 +198,7 @@ public class GameBoardController {
                 for (int c = 0; c < boardSize; c++) {
                     boolean animate = (r == row && c == col); //for smooth rotation
                     GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
-                            animate);
+                            animate, false);
                 }
             }
             if (this.hints_on)
@@ -382,5 +385,36 @@ public class GameBoardController {
                         new KeyValue(stageY, centerY)
                 )
         );
+    }
+
+    //TODO
+    @FXML public void getUndo() {
+        boolean undo = game.undo();
+        if (undo){
+            int row = game.getLastTurnedNode().getRow() - 1;
+            int col = game.getLastTurnedNode().getCol() - 1;
+            for (int r = 0; r < boardSize; r++) {
+                for (int c = 0; c < boardSize; c++) {
+                    boolean animation = r == row && c == col;
+                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
+                            animation, true);
+                }
+            }
+        }
+    }
+
+    @FXML public void getRedo() {
+        boolean redo = game.redo();
+        if(redo) {
+            int row = game.getLastTurnedNode().getRow() - 1;
+            int col = game.getLastTurnedNode().getCol() - 1;
+            for (int r = 0; r < boardSize; r++) {
+                for (int c = 0; c < boardSize; c++) {
+                    boolean animation = r == row && c == col;
+                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
+                            animation, false);
+                }
+            }
+        }
     }
 }
