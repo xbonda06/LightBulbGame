@@ -82,6 +82,8 @@ public class GameBoardController {
     @FXML private Label stepsLabel;
     @FXML private Button hintButton;
     @FXML public StackPane rootPane;
+    @FXML public Button undoButton;
+    @FXML public Button redoButton;
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -382,5 +384,12 @@ public class GameBoardController {
                         new KeyValue(stageY, centerY)
                 )
         );
+    }
+
+    //TODO
+    @FXML public void getUndo() {
+    }
+
+    @FXML public void getRedo() {
     }
 }
