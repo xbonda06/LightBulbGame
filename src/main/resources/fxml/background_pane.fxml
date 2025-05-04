@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.RadialGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.shape.Circle?>
+
+<Pane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <Circle centerX="100" centerY="100" layoutX="-36.0" layoutY="90.0" radius="50">
+        <fill>
+            <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
+                <stops>
+                    <Stop>
+                        <color>
+                            <Color red="0.9868420958518982" green="0.6094663739204407" blue="0.17817983031272888" />
+                        </color>
+                    </Stop>
+                    <Stop offset="1.0">
+                        <color>
+                            <Color red="1.0" green="0.9861666560173035" blue="0.17000000178813934" opacity="0.0" />
+                        </color>
+                    </Stop>
+                </stops>
+            </RadialGradient>
+        </fill></Circle>
+    <Circle centerX="500" centerY="150" layoutX="89.0" layoutY="364.0" radius="55.0">
+        <fill>
+            <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
+                <stops>
+                    <Stop>
+                        <color>
+                            <Color red="0.21296297013759613" green="0.6195987462997437" blue="1.0" />
+                        </color>
+                    </Stop>
+                    <Stop offset="1.0">
+                        <color>
+                            <Color red="1.0" green="0.9861666560173035" blue="0.17000000178813934" opacity="0.0" />
+                        </color>
+                    </Stop>
+                </stops>
+            </RadialGradient>
+        </fill></Circle>
+    <Circle centerX="300" centerY="200" layoutX="-174.0" layoutY="287.0" radius="62.0">
+        <fill>
+            <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
+                <stops>
+                    <Stop>
+                        <color>
+                            <Color red="0.32153183221817017" green="0.8157894611358643" blue="0.24549220502376556" />
+                        </color>
+                    </Stop>
+                    <Stop offset="1.0">
+                        <color>
+                            <Color red="1.0" green="0.9861666560173035" blue="0.17000000178813934" opacity="0.0" />
+                        </color>
+                    </Stop>
+                </stops>
+            </RadialGradient>
+        </fill>
+    </Circle>
+    <Circle centerX="500" centerY="150" layoutX="188.0" layoutY="-50.0" radius="62.0">
+        <fill>
+            <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
+                <stops>
+                    <Stop>
+                        <color>
+                            <Color red="1.0" green="0.08796296268701553" blue="0.9239969253540039" />
+                        </color>
+                    </Stop>
+                    <Stop offset="1.0">
+                        <color>
+                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.0" />
+                        </color>
+                    </Stop>
+                </stops>
+            </RadialGradient>
+        </fill>
+    </Circle>
+</Pane>
