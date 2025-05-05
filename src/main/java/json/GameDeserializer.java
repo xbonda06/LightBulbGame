@@ -48,6 +48,7 @@ public class GameDeserializer {
         }
 
         goToStep(0);
+        game.loadHistory(snapshot.undoHistory, snapshot.redoHistory);
     }
 
     public Game getGame() {

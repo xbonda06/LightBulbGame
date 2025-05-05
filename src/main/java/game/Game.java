@@ -37,7 +37,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         this.rows = rows;
         this.cols = cols;
         this.nodes = new GameNode[rows][cols];
-        this.serializer = new GameSerializer(Paths.get("logs", gameId + ".json"));
+        this.serializer = new GameSerializer();
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
                 this.nodes[r - 1][c - 1] = new GameNode(new Position(r, c));
@@ -456,6 +456,15 @@ public class Game implements ToolEnvironment, Observable.Observer {
         undoStack.clear();
         redoStack.clear();
         moveCount = 0;
+    }
+
+    public void loadHistory(List<Position> undoHistory, List<Position> redoHistory) {
+        undoStack.clear();
+        redoStack.clear();
+        undoStack.addAll(undoHistory);
+        for (int i = redoHistory.size() - 1; i >= 0; i--) {
+            redoStack.push(redoHistory.get(i));
+        }
     }
 
 }

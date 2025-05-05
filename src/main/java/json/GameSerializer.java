@@ -3,15 +3,13 @@ package json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import common.Position;
-import game.Game;
 import common.GameNode;
+import game.Game;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +17,6 @@ import java.util.Stack;
 
 public class GameSerializer {
     private static final Path DATA_DIRECTORY = Paths.get("data");
-    private static int globalNextId = -1;
 
     private final Path logFile;
     private final Gson gson;
@@ -27,34 +24,41 @@ public class GameSerializer {
     private List<NodeDto> initialNodes;
     private boolean initialCaptured = false;
 
-    public GameSerializer(Path ignored) {
+    public GameSerializer() {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             Files.createDirectories(DATA_DIRECTORY);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not create data directory", e);
         }
         int id = allocateNextId();
         this.logFile = DATA_DIRECTORY.resolve(id + ".json");
     }
 
-    private synchronized int allocateNextId() {
-        if (globalNextId < 0) {
-            try {
-                globalNextId = Files.list(DATA_DIRECTORY)
-                        .map(Path::getFileName)
-                        .map(Path::toString)
-                        .filter(n -> n.endsWith(".json"))
-                        .map(n -> n.substring(0, n.length() - 5))  // strip ".json"
-                        .filter(s -> s.matches("\\d+"))
-                        .mapToInt(Integer::parseInt)
-                        .max()
-                        .orElse(0);
-            } catch (IOException e) {
-                globalNextId = 0;
+    private int allocateNextId() {
+        try {
+            List<Integer> ids = Files.list(DATA_DIRECTORY)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .filter(n -> n.endsWith(".json"))
+                    .map(n -> n.substring(0, n.length() - 5))
+                    .filter(s -> s.matches("\\d+"))
+                    .map(Integer::valueOf)
+                    .sorted()
+                    .toList();
+
+            int next = 1;
+            for (int id : ids) {
+                if (id == next) {
+                    next++;
+                } else if (id > next) {
+                    break;
+                }
             }
+            return next;
+        } catch (IOException e) {
+            return 1;
         }
-        return ++globalNextId;
     }
 
     public void serialize(Game game, int moveCount) {
@@ -100,7 +104,7 @@ public class GameSerializer {
         try {
             Field f = Game.class.getDeclaredField(fieldName);
             f.setAccessible(true);
-            Stack<Position> st = (Stack<Position>)f.get(game);
+            Stack<Position> st = (Stack<Position>) f.get(game);
             return new ArrayList<>(st);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -119,19 +123,22 @@ public class GameSerializer {
     }
 
     private static class SnapshotWithHistory {
-        int moveNumber; long timestamp; int rows, cols;
+        int moveNumber;
+        long timestamp;
+        int rows, cols;
         List<NodeDto> initialNodes;
         List<Position> undoHistory, redoHistory;
         SnapshotWithHistory(int mn, long ts, int r, int c,
                             List<NodeDto> init,
                             List<Position> undo,
                             List<Position> redo) {
-            this.moveNumber = mn;
-            this.timestamp = ts;
-            this.rows = r; this.cols = c;
+            this.moveNumber   = mn;
+            this.timestamp    = ts;
+            this.rows         = r;
+            this.cols         = c;
             this.initialNodes = init;
-            this.undoHistory = undo;
-            this.redoHistory = redo;
+            this.undoHistory  = undo;
+            this.redoHistory  = redo;
         }
     }
 }
