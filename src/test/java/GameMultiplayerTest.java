@@ -50,4 +50,89 @@ public class GameMultiplayerTest {
         Position last = client2.getGame().getLastTurnedNode();
         assertEquals(move, last, "Client2 should have received the move from client1.");
     }
+
+    @Test
+    public void testAllClientsGetSameGame() throws Exception {
+        int port = 8889;
+        int difficulty = 7;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient client1 = new GameClient("localhost", port);
+        GameClient client2 = new GameClient("localhost", port);
+
+        client1.start();
+        client2.start();
+
+        Thread.sleep(1000);
+
+        Game g1 = client1.getGame();
+        Game g2 = client2.getGame();
+
+        assertNotNull(g1);
+        assertNotNull(g2);
+
+        for (int r = 1; r <= g1.rows(); r++) {
+            for (int c = 1; c <= g1.cols(); c++) {
+                assertEquals(g1.node(new Position(r, c)).getConnectors(),
+                        g2.node(new Position(r, c)).getConnectors(),
+                        "Mismatch at (" + r + "," + c + ")");
+            }
+        }
+    }
+
+    @Test
+    public void testMoveDoesNotAffectSenderTwice() throws Exception {
+        int port = 8890;
+        int difficulty = 7;
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient client = new GameClient("localhost", port);
+        client.start();
+        Thread.sleep(1000);
+
+        Game g = client.getGame();
+        Position move = new Position(2, 2);
+        int before = g.node(move).getConnectors().hashCode();
+
+        client.sendTurn(move);
+        Thread.sleep(500);
+
+        int after = g.node(move).getConnectors().hashCode();
+        assertEquals(before, after, "Sender's node should not be turned again.");
+    }
+
+    @Test
+    public void testMultipleMovesSyncCorrectly() throws Exception {
+        int port = 8891;
+        int difficulty = 7;
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient c1 = new GameClient("localhost", port);
+        GameClient c2 = new GameClient("localhost", port);
+        GameClient c3 = new GameClient("localhost", port);
+
+        c1.start(); c2.start(); c3.start();
+        Thread.sleep(1500);
+
+        Position m1 = new Position(2, 2);
+        Position m2 = new Position(3, 3);
+
+        c1.sendTurn(m1);
+        Thread.sleep(1000);
+        c2.sendTurn(m2);
+        Thread.sleep(1000);
+
+        for (GameClient c : new GameClient[]{c1, c2, c3}) {
+            Position actual = c.getGame().getLastTurnedNode();
+            assertEquals(3, actual.getRow(), "Expected row = 3");
+            assertEquals(3, actual.getCol(), "Expected col = 3");
+        }
+
+    }
+
+
 }

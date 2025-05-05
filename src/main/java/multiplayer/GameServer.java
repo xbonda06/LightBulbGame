@@ -43,7 +43,7 @@ public class GameServer {
                 ClientHandler handler = new ClientHandler(clientSocket, playerId++);
                 clients.add(handler);
                 pool.execute(handler);
-                System.out.println(" SERVER: Player " + handler.playerId + " connected.");
+                System.out.println("SERVER: Player " + handler.playerId + " connected.");
             }
 
         } catch (IOException e) {
