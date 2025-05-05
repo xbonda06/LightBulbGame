@@ -3,19 +3,20 @@ package json;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.*;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class GameArchive {
 
-    private static final Path DATA_DIR = Paths.get("data");
-
     /**
-     * Returns a sorted list of all saved game IDs (the numeric prefix of each .json file).
+     * Returns a sorted list of all saved game IDs
+     * (the numeric prefixes of each .json file) from either
+     * the project’s top-level data/ directory or the test resources.
      */
     public static List<Integer> listSavedGameIds() {
+        Path dataDir = findDataDirectory();
         try {
-            return Files.list(DATA_DIR)
+            return Files.list(dataDir)
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .filter(n -> n.endsWith(".json"))
@@ -25,16 +26,13 @@ public class GameArchive {
                     .sorted()
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            throw new UncheckedIOException("Could not list saved games", e);
+            throw new UncheckedIOException("Could not list saved games in " + dataDir, e);
         }
     }
 
-    /**
-     * Loads the given game ID from disk into a GameDeserializer.
-     * Throws if the file does not exist or fails to parse.
-     */
+    /** Loads the given game ID from disk into a GameDeserializer. */
     public static GameDeserializer load(int gameId) {
-        Path file = DATA_DIR.resolve(gameId + ".json");
+        Path file = findDataDirectory().resolve(gameId + ".json");
         if (!Files.exists(file)) {
             throw new IllegalArgumentException("No save with id=" + gameId);
         }
@@ -45,11 +43,9 @@ public class GameArchive {
         }
     }
 
-    /**
-     * Deletes the saved-game file for the given ID.
-     */
+    /** Deletes the saved-game file for the given ID. */
     public static void delete(int gameId) {
-        Path file = DATA_DIR.resolve(gameId + ".json");
+        Path file = findDataDirectory().resolve(gameId + ".json");
         try {
             Files.deleteIfExists(file);
         } catch (IOException e) {
@@ -57,10 +53,25 @@ public class GameArchive {
         }
     }
 
+    private static Path findDataDirectory() {
+        Path top = Paths.get("data");
+        if (Files.isDirectory(top)) {
+            return top;
+        }
+        Path testRes = Paths.get("src", "test", "resources", "data");
+        if (Files.isDirectory(testRes)) {
+            return testRes;
+        }
+        throw new UncheckedIOException(new IOException(
+                "Neither data/ nor src/test/resources/data/ exists"
+        ));
+    }
+
     private static boolean isNumeric(String s) {
-        for (char c: s.toCharArray()) {
+        if (s.isEmpty()) return false;
+        for (char c : s.toCharArray()) {
             if (!Character.isDigit(c)) return false;
         }
-        return !s.isEmpty();
+        return true;
     }
 }

@@ -78,7 +78,6 @@ public class GameDeserializer {
             GameNode node = game.node(move);
             node.turn();
             game.updatePowerPropagation();
-            // record as "last turned" so getLastTurnedNode() works
             game.setLastTurnedNode(move);
         }
         currentStep = step;
