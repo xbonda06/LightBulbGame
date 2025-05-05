@@ -2,7 +2,6 @@ package json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import common.Position;
 import game.Game;
 import common.GameNode;
@@ -20,38 +19,50 @@ import java.util.Stack;
 
 public class GameSerializer {
     private static final Path DATA_DIRECTORY = Paths.get("data");
+    private static int globalNextId = -1;
 
     private final Path logFile;
     private final Gson gson;
 
-    // will hold the snapshot of nodes right after randomizeRotations()
     private List<NodeDto> initialNodes;
     private boolean initialCaptured = false;
 
-    public GameSerializer(Path originalLogFile) {
-        this.gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
-
+    public GameSerializer(Path ignored) {
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             Files.createDirectories(DATA_DIRECTORY);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create data directory", e);
+            throw new RuntimeException(e);
         }
+        int id = allocateNextId();
+        this.logFile = DATA_DIRECTORY.resolve(id + ".json");
+    }
 
-        this.logFile = DATA_DIRECTORY.resolve(originalLogFile.getFileName());
+    private synchronized int allocateNextId() {
+        if (globalNextId < 0) {
+            try {
+                globalNextId = Files.list(DATA_DIRECTORY)
+                        .map(Path::getFileName)
+                        .map(Path::toString)
+                        .filter(n -> n.endsWith(".json"))
+                        .map(n -> n.substring(0, n.length() - 5))  // strip ".json"
+                        .filter(s -> s.matches("\\d+"))
+                        .mapToInt(Integer::parseInt)
+                        .max()
+                        .orElse(0);
+            } catch (IOException e) {
+                globalNextId = 0;
+            }
+        }
+        return ++globalNextId;
     }
 
     public void serialize(Game game, int moveCount) {
-        if (moveCount == 0) {
-            return;
-        }
-
+        if (moveCount == 0) return;
         if (!initialCaptured) {
             initialNodes = captureNodes(game);
             initialCaptured = true;
         }
-
         List<Position> undoHistory = extractStack(game, "undoStack");
         List<Position> redoHistory = extractStack(game, "redoStack");
 
@@ -65,9 +76,9 @@ public class GameSerializer {
         );
 
         String json = gson.toJson(dto);
-        try (FileWriter writer = new FileWriter(logFile.toFile(), false)) {
-            writer.write(json);
-            writer.write(System.lineSeparator());
+        try (FileWriter w = new FileWriter(logFile.toFile(), false)) {
+            w.write(json);
+            w.write(System.lineSeparator());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,14 +88,8 @@ public class GameSerializer {
         List<NodeDto> list = new ArrayList<>();
         for (int r = 1; r <= game.rows(); r++) {
             for (int c = 1; c <= game.cols(); c++) {
-                GameNode node = game.node(new Position(r, c));
-                list.add(new NodeDto(
-                        r, c,
-                        node.isPower(),
-                        node.isBulb(),
-                        node.isLink(),
-                        node.getConnectors()
-                ));
+                GameNode n = game.node(new Position(r, c));
+                list.add(new NodeDto(r, c, n.isPower(), n.isBulb(), n.isLink(), n.getConnectors()));
             }
         }
         return list;
@@ -95,54 +100,38 @@ public class GameSerializer {
         try {
             Field f = Game.class.getDeclaredField(fieldName);
             f.setAccessible(true);
-            Stack<Position> stack = (Stack<Position>) f.get(game);
-            // return a shallow copy
-            return new ArrayList<>(stack);
+            Stack<Position> st = (Stack<Position>)f.get(game);
+            return new ArrayList<>(st);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to extract stack " + fieldName, e);
+            throw new RuntimeException(e);
         }
     }
 
-    /** DTO that represents one node for JSON. */
     private static class NodeDto {
         int row, col;
         boolean isPower, isBulb, isLink;
         List<common.Side> connectors;
-
-        NodeDto(int row, int col,
-                boolean isPower, boolean isBulb, boolean isLink,
-                List<common.Side> connectors) {
-            this.row = row;
-            this.col = col;
-            this.isPower = isPower;
-            this.isBulb = isBulb;
-            this.isLink = isLink;
-            this.connectors = connectors;
+        NodeDto(int row, int col, boolean p, boolean b, boolean l, List<common.Side> cn) {
+            this.row = row; this.col = col;
+            this.isPower = p; this.isBulb = b; this.isLink = l;
+            this.connectors = cn;
         }
     }
 
-    /** JSON payload for a snapshot with history. */
     private static class SnapshotWithHistory {
-        int moveNumber;
-        long timestamp;
-        int rows, cols;
+        int moveNumber; long timestamp; int rows, cols;
         List<NodeDto> initialNodes;
-        List<Position> undoHistory;
-        List<Position> redoHistory;
-
-        SnapshotWithHistory(int moveNumber,
-                            long timestamp,
-                            int rows, int cols,
-                            List<NodeDto> initialNodes,
-                            List<Position> undoHistory,
-                            List<Position> redoHistory) {
-            this.moveNumber    = moveNumber;
-            this.timestamp     = timestamp;
-            this.rows          = rows;
-            this.cols          = cols;
-            this.initialNodes  = initialNodes;
-            this.undoHistory   = undoHistory;
-            this.redoHistory   = redoHistory;
+        List<Position> undoHistory, redoHistory;
+        SnapshotWithHistory(int mn, long ts, int r, int c,
+                            List<NodeDto> init,
+                            List<Position> undo,
+                            List<Position> redo) {
+            this.moveNumber = mn;
+            this.timestamp = ts;
+            this.rows = r; this.cols = c;
+            this.initialNodes = init;
+            this.undoHistory = undo;
+            this.redoHistory = redo;
         }
     }
 }
