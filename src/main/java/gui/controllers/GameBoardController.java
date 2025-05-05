@@ -387,7 +387,6 @@ public class GameBoardController {
         );
     }
 
-    //TODO
     @FXML public void getUndo() {
         boolean undo = game.undo();
         if (undo){
