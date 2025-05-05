@@ -21,6 +21,8 @@ public class GameSerializer {
     private final Path logFile;
     private final Gson gson;
 
+    private String json;
+
     private List<NodeDto> initialNodes;
     private boolean initialCaptured = false;
 
@@ -79,13 +81,17 @@ public class GameSerializer {
                 redoHistory
         );
 
-        String json = gson.toJson(dto);
+        json = gson.toJson(dto);
         try (FileWriter w = new FileWriter(logFile.toFile(), false)) {
             w.write(json);
             w.write(System.lineSeparator());
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getJson() {
+        return json;
     }
 
     private List<NodeDto> captureNodes(Game game) {
