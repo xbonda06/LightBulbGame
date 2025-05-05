@@ -1,6 +1,8 @@
 package json;
 
 import common.Position;
+import game.Game;
+import json.GameDeserializer;    // <— import YOUR class
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -13,11 +15,10 @@ class GameDeserializerTest {
 
     @Test
     void testFullHistoryCombination() throws Exception {
-        Path json = Path.of("src", "test", "resources", "sample.json");
+        Path json = Path.of("src","test","resources","sample.json");
         GameDeserializer deser = new GameDeserializer(json);
 
         List<Position> full = deser.getFullHistory();
-        // print in (row,col) format
         System.out.println("Full history: " +
                 full.stream()
                         .map(p -> "(" + p.getRow() + "," + p.getCol() + ")")
@@ -40,5 +41,18 @@ class GameDeserializerTest {
         );
 
         assertEquals(expected, full);
+    }
+
+    @Test
+    void testGameStepNavigation() throws Exception {
+        Path json = Path.of("src","test","resources","sample.json");
+        GameDeserializer deser = new GameDeserializer(json);
+        Game game = deser.getGame();
+
+        assertEquals(0, deser.getCurrentStep());
+        assertTrue(deser.nextStep());
+        assertEquals(1, deser.getCurrentStep());
+        assertTrue(deser.previousStep());
+        assertEquals(0, deser.getCurrentStep());
     }
 }
