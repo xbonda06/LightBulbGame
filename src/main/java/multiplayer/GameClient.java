@@ -27,7 +27,10 @@ public class GameClient {
 
     private final Gson gson = new Gson();
 
+    // debug fields used for testing
     private final List<Position> receivedMoves = new ArrayList<>();
+    private final Map<Integer, Stack<Position>> opponentUndoStacks = new HashMap<>();
+    private final Map<Integer, Stack<Position>> opponentRedoStacks = new HashMap<>();
 
     public GameClient(String host, int port) {
         this.host = host;
@@ -55,7 +58,10 @@ public class GameClient {
                         ownGame = deserializeGame(gameJson);
                         for (int i = 1; i <= 4; i++) {
                             if (i != playerId) {
-                                opponentGames.put(i, deserializeGame(gameJson));
+                                Game g = deserializeGame(gameJson);
+                                opponentGames.put(i, g);
+                                opponentUndoStacks.put(i, new Stack<>());
+                                opponentRedoStacks.put(i, new Stack<>());
                             }
                         }
                         System.out.println("CLIENT: Connected as player " + playerId);
@@ -74,6 +80,45 @@ public class GameClient {
                                 g.node(pos).turn();
                                 g.setLastTurnedNode(pos);
                                 g.updatePowerPropagation();
+
+                                opponentUndoStacks.get(sender).push(pos);
+                                opponentRedoStacks.get(sender).clear();
+                            }
+                        }
+                    }
+
+                    case "undo" -> {
+                        int sender = obj.get("playerId").getAsInt();
+                        if (sender != playerId) {
+                            Stack<Position> undoStack = opponentUndoStacks.get(sender);
+                            Stack<Position> redoStack = opponentRedoStacks.get(sender);
+                            if (undoStack != null && !undoStack.isEmpty()) {
+                                Position pos = undoStack.pop();
+                                Game g = opponentGames.get(sender);
+                                if (g != null) {
+                                    g.node(pos).turnBack();
+                                    g.setLastTurnedNode(pos);
+                                    g.updatePowerPropagation();
+                                }
+                                redoStack.push(pos);
+                            }
+                        }
+                    }
+
+                    case "redo" -> {
+                        int sender = obj.get("playerId").getAsInt();
+                        if (sender != playerId) {
+                            Stack<Position> redoStack = opponentRedoStacks.get(sender);
+                            Stack<Position> undoStack = opponentUndoStacks.get(sender);
+                            if (redoStack != null && !redoStack.isEmpty()) {
+                                Position pos = redoStack.pop();
+                                Game g = opponentGames.get(sender);
+                                if (g != null) {
+                                    g.node(pos).turn();
+                                    g.setLastTurnedNode(pos);
+                                    g.updatePowerPropagation();
+                                }
+                                undoStack.push(pos);
                             }
                         }
                     }
@@ -105,6 +150,20 @@ public class GameClient {
         posJson.addProperty("col", pos.getCol());
         msg.add("position", posJson);
 
+        out.println(msg);
+    }
+
+    public void sendUndo() {
+        JsonObject msg = new JsonObject();
+        msg.addProperty("type", "undo");
+        msg.addProperty("playerId", playerId);
+        out.println(msg);
+    }
+
+    public void sendRedo() {
+        JsonObject msg = new JsonObject();
+        msg.addProperty("type", "redo");
+        msg.addProperty("playerId", playerId);
         out.println(msg);
     }
 
