@@ -1,7 +1,6 @@
 package gui.controllers;
 
 import game.Game;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,12 +26,18 @@ public class GameArchiveController {
     private int boardSize = 0;
     private Game game;
     private Stage primaryStage;
+    private int cellSize;
+
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
 
     public void loadGame(int gameId) {
         GameDeserializer deserializer = GameArchive.load(gameId);
         this.game = deserializer.getGame();
+        GridHelper.loadImages();
         this.boardSize = game.rows();
+        System.out.println(boardSize);
+        this.cellSize = 400 / boardSize;
+        GridHelper.createCells(game, gameGrid, cellSize, boardSize, null);
     }
 
     @FXML public void getUndo() {
@@ -46,8 +51,10 @@ public class GameArchiveController {
         Parent root = loader.load();
 
         GameBoardController controller = loader.getController();
+
         controller.setFromArchive(true);
         controller.setGame(game);
+
         controller.setBoardSize(boardSize);
         controller.setPrimaryStage(primaryStage);
 
