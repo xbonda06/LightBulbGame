@@ -38,11 +38,12 @@ public class GameBoardController {
     private int secondsElapsed = 0;
     private int hintsUsed = 0;
     private int stepsTaken = 0;
-    private Stage primaryStage;
+    Stage primaryStage;
     private Timeline gameTimer;
     private Game game;
     private boolean hints_on = false;
     private boolean disableGame = false;
+    private boolean fromArchive = false;
 
     private Stage hintsStage = null;
     private HintsController hintsController = null;
@@ -59,6 +60,7 @@ public class GameBoardController {
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
+    public void setFromArchive(boolean fromArchive) { this.fromArchive = fromArchive;}
 
     @FXML
     public void initialize() {
@@ -70,6 +72,10 @@ public class GameBoardController {
     public void setBoardSize(int size) {
         this.boardSize = size;
         resetGame();
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     // Initializes a timer that updates the display every second to track elapsed game time.
@@ -93,10 +99,12 @@ public class GameBoardController {
 
     // Initialize a new game with a ready board and randomly rotated connectors
     private void createGameBoard() {
-        this.game = Game.generate(boardSize, boardSize);
-        this.game.randomizeRotations();
+        if(!fromArchive) {
+            this.game = Game.generate(boardSize, boardSize);
+            this.game.randomizeRotations();
+        }
         this.cellSize = FIELD_SIZE / boardSize;
-
+        fromArchive = false;
         clearGameGrid();
         setupGridConstraints();
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick);
