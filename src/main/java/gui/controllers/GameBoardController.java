@@ -17,7 +17,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -27,38 +26,11 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.*;
 import javafx.util.Duration;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GameBoardController {
     // Game constants
     private static final int FIELD_SIZE = 400;
-
-    private static final String BULB_OFF_IMAGE = "/images/bulb_off.png";
-    private static final String BULB_ON_IMAGE = "/images/bulb_on.png";
-    private static final String POWER_1_IMAGE = "/images/power/power_1.png";
-    private static final String POWER_2_IMAGE = "/images/power/power_2.png";
-    private static final String POWER_2ud_IMAGE = "/images/power/power_2ud.png";
-    private static final String POWER_3_IMAGE = "/images/power/power_3.png";
-    private static final String POWER_4_IMAGE = "/images/power/power_4.png";
-
-    private static final String CROSS_OFF_IMAGE = "/images/connectors_off/cross.png";
-    private static final String HALF_CROSS_OFF_IMAGE = "/images/connectors_off/half_cross.png";
-    private static final String CORNER_OFF_IMAGE = "/images/connectors_off/corner.png";
-    private static final String LONG_OFF_IMAGE = "/images/connectors_off/long.png";
-    private static final String SHORT_OFF_IMAGE = "/images/connectors_off/short.png";
-
-    private static final String CROSS_ON_IMAGE = "/images/connectors_on/cross.png";
-    private static final String HALF_CROSS_ON_IMAGE = "/images/connectors_on/half_cross.png";
-    private static final String CORNER_ON_IMAGE = "/images/connectors_on/corner.png";
-    private static final String LONG_ON_IMAGE = "/images/connectors_on/long.png";
-    private static final String SHORT_ON_IMAGE = "/images/connectors_on/short.png";
-
-    private static final String HINT1_IMAGE = "/images/hint/hint1.png";
-    private static final String HINT2_IMAGE = "/images/hint/hint2.png";
-    private static final String HINT3_IMAGE = "/images/hint/hint3.png";
 
     // Game state
     private int boardSize = 5;
@@ -66,7 +38,6 @@ public class GameBoardController {
     private int secondsElapsed = 0;
     private int hintsUsed = 0;
     private int stepsTaken = 0;
-    private final Map<String, Image> imageCache = new HashMap<>();
     private Stage primaryStage;
     private Timeline gameTimer;
     private Game game;
@@ -92,7 +63,7 @@ public class GameBoardController {
     @FXML
     public void initialize() {
         setupTimer();
-        loadImages();
+        GridHelper.loadImages();
     }
 
     // Sets size based on the selected game (passed from MainMenuController)
@@ -112,38 +83,6 @@ public class GameBoardController {
         gameTimer.setCycleCount(Animation.INDEFINITE);
     }
 
-    // Load images to cache
-    private void loadImages() {
-        try {
-            imageCache.put("bulb_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_OFF_IMAGE))));
-            imageCache.put("bulb_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_ON_IMAGE))));
-
-            imageCache.put("power_1", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_1_IMAGE))));
-            imageCache.put("power_2", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_2_IMAGE))));
-            imageCache.put("power_2ud", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_2ud_IMAGE))));
-            imageCache.put("power_3", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_3_IMAGE))));
-            imageCache.put("power_4", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_4_IMAGE))));
-
-            imageCache.put("cross_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CROSS_OFF_IMAGE))));
-            imageCache.put("half_cross_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HALF_CROSS_OFF_IMAGE))));
-            imageCache.put("corner_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CORNER_OFF_IMAGE))));
-            imageCache.put("long_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(LONG_OFF_IMAGE))));
-            imageCache.put("short_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(SHORT_OFF_IMAGE))));
-
-            imageCache.put("cross_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CROSS_ON_IMAGE))));
-            imageCache.put("half_cross_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HALF_CROSS_ON_IMAGE))));
-            imageCache.put("corner_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CORNER_ON_IMAGE))));
-            imageCache.put("long_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(LONG_ON_IMAGE))));
-            imageCache.put("short_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(SHORT_ON_IMAGE))));
-
-            imageCache.put("hint1", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HINT1_IMAGE))));
-            imageCache.put("hint2", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HINT2_IMAGE))));
-            imageCache.put("hint3", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HINT3_IMAGE))));
-        } catch (NullPointerException e) {
-            System.err.println("Error loading images: " + e.getMessage());
-        }
-    }
-
     // Start new game
     private void resetGame() {
         stopTimer();
@@ -160,7 +99,7 @@ public class GameBoardController {
 
         clearGameGrid();
         setupGridConstraints();
-        GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick, imageCache);
+        GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick);
     }
 
     // Delete game
@@ -197,7 +136,7 @@ public class GameBoardController {
             for (int r = 0; r < boardSize; r++) {
                 for (int c = 0; c < boardSize; c++) {
                     boolean animate = (r == row && c == col); //for smooth rotation
-                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
+                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
                             animate, false);
                 }
             }
@@ -263,7 +202,7 @@ public class GameBoardController {
                 Parent root = loader.load();
 
                 hintsController = loader.getController();
-                hintsController.init(game, cellSize, boardSize, imageCache);
+                hintsController.init(game, cellSize, boardSize);
 
                 hintsStage = new Stage();
                 hintsStage.setTitle("Hints");
@@ -379,10 +318,10 @@ public class GameBoardController {
     }
 
     @FXML public void getUndo() {
-        GridHelper.undo(game, boardSize, gameGrid, cellSize, imageCache, this::handleCellClick);
+        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick);
     }
 
     @FXML public void getRedo() {
-        GridHelper.redo(game, boardSize, gameGrid, cellSize, imageCache, this::handleCellClick);
+        GridHelper.redo(game, boardSize, gameGrid, cellSize, this::handleCellClick);
     }
 }

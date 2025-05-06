@@ -16,11 +16,74 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class GridHelper {
-    public static void createCells(Game game, GridPane grid, int cellSize, int boardSize, Consumer<GameNode> clickHandler, Map<String, Image> imageCache) {
+    public static final Map<String, Image> imageCache = new HashMap<>();
+
+    private static final String BULB_OFF_IMAGE = "/images/bulb_off.png";
+    private static final String BULB_ON_IMAGE = "/images/bulb_on.png";
+    private static final String POWER_1_IMAGE = "/images/power/power_1.png";
+    private static final String POWER_2_IMAGE = "/images/power/power_2.png";
+    private static final String POWER_2ud_IMAGE = "/images/power/power_2ud.png";
+    private static final String POWER_3_IMAGE = "/images/power/power_3.png";
+    private static final String POWER_4_IMAGE = "/images/power/power_4.png";
+
+    private static final String CROSS_OFF_IMAGE = "/images/connectors_off/cross.png";
+    private static final String HALF_CROSS_OFF_IMAGE = "/images/connectors_off/half_cross.png";
+    private static final String CORNER_OFF_IMAGE = "/images/connectors_off/corner.png";
+    private static final String LONG_OFF_IMAGE = "/images/connectors_off/long.png";
+    private static final String SHORT_OFF_IMAGE = "/images/connectors_off/short.png";
+
+    private static final String CROSS_ON_IMAGE = "/images/connectors_on/cross.png";
+    private static final String HALF_CROSS_ON_IMAGE = "/images/connectors_on/half_cross.png";
+    private static final String CORNER_ON_IMAGE = "/images/connectors_on/corner.png";
+    private static final String LONG_ON_IMAGE = "/images/connectors_on/long.png";
+    private static final String SHORT_ON_IMAGE = "/images/connectors_on/short.png";
+
+    private static final String HINT1_IMAGE = "/images/hint/hint1.png";
+    private static final String HINT2_IMAGE = "/images/hint/hint2.png";
+    private static final String HINT3_IMAGE = "/images/hint/hint3.png";
+
+    public static void loadImages() {
+        try {
+            imageCache.put("bulb_off", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(BULB_OFF_IMAGE))));
+            imageCache.put("bulb_on", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(BULB_ON_IMAGE))));
+
+            imageCache.put("power_1", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(POWER_1_IMAGE))));
+            imageCache.put("power_2", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(POWER_2_IMAGE))));
+            imageCache.put("power_2ud", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(POWER_2ud_IMAGE))));
+            imageCache.put("power_3", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(POWER_3_IMAGE))));
+            imageCache.put("power_4", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(POWER_4_IMAGE))));
+
+            imageCache.put("cross_off", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(CROSS_OFF_IMAGE))));
+            imageCache.put("half_cross_off", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(HALF_CROSS_OFF_IMAGE))));
+            imageCache.put("corner_off", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(CORNER_OFF_IMAGE))));
+            imageCache.put("long_off", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(LONG_OFF_IMAGE))));
+            imageCache.put("short_off", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(SHORT_OFF_IMAGE))));
+
+            imageCache.put("cross_on", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(CROSS_ON_IMAGE))));
+            imageCache.put("half_cross_on", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(HALF_CROSS_ON_IMAGE))));
+            imageCache.put("corner_on", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(CORNER_ON_IMAGE))));
+            imageCache.put("long_on", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(LONG_ON_IMAGE))));
+            imageCache.put("short_on", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(SHORT_ON_IMAGE))));
+
+            imageCache.put("hint1", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(HINT1_IMAGE))));
+            imageCache.put("hint2", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(HINT2_IMAGE))));
+            imageCache.put("hint3", new Image(Objects.requireNonNull(GridHelper.class.getResourceAsStream(HINT3_IMAGE))));
+        } catch (NullPointerException e) {
+            System.err.println("Error loading images: " + e.getMessage());
+        }
+    }
+
+    public static Image getImage(String str) {
+        return imageCache.get(str);
+    }
+
+    public static void createCells(Game game, GridPane grid, int cellSize, int boardSize, Consumer<GameNode> clickHandler) {
 
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
@@ -32,12 +95,12 @@ public class GridHelper {
                     cell.setOnMouseClicked(event -> clickHandler.accept(node));
 
                 grid.add(cell, col, row);
-                fillCell(game, grid, cellSize, imageCache, row, col, clickHandler, false, false);
+                fillCell(game, grid, cellSize, row, col, clickHandler, false, false);
             }
         }
     }
 
-    public static void fillCell(Game game, GridPane grid, int cellSize, Map<String, Image> imageCache, int row, int col, Consumer<GameNode> clickHandler, boolean animate, boolean isUndo) {
+    public static void fillCell(Game game, GridPane grid, int cellSize, int row, int col, Consumer<GameNode> clickHandler, boolean animate, boolean isUndo) {
         GameNode node = game.node(new Position(row + 1, col + 1));
         double rotationAngle = 0;
         ImageView connectorView = null;
@@ -195,7 +258,7 @@ public class GridHelper {
         primaryStage.setTitle("Light Bulb Game - " + size + "x" + size);
     }
 
-    public static void undo(Game game, int boardSize, GridPane gameGrid, int cellSize, Map<String, Image> imageCache, Consumer<GameNode> clickHandler) {
+    public static void undo(Game game, int boardSize, GridPane gameGrid, int cellSize,Consumer<GameNode> clickHandler) {
         boolean undo = game.undo();
         if (undo){
             int row = game.getLastTurnedNode().getRow() - 1;
@@ -203,14 +266,14 @@ public class GridHelper {
             for (int r = 0; r < boardSize; r++) {
                 for (int c = 0; c < boardSize; c++) {
                     boolean animation = r == row && c == col;
-                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, clickHandler,
+                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, clickHandler,
                             animation, true);
                 }
             }
         }
     }
 
-    public static void redo(Game game, int boardSize, GridPane gameGrid, int cellSize, Map<String, Image> imageCache, Consumer<GameNode> clickHandler){
+    public static void redo(Game game, int boardSize, GridPane gameGrid, int cellSize,Consumer<GameNode> clickHandler){
         boolean redo = game.redo();
         if(redo) {
             int row = game.getLastTurnedNode().getRow() - 1;
@@ -218,7 +281,7 @@ public class GridHelper {
             for (int r = 0; r < boardSize; r++) {
                 for (int c = 0; c < boardSize; c++) {
                     boolean animation = r == row && c == col;
-                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, clickHandler,
+                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, clickHandler,
                             animation, false);
                 }
             }

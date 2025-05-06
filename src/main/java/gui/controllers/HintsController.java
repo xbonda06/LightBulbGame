@@ -10,8 +10,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.util.Map;
-
 public class HintsController {
 
     @FXML
@@ -20,14 +18,12 @@ public class HintsController {
     private Game game;
     private int cellSize;
     private int boardSize;
-    private Map<String, Image> imageCache;
 
-    public void init(Game game, int cellSize, int boardSize, Map<String, Image> imageCache) {
+    public void init(Game game, int cellSize, int boardSize) {
         this.game = game;
         this.cellSize = cellSize;
-        this.imageCache = imageCache;
         this.boardSize = boardSize;
-        GridHelper.createCells(game, gameGrid, cellSize, boardSize, null, imageCache );
+        GridHelper.createCells(game, gameGrid, cellSize, boardSize, null);
         showHints();
     }
 
@@ -36,7 +32,7 @@ public class HintsController {
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
                 boolean animate = (r == row && c == col); //for smooth rotation
-                GridHelper.fillCell(game, gameGrid, cellSize, imageCache, row, col, null, animate, false);
+                GridHelper.fillCell(game, gameGrid, cellSize, row, col, null, animate, false);
                 updateHint(row, col);
             }
         }
@@ -56,9 +52,9 @@ public class HintsController {
         int hints = node.getHint();
         System.out.println("Hint at (" + row + "," + col + "): " + hints);
         img = switch (hints) {
-            case 1 -> imageCache.get("hint1");
-            case 2 -> imageCache.get("hint2");
-            case 3 -> imageCache.get("hint3");
+            case 1 -> GridHelper.getImage("hint1");
+            case 2 -> GridHelper.getImage("hint2");
+            case 3 -> GridHelper.getImage("hint3");
             default -> null;
         };
 
