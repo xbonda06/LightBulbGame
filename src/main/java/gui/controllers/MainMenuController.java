@@ -34,24 +34,10 @@ public class MainMenuController {
     }
 
     private void startGame(int size) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/game_board.fxml"));
-        Parent root = loader.load();
-
-        GameBoardController controller = loader.getController();
-        controller.setBoardSize(size);
-        controller.setPrimaryStage(primaryStage);
-
-        primaryStage.setScene(new Scene(root, 800, 600));
-        primaryStage.setTitle("Light Bulb Game - " + size + "x" + size);
+        GridHelper.startGame(size, primaryStage);
     }
 
     @FXML public void openArchive() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/archive_menu.fxml"));
-        Parent root = loader.load();
-        ArchiveController controller = loader.getController();
-        controller.setPrimaryStage(primaryStage);
-        primaryStage.setScene(new Scene(root, 600, 600));
-        primaryStage.setTitle("Light Bulb Game - Archive Menu");
-        controller.showGames();
+        GridHelper.loadArchive(primaryStage);
     }
 }
