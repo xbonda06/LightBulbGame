@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane fx:id="rootPane" prefHeight="343.0" prefWidth="322.0" style="-fx-background-color: #1D1033;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.MultiplayerController">
+
+    <BorderPane>
+        <top>
+            <HBox alignment="CENTER" prefHeight="4.0" prefWidth="350.0" spacing="20" style="-fx-padding: 10;">
+                <Label fx:id="playerId" style="-fx-font-size: 23; -fx-font-weight: bold;" text="Player 1" textFill="WHITE" />
+            </HBox>
+        </top>
+
+        <center>
+            <HBox alignment="CENTER" prefHeight="386.0" prefWidth="514.0" spacing="20" style="-fx-padding: 10;">
+                <GridPane fx:id="gameGrid" gridLinesVisible="true" maxHeight="250.0" maxWidth="250.0" minHeight="250.0" minWidth="250.0" prefHeight="250.0" prefWidth="250.0" />
+            </HBox>
+        </center>
+    </BorderPane>
+</StackPane>
