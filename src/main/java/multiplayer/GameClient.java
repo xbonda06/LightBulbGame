@@ -10,8 +10,7 @@ import java.net.Socket;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class GameClient {
 
@@ -23,7 +22,8 @@ public class GameClient {
     private PrintWriter out;
 
     private int playerId;
-    private Game game;
+    private Game ownGame;
+    private final Map<Integer, Game> opponentGames = new HashMap<>();
 
     private final Gson gson = new Gson();
 
@@ -52,7 +52,12 @@ public class GameClient {
                     case "init" -> {
                         playerId = obj.get("playerId").getAsInt();
                         String gameJson = obj.get("gameJson").toString();
-                        game = deserializeGame(gameJson);
+                        ownGame = deserializeGame(gameJson);
+                        for (int i = 1; i <= 4; i++) {
+                            if (i != playerId) {
+                                opponentGames.put(i, deserializeGame(gameJson));
+                            }
+                        }
                         System.out.println("CLIENT: Connected as player " + playerId);
                     }
 
@@ -64,9 +69,12 @@ public class GameClient {
                         if (sender != playerId) {
                             Position pos = new Position(r, c);
                             receivedMoves.add(pos);
-                            game.node(pos).turn();
-                            game.setLastTurnedNode(pos);
-                            game.updatePowerPropagation();
+                            Game g = opponentGames.get(sender);
+                            if (g != null) {
+                                g.node(pos).turn();
+                                g.setLastTurnedNode(pos);
+                                g.updatePowerPropagation();
+                            }
                         }
                     }
                 }
@@ -100,15 +108,11 @@ public class GameClient {
         out.println(msg);
     }
 
-    public Game getGame() {
-        return game;
-    }
-
+    public Game getOwnGame() { return ownGame; }
+    public Game getOpponentGame(int id) { return opponentGames.get(id); }
+    public Set<Integer> getOpponentIds() { return opponentGames.keySet(); }
     public int getPlayerId() {
         return playerId;
     }
-
-    public List<Position> getReceivedMoves() {
-        return receivedMoves;
-    }
+    public List<Position> getReceivedMoves() { return receivedMoves; }
 }
