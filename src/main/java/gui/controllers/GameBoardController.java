@@ -326,10 +326,10 @@ public class GameBoardController {
     }
 
     @FXML public void getUndo() {
-        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick);
+        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, true);
     }
 
     @FXML public void getRedo() {
-        GridHelper.redo(game, boardSize, gameGrid, cellSize, this::handleCellClick);
+        GridHelper.redo(game, boardSize, gameGrid, cellSize, this::handleCellClick, false);
     }
 }

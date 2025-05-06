@@ -43,35 +43,18 @@ public class GameArchiveController {
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, null);
     }
 
-
     private void updateStepsDisplay() {
         stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
     }
 
-    private void handleCellClick(GameNode node) {
-            stepsTaken++;
-            updateStepsDisplay();
-            game.setLastTurnedNode(node.getPosition());
-            node.turn();
-            int row = node.getPosition().getRow() - 1;
-            int col = node.getPosition().getCol() - 1;
-            for (int r = 0; r < boardSize; r++) {
-                for (int c = 0; c < boardSize; c++) {
-                    boolean animate = (r == row && c == col); //for smooth rotation
-                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
-                            animate, false);
-                }
-            }
+    @FXML
+    public void getRedo() {
+        GridHelper.redo(this.game, this.boardSize, this.gameGrid, this.cellSize, null, true);
     }
 
     @FXML
     public void getUndo() {
-        GridHelper.redoArchive(this.game, this.boardSize, this.gameGrid, this.cellSize, this::handleCellClick);
-    }
-
-    @FXML
-    public void getRedo() {
-        GridHelper.undoArchive(this.game, this.boardSize, this.gameGrid, this.cellSize, this::handleCellClick);
+        GridHelper.undo(this.game, this.boardSize, this.gameGrid, this.cellSize, null, true);
     }
 
     @FXML public void startGame() throws IOException {
