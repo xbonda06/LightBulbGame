@@ -1,3 +1,5 @@
+import common.GameNode;
+import common.Side;
 import multiplayer.GameClient;
 import multiplayer.GameServer;
 import common.Position;
@@ -6,8 +8,6 @@ import game.Game;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.List;
 
 public class GameMultiplayerTest {
 
@@ -131,5 +131,48 @@ public class GameMultiplayerTest {
 
         assertTrue(sawM1, "Client 3 should see move m1.");
         assertTrue(sawM2, "Client 3 should see move m2.");
+    }
+
+    @Test
+    public void testUndoRedoBroadcast() throws Exception {
+        int port = 8893;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient sender = new GameClient("localhost", port);
+        GameClient receiver = new GameClient("localhost", port);
+
+        sender.start();
+        receiver.start();
+        Thread.sleep(1500);
+
+        // Move
+        Position move = new Position(2, 2);
+        GameNode senderNode = sender.getOwnGame().node(move);
+        int originalHash = senderNode.getConnectors().hashCode();
+
+        sender.sendTurn(move);
+        Thread.sleep(1000);
+
+        GameNode receiverNode = receiver.getOpponentGame(sender.getPlayerId()).node(move);
+        int turnedHash = receiverNode.getConnectors().hashCode();
+
+        assertNotEquals(originalHash, turnedHash, "Opponent should see turned node.");
+
+        // Undo
+        sender.sendUndo();
+        Thread.sleep(1000);
+
+        int afterUndoHash = receiverNode.getConnectors().hashCode();
+        assertEquals(originalHash, afterUndoHash, "Opponent should see undo applied.");
+
+        // Redo
+        sender.sendRedo();
+        Thread.sleep(1000);
+
+        int afterRedoHash = receiverNode.getConnectors().hashCode();
+        assertEquals(turnedHash, afterRedoHash, "Opponent should see redo reapplied.");
     }
 }
