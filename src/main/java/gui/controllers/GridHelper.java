@@ -189,7 +189,10 @@ public class GridHelper {
 
         // if this cell was clicked, smooth rotation
         if (animate && !(node.isBulb() && node.light())) {
-            double previousRotation = isUndo ? (rotationAngle + 90 + 360) % 360 : (rotationAngle - 90) % 360;
+
+            double previousRotation = isUndo ? (rotationAngle + 90 + 360) % 360 : (rotationAngle - 90 + 360) % 360;
+            System.out.println("Prev: " + previousRotation);
+            System.out.println("Rotate: " + rotationAngle);
             RotateTransition rotate = new RotateTransition(Duration.millis(220), imageView);
             rotate.setFromAngle(previousRotation);
             double rotation = isUndo ? -90 : 90;
@@ -297,7 +300,7 @@ public class GridHelper {
                 for (int c = 0; c < boardSize; c++) {
                     boolean animation = r == row && c == col;
                     GridHelper.fillCell(game, gameGrid, cellSize, r, c, clickHandler,
-                            animation, true);
+                            animation, false);
                 }
             }
         }
@@ -312,7 +315,7 @@ public class GridHelper {
                 for (int c = 0; c < boardSize; c++) {
                     boolean animation = r == row && c == col;
                     GridHelper.fillCell(game, gameGrid, cellSize, r, c, clickHandler,
-                            animation, false);
+                            animation, true);
                 }
             }
         }
