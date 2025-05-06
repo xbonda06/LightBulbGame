@@ -21,7 +21,7 @@ public class GameArchiveController {
     @FXML public Button undoButton;
     @FXML public Button redoButton;
     @FXML public StackPane rootPane;
-    @FXML public Label stepsLabel1;
+    @FXML public Label gameIdLabel;
     @FXML public Label stepsLabel;
 
     private int stepsTaken = 0;
@@ -34,6 +34,7 @@ public class GameArchiveController {
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
 
     public void loadGame(int gameId) {
+        gameIdLabel.setText("Archive - Game " + gameId);
         GameDeserializer deserializer = GameArchive.load(gameId);
         this.game = deserializer.getGame();
         GridHelper.loadImages();
@@ -49,12 +50,18 @@ public class GameArchiveController {
 
     @FXML
     public void getRedo() {
-        GridHelper.redo(this.game, this.boardSize, this.gameGrid, this.cellSize, null, true);
+        if (GridHelper.redo(this.game, this.boardSize, this.gameGrid, this.cellSize, null, true)){
+            --stepsTaken;
+            updateStepsDisplay();
+        }
     }
 
     @FXML
     public void getUndo() {
-        GridHelper.undo(this.game, this.boardSize, this.gameGrid, this.cellSize, null, true);
+        if(GridHelper.undo(this.game, this.boardSize, this.gameGrid, this.cellSize, null, true)){
+            ++stepsTaken;
+            updateStepsDisplay();
+        }
     }
 
     @FXML public void startGame() throws IOException {
