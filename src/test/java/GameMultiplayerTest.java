@@ -1,5 +1,6 @@
 import common.GameNode;
 import common.Side;
+import json.GameSerializer;
 import multiplayer.GameClient;
 import multiplayer.GameServer;
 import common.Position;
@@ -134,6 +135,40 @@ public class GameMultiplayerTest {
     }
 
     @Test
+    public void testAllClientsGetSameGameStateInitially() throws Exception {
+        int port = 8896;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient c1 = new GameClient("localhost", port);
+        GameClient c2 = new GameClient("localhost", port);
+
+        c1.start(); c2.start();
+        Thread.sleep(1500);
+
+        Game g1 = c1.getOwnGame();
+        Game g2 = c2.getOwnGame();
+
+        assertEquals(g1.rows(), g2.rows(), "Game rows should match.");
+        assertEquals(g1.cols(), g2.cols(), "Game cols should match.");
+
+        for (int r = 1; r <= g1.rows(); r++) {
+            for (int c = 1; c <= g1.cols(); c++) {
+                Position pos = new Position(r, c);
+                GameNode n1 = g1.node(pos);
+                GameNode n2 = g2.node(pos);
+
+                assertEquals(n1.isPower(), n2.isPower(), "Power node mismatch at " + pos);
+                assertEquals(n1.isBulb(), n2.isBulb(), "Bulb node mismatch at " + pos);
+                assertEquals(n1.isLink(), n2.isLink(), "Link node mismatch at " + pos);
+                assertEquals(n1.getConnectors(), n2.getConnectors(), "Connectors mismatch at " + pos);
+            }
+        }
+    }
+
+    @Test
     public void testUndoRedoBroadcast() throws Exception {
         int port = 8893;
         int difficulty = 5;
@@ -174,5 +209,58 @@ public class GameMultiplayerTest {
 
         int afterRedoHash = receiverNode.getConnectors().hashCode();
         assertEquals(turnedHash, afterRedoHash, "Opponent should see redo reapplied.");
+    }
+
+    @Test
+    public void testMaxPlayerConnections() throws Exception {
+        int port = 8894;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient c1 = new GameClient("localhost", port);
+        GameClient c2 = new GameClient("localhost", port);
+        GameClient c3 = new GameClient("localhost", port);
+        GameClient c4 = new GameClient("localhost", port);
+
+        c1.start(); c2.start(); c3.start(); c4.start();
+        Thread.sleep(2000);
+
+        assertEquals(3, c1.getOpponentIds().size(), "Client1 should see 3 opponents.");
+        assertEquals(3, c2.getOpponentIds().size(), "Client2 should see 3 opponents.");
+        assertEquals(3, c3.getOpponentIds().size(), "Client3 should see 3 opponents.");
+        assertEquals(3, c4.getOpponentIds().size(), "Client4 should see 3 opponents.");
+    }
+
+    @Test
+    public void testSenderDoesNotApplyUndoRedo() throws Exception {
+        int port = 8895;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient client = new GameClient("localhost", port);
+        client.start();
+        Thread.sleep(1500);
+
+        Position move = new Position(2, 3);
+        int before = client.getOwnGame().node(move).getConnectors().hashCode();
+
+        client.sendTurn(move);
+        Thread.sleep(500);
+        int after = client.getOwnGame().node(move).getConnectors().hashCode();
+        assertEquals(before, after, "Sender should not apply their own move.");
+
+        client.sendUndo();
+        Thread.sleep(500);
+        int afterUndo = client.getOwnGame().node(move).getConnectors().hashCode();
+        assertEquals(before, afterUndo, "Sender applies undo locally, not through message.");
+
+        client.sendRedo();
+        Thread.sleep(500);
+        int afterRedo = client.getOwnGame().node(move).getConnectors().hashCode();
+        assertEquals(after, afterRedo, "Sender applies redo locally, not through message.");
     }
 }
