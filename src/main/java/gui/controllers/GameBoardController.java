@@ -379,32 +379,10 @@ public class GameBoardController {
     }
 
     @FXML public void getUndo() {
-        boolean undo = game.undo();
-        if (undo){
-            int row = game.getLastTurnedNode().getRow() - 1;
-            int col = game.getLastTurnedNode().getCol() - 1;
-            for (int r = 0; r < boardSize; r++) {
-                for (int c = 0; c < boardSize; c++) {
-                    boolean animation = r == row && c == col;
-                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
-                            animation, true);
-                }
-            }
-        }
+        GridHelper.undo(game, boardSize, gameGrid, cellSize, imageCache, this::handleCellClick);
     }
 
     @FXML public void getRedo() {
-        boolean redo = game.redo();
-        if(redo) {
-            int row = game.getLastTurnedNode().getRow() - 1;
-            int col = game.getLastTurnedNode().getCol() - 1;
-            for (int r = 0; r < boardSize; r++) {
-                for (int c = 0; c < boardSize; c++) {
-                    boolean animation = r == row && c == col;
-                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
-                            animation, false);
-                }
-            }
-        }
+        GridHelper.redo(game, boardSize, gameGrid, cellSize, imageCache, this::handleCellClick);
     }
 }

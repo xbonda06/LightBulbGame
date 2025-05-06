@@ -194,5 +194,35 @@ public class GridHelper {
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - " + size + "x" + size);
     }
+
+    public static void undo(Game game, int boardSize, GridPane gameGrid, int cellSize, Map<String, Image> imageCache, Consumer<GameNode> clickHandler) {
+        boolean undo = game.undo();
+        if (undo){
+            int row = game.getLastTurnedNode().getRow() - 1;
+            int col = game.getLastTurnedNode().getCol() - 1;
+            for (int r = 0; r < boardSize; r++) {
+                for (int c = 0; c < boardSize; c++) {
+                    boolean animation = r == row && c == col;
+                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, clickHandler,
+                            animation, true);
+                }
+            }
+        }
+    }
+
+    public static void redo(Game game, int boardSize, GridPane gameGrid, int cellSize, Map<String, Image> imageCache, Consumer<GameNode> clickHandler){
+        boolean redo = game.redo();
+        if(redo) {
+            int row = game.getLastTurnedNode().getRow() - 1;
+            int col = game.getLastTurnedNode().getCol() - 1;
+            for (int r = 0; r < boardSize; r++) {
+                for (int c = 0; c < boardSize; c++) {
+                    boolean animation = r == row && c == col;
+                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, clickHandler,
+                            animation, false);
+                }
+            }
+        }
+    }
 }
 
