@@ -62,7 +62,6 @@ public class GameSerializer {
     }
 
     public void serialize(Game game, int moveCount) {
-        if (moveCount == 0) return;
         if (!initialCaptured) {
             initialNodes = captureNodes(game);
             initialCaptured = true;

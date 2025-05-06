@@ -287,5 +287,35 @@ public class GridHelper {
             }
         }
     }
+
+    public static void undoArchive(Game game, int boardSize, GridPane gameGrid, int cellSize,Consumer<GameNode> clickHandler) {
+        boolean undo = game.undoArchive();
+        if (undo){
+            int row = game.getLastTurnedNode().getRow() - 1;
+            int col = game.getLastTurnedNode().getCol() - 1;
+            for (int r = 0; r < boardSize; r++) {
+                for (int c = 0; c < boardSize; c++) {
+                    boolean animation = r == row && c == col;
+                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, clickHandler,
+                            animation, true);
+                }
+            }
+        }
+    }
+
+    public static void redoArchive(Game game, int boardSize, GridPane gameGrid, int cellSize,Consumer<GameNode> clickHandler){
+        boolean redo = game.redoArchive();
+        if(redo) {
+            int row = game.getLastTurnedNode().getRow() - 1;
+            int col = game.getLastTurnedNode().getCol() - 1;
+            for (int r = 0; r < boardSize; r++) {
+                for (int c = 0; c < boardSize; c++) {
+                    boolean animation = r == row && c == col;
+                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, clickHandler,
+                            animation, false);
+                }
+            }
+        }
+    }
 }
 

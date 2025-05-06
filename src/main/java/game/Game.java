@@ -307,6 +307,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
     }
 
     public void randomizeRotations() {
+        suppressRecording = true;
         Random random = new Random();
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
@@ -319,6 +320,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
         moveCount = 0;
         clearHistory();
+        suppressRecording = false;
+        this.serializer.serialize(this, moveCount);
     }
 
     // Checks whether all bulbs in the game are lit
@@ -411,10 +414,30 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
         lastTurnedNode = last;
         redoStack.push(last);
-        serializer.serialize(this, moveCount);
+        serializer.serialize(this, 999);
 
         //System.out.println("UNDO → undo=" + formatStack(undoStack)
                 //+ ", redo=" + formatStack(redoStack));
+        return true;
+    }
+
+    public boolean undoArchive() {
+        if (undoStack.isEmpty()) return false;
+        Position last = undoStack.getFirst();
+        undoStack.removeFirst();
+
+        GameNode n = node(last);
+
+        suppressRecording = true;
+        n.turn();
+        suppressRecording = false;
+
+        lastTurnedNode = last;
+        redoStack.push(last);
+        serializer.serialize(this, 999);
+
+        //System.out.println("UNDO → undo=" + formatStack(undoStack)
+        //+ ", redo=" + formatStack(redoStack));
         return true;
     }
 
@@ -430,10 +453,30 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
         lastTurnedNode = next;
         undoStack.push(next);
-        serializer.serialize(this, moveCount);
+        serializer.serialize(this, 997);
 
         //System.out.println("REDO → undo=" + formatStack(undoStack)
                 //+ ", redo=" + formatStack(redoStack));
+        return true;
+    }
+
+    public boolean redoArchive() {
+        if (redoStack.isEmpty()) return false;
+        Position next = redoStack.getFirst();
+        redoStack.removeFirst();
+
+        GameNode n = node(next);
+
+        suppressRecording = true;
+        n.turnBack();
+        suppressRecording = false;
+
+        lastTurnedNode = next;
+        undoStack.push(next);
+        serializer.serialize(this, 997);
+
+        //System.out.println("REDO → undo=" + formatStack(undoStack)
+        //+ ", redo=" + formatStack(redoStack));
         return true;
     }
 

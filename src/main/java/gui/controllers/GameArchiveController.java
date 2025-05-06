@@ -1,5 +1,6 @@
 package gui.controllers;
 
+import common.GameNode;
 import game.Game;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,6 +24,8 @@ public class GameArchiveController {
     @FXML public Label stepsLabel1;
     @FXML public Label stepsLabel;
 
+    private int stepsTaken = 0;
+
     private int boardSize = 0;
     private Game game;
     private Stage primaryStage;
@@ -40,10 +43,35 @@ public class GameArchiveController {
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, null);
     }
 
-    @FXML public void getUndo() {
+
+    private void updateStepsDisplay() {
+        stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
     }
 
-    @FXML public void getRedo() {
+    private void handleCellClick(GameNode node) {
+            stepsTaken++;
+            updateStepsDisplay();
+            game.setLastTurnedNode(node.getPosition());
+            node.turn();
+            int row = node.getPosition().getRow() - 1;
+            int col = node.getPosition().getCol() - 1;
+            for (int r = 0; r < boardSize; r++) {
+                for (int c = 0; c < boardSize; c++) {
+                    boolean animate = (r == row && c == col); //for smooth rotation
+                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
+                            animate, false);
+                }
+            }
+    }
+
+    @FXML
+    public void getUndo() {
+        GridHelper.redoArchive(this.game, this.boardSize, this.gameGrid, this.cellSize, this::handleCellClick);
+    }
+
+    @FXML
+    public void getRedo() {
+        GridHelper.undoArchive(this.game, this.boardSize, this.gameGrid, this.cellSize, this::handleCellClick);
     }
 
     @FXML public void startGame() throws IOException {
@@ -52,7 +80,8 @@ public class GameArchiveController {
 
         GameBoardController controller = loader.getController();
 
-        controller.setFromArchive(true);
+        controller.setFromArchive(false);
+        game.clearHistory();
         controller.setGame(game);
 
         controller.setBoardSize(boardSize);
