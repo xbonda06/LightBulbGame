@@ -35,12 +35,13 @@ public class GameArchiveController {
 
     public void loadGame(int gameId) {
         gameIdLabel.setText("Archive - Game " + gameId);
+        GridHelper.loadImages();
+
         GameDeserializer deserializer = GameArchive.load(gameId);
         this.game = deserializer.getGame();
-        GridHelper.loadImages();
         this.boardSize = game.rows();
-        System.out.println(boardSize);
         this.cellSize = 400 / boardSize;
+
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, null);
     }
 
