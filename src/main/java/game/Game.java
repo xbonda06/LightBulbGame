@@ -414,7 +414,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
         lastTurnedNode = last;
         redoStack.push(last);
-        serializer.serialize(this, 999);
+        serializer.serialize(this, moveCount);
 
         //System.out.println("UNDO → undo=" + formatStack(undoStack)
                 //+ ", redo=" + formatStack(redoStack));
@@ -434,7 +434,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
         lastTurnedNode = last;
         redoStack.push(last);
-        serializer.serialize(this, 999);
+        serializer.serialize(this, moveCount);
 
         //System.out.println("UNDO → undo=" + formatStack(undoStack)
         //+ ", redo=" + formatStack(redoStack));
@@ -453,7 +453,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
         lastTurnedNode = next;
         undoStack.push(next);
-        serializer.serialize(this, 997);
+        serializer.serialize(this, moveCount);
 
         //System.out.println("REDO → undo=" + formatStack(undoStack)
                 //+ ", redo=" + formatStack(redoStack));
@@ -473,7 +473,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
         lastTurnedNode = next;
         undoStack.push(next);
-        serializer.serialize(this, 997);
+        serializer.serialize(this, moveCount);
 
         //System.out.println("REDO → undo=" + formatStack(undoStack)
         //+ ", redo=" + formatStack(redoStack));
