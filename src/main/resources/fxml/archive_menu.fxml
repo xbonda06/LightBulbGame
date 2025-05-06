@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -32,10 +31,13 @@
          </Label>
       </top>
       <center>
-         <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" style="-fx-background: transparent; -fx-background-color: transparent;" BorderPane.alignment="CENTER">
-             <VBox fx:id="contentBox" spacing="10.0" alignment="TOP_CENTER" style="-fx-background-color: transparent;" prefWidth="350">
-             </VBox>
-         </ScrollPane>
+          <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="400.0" prefWidth="400.0"
+                      style="-fx-background: transparent; -fx-background-color: transparent;
+                   -fx-vbar-policy: NEVER; -fx-hbar-policy: NEVER;" BorderPane.alignment="CENTER">
+              <VBox fx:id="contentBox" spacing="10.0" alignment="TOP_CENTER" style="-fx-background-color: transparent;" prefWidth="400">
+              </VBox>
+          </ScrollPane>
+
       </center>
     </BorderPane>
 </StackPane>

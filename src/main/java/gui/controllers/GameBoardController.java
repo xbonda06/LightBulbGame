@@ -307,16 +307,7 @@ public class GameBoardController {
 
     // Switch to the Main Menu scene
     private void loadMainMenu() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_menu.fxml"));
-            Parent root = loader.load();
-            MainMenuController controller = loader.getController();
-            controller.setPrimaryStage(primaryStage);
-            primaryStage.setScene(new Scene(root, 800, 600));
-            primaryStage.setTitle("Light Bulb Game");
-        } catch (IOException e) {
-            System.err.println("Error loading main menu: " + e.getMessage());
-        }
+        GridHelper.loadMainMenu(primaryStage);
     }
 
     private void startTimer() {

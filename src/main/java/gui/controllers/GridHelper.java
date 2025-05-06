@@ -4,13 +4,18 @@ import common.GameNode;
 import common.Position;
 import game.Game;
 import javafx.animation.RotateTransition;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -153,6 +158,19 @@ public class GridHelper {
             grid.add(connectorView, col, row);
         }
         grid.add(imageView, col, row);
+    }
+
+    public static void loadMainMenu(Stage primaryStage) {
+        try {
+            FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/main_menu.fxml"));
+            Parent root = loader.load();
+            MainMenuController controller = loader.getController();
+            controller.setPrimaryStage(primaryStage);
+            primaryStage.setScene(new Scene(root, 800, 600));
+            primaryStage.setTitle("Light Bulb Game");
+        } catch (IOException e) {
+            System.err.println("Error loading main menu: " + e.getMessage());
+        }
     }
 }
 

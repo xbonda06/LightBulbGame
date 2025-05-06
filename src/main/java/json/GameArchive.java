@@ -1,8 +1,16 @@
 package json;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +58,19 @@ public class GameArchive {
             Files.deleteIfExists(file);
         } catch (IOException e) {
             throw new UncheckedIOException("Could not delete save " + gameId, e);
+        }
+    }
+
+    /** Returns the date (without time) of the saved game by ID. */
+    public static LocalDate getGameDate(int gameId) {
+        Path file = findDataDirectory().resolve(gameId + ".json");
+        try (FileReader reader = new FileReader(file.toFile())) {
+            JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
+            long timestamp = jsonObject.get("timestamp").getAsLong();
+            Instant instant = Instant.ofEpochMilli(timestamp);
+            return LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not read timestamp from game " + gameId, e);
         }
     }
 
