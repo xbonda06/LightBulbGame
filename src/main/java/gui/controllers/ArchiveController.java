@@ -13,9 +13,7 @@ import json.GameArchive;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class ArchiveController {
     private Stage primaryStage;
@@ -26,29 +24,33 @@ public class ArchiveController {
     public void showGames() {
         contentBox.getChildren().clear();
 
-        List<Integer> gameIds = new ArrayList<>(GameArchive.listSavedGameIds());
-        gameIds.sort(Comparator.reverseOrder());
-        LocalDate lastDate = null;
-
-        for (Integer gameId : gameIds) {
+        Map<LocalDate, List<Integer>> grouped = new HashMap<>();
+        for (Integer gameId : GameArchive.listSavedGameIds()) {
             LocalDate date = GameArchive.getGameDate(gameId);
             if (date == null) continue;
 
-            if (!date.equals(lastDate)) {
-                lastDate = date;
+            grouped.computeIfAbsent(date, d -> new ArrayList<>()).add(gameId);
+        }
 
-                Label label = new Label(date.toString());
-                label.setStyle("""
-                    -fx-background-color: transparent;
-                    -fx-text-fill: #FFD900;
-                    -fx-font-size: 23;
-                """);
-                contentBox.getChildren().add(label);
+        List<LocalDate> sortedDates = new ArrayList<>(grouped.keySet());
+        sortedDates.sort(Comparator.reverseOrder());
+
+        for (LocalDate date : sortedDates) {
+            Label label = new Label(date.toString());
+            label.setStyle("""
+            -fx-background-color: transparent;
+            -fx-text-fill: #FFD900;
+            -fx-font-size: 23;
+        """);
+            contentBox.getChildren().add(label);
+
+            List<Integer> ids = grouped.get(date);
+            ids.sort(Comparator.reverseOrder());
+
+            for (Integer gameId : ids) {
+                Button gameButton = getButton(gameId);
+                contentBox.getChildren().add(gameButton);
             }
-
-            Button gameButton = getButton(gameId);
-
-            contentBox.getChildren().add(gameButton);
         }
     }
 
