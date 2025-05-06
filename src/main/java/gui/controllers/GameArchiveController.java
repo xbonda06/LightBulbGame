@@ -80,7 +80,7 @@ public class GameArchiveController {
 
         GameBoardController controller = loader.getController();
 
-        controller.setFromArchive(false);
+        controller.setFromArchive(true);
         game.clearHistory();
         controller.setGame(game);
 

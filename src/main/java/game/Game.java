@@ -433,7 +433,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         suppressRecording = false;
 
         lastTurnedNode = last;
-        redoStack.push(last);
+        redoStack.insertElementAt(last, 0);
         serializer.serialize(this, moveCount);
 
         //System.out.println("UNDO → undo=" + formatStack(undoStack)
@@ -472,7 +472,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         suppressRecording = false;
 
         lastTurnedNode = next;
-        undoStack.push(next);
+        undoStack.insertElementAt(next, 0);
         serializer.serialize(this, moveCount);
 
         //System.out.println("REDO → undo=" + formatStack(undoStack)
