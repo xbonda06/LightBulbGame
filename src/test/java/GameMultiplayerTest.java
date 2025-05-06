@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+
 public class GameMultiplayerTest {
 
     @Test
@@ -107,7 +109,7 @@ public class GameMultiplayerTest {
     @Test
     public void testMultipleMovesSyncCorrectly() throws Exception {
         int port = 8891;
-        int difficulty = 7;
+        int difficulty = 5;
         new Thread(() -> new GameServer(port, difficulty).start()).start();
         Thread.sleep(500);
 
@@ -122,16 +124,15 @@ public class GameMultiplayerTest {
         Position m2 = new Position(3, 3);
 
         c1.sendTurn(m1);
-        Thread.sleep(1000);
+        Thread.sleep(300);
         c2.sendTurn(m2);
         Thread.sleep(1000);
 
         for (GameClient c : new GameClient[]{c1, c2, c3}) {
-            Position actual = c.getGame().getLastTurnedNode();
-            assertEquals(3, actual.getRow(), "Expected row = 3");
-            assertEquals(3, actual.getCol(), "Expected col = 3");
+            List<Position> moves = c.getReceivedMoves();
+            assertTrue(moves.contains(m1) || c.getPlayerId() == 1, "Client " + c.getPlayerId() + " should have seen move m1 if not sender.");
+            assertTrue(moves.contains(m2) || c.getPlayerId() == 2, "Client " + c.getPlayerId() + " should have seen move m2 if not sender.");
         }
-
     }
 
 

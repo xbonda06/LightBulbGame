@@ -10,6 +10,8 @@ import java.net.Socket;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameClient {
 
@@ -24,6 +26,8 @@ public class GameClient {
     private Game game;
 
     private final Gson gson = new Gson();
+
+    private final List<Position> receivedMoves = new ArrayList<>();
 
     public GameClient(String host, int port) {
         this.host = host;
@@ -59,6 +63,7 @@ public class GameClient {
 
                         if (sender != playerId) {
                             Position pos = new Position(r, c);
+                            receivedMoves.add(pos);
                             game.node(pos).turn();
                             game.setLastTurnedNode(pos);
                             game.updatePowerPropagation();
@@ -101,5 +106,9 @@ public class GameClient {
 
     public int getPlayerId() {
         return playerId;
+    }
+
+    public List<Position> getReceivedMoves() {
+        return receivedMoves;
     }
 }
