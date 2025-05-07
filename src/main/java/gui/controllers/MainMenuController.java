@@ -1,5 +1,6 @@
 package gui.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -33,14 +34,10 @@ public class MainMenuController {
     }
 
     private void startGame(int size) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/game_board.fxml"));
-        Parent root = loader.load();
+        GridHelper.startGame(size, primaryStage);
+    }
 
-        GameBoardController controller = loader.getController();
-        controller.setBoardSize(size);
-        controller.setPrimaryStage(primaryStage);
-
-        primaryStage.setScene(new Scene(root, 800, 600));
-        primaryStage.setTitle("Light Bulb Game - " + size + "x" + size);
+    @FXML public void openArchive() throws IOException {
+        GridHelper.loadArchive(primaryStage);
     }
 }

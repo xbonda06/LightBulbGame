@@ -18,7 +18,7 @@ import java.util.Stack;
 public class GameSerializer {
     private static final Path DATA_DIRECTORY = Paths.get("data");
 
-    private final Path logFile;
+    private Path logFile;
     private final Gson gson;
 
     private String json;
@@ -26,6 +26,11 @@ public class GameSerializer {
     private List<NodeDto> initialNodes;
     private boolean initialCaptured = false;
 
+
+    /**
+     * Creates a new serializer, prepares the data directory,
+     * and allocates a unique save file name (e.g., 1.json, 2.json, ...).
+     */
     public GameSerializer() {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         try {
@@ -37,6 +42,11 @@ public class GameSerializer {
         this.logFile = DATA_DIRECTORY.resolve(id + ".json");
     }
 
+    /**
+     * Finds the next available numeric ID for a new save file.
+     * Skips missing numbers (e.g., [1, 2, 4] → next ID is 3).
+     * @return the next unused game ID
+     */
     private int allocateNextId() {
         try {
             List<Integer> ids = Files.list(DATA_DIRECTORY)
@@ -63,8 +73,13 @@ public class GameSerializer {
         }
     }
 
+    /**
+     * Saves the current game state to the assigned JSON file.
+     * Captures the board layout, move count, and undo/redo history.
+     * @param game       the game instance to serialize
+     * @param moveCount  the number of moves performed
+     */
     public void serialize(Game game, int moveCount) {
-        if (moveCount == 0) return;
         if (!initialCaptured) {
             initialNodes = captureNodes(game);
             initialCaptured = true;
@@ -94,6 +109,11 @@ public class GameSerializer {
         return json;
     }
 
+   /**
+   * Captures the layout and type of all nodes on the board.
+   * @param game the current game instance
+   * @return a list of serializable node descriptors
+   */
     private List<NodeDto> captureNodes(Game game) {
         List<NodeDto> list = new ArrayList<>();
         for (int r = 1; r <= game.rows(); r++) {
@@ -105,6 +125,13 @@ public class GameSerializer {
         return list;
     }
 
+
+    /**
+     * Uses reflection to extract the undo/redo stacks from the game object.
+     * @param game      the game instance
+     * @param fieldName the name of the stack field ("undoStack" or "redoStack")
+     * @return a copy of the stack as a list
+     */
     @SuppressWarnings("unchecked")
     private List<Position> extractStack(Game game, String fieldName) {
         try {
@@ -117,6 +144,9 @@ public class GameSerializer {
         }
     }
 
+    /**
+     * Serializable data class representing one node on the board.
+     */
     private static class NodeDto {
         int row, col;
         boolean isPower, isBulb, isLink;
@@ -146,5 +176,14 @@ public class GameSerializer {
             this.undoHistory  = undo;
             this.redoHistory  = redo;
         }
+
+    }
+
+    /**
+     * Updates the save file path to a fixed ID (used when reloading existing games).
+     * @param id the fixed game ID (e.g., 3 → "3.json")
+     */
+    public void setFixedFile(int id) {
+        this.logFile = DATA_DIRECTORY.resolve(id + ".json");
     }
 }

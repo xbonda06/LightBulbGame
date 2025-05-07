@@ -17,7 +17,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -27,38 +26,11 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.*;
 import javafx.util.Duration;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GameBoardController {
     // Game constants
     private static final int FIELD_SIZE = 400;
-
-    private static final String BULB_OFF_IMAGE = "/images/bulb_off.png";
-    private static final String BULB_ON_IMAGE = "/images/bulb_on.png";
-    private static final String POWER_1_IMAGE = "/images/power/power_1.png";
-    private static final String POWER_2_IMAGE = "/images/power/power_2.png";
-    private static final String POWER_2ud_IMAGE = "/images/power/power_2ud.png";
-    private static final String POWER_3_IMAGE = "/images/power/power_3.png";
-    private static final String POWER_4_IMAGE = "/images/power/power_4.png";
-
-    private static final String CROSS_OFF_IMAGE = "/images/connectors_off/cross.png";
-    private static final String HALF_CROSS_OFF_IMAGE = "/images/connectors_off/half_cross.png";
-    private static final String CORNER_OFF_IMAGE = "/images/connectors_off/corner.png";
-    private static final String LONG_OFF_IMAGE = "/images/connectors_off/long.png";
-    private static final String SHORT_OFF_IMAGE = "/images/connectors_off/short.png";
-
-    private static final String CROSS_ON_IMAGE = "/images/connectors_on/cross.png";
-    private static final String HALF_CROSS_ON_IMAGE = "/images/connectors_on/half_cross.png";
-    private static final String CORNER_ON_IMAGE = "/images/connectors_on/corner.png";
-    private static final String LONG_ON_IMAGE = "/images/connectors_on/long.png";
-    private static final String SHORT_ON_IMAGE = "/images/connectors_on/short.png";
-
-    private static final String HINT1_IMAGE = "/images/hint/hint1.png";
-    private static final String HINT2_IMAGE = "/images/hint/hint2.png";
-    private static final String HINT3_IMAGE = "/images/hint/hint3.png";
 
     // Game state
     private int boardSize = 5;
@@ -66,12 +38,12 @@ public class GameBoardController {
     private int secondsElapsed = 0;
     private int hintsUsed = 0;
     private int stepsTaken = 0;
-    private final Map<String, Image> imageCache = new HashMap<>();
-    private Stage primaryStage;
+    Stage primaryStage;
     private Timeline gameTimer;
     private Game game;
     private boolean hints_on = false;
     private boolean disableGame = false;
+    private boolean fromArchive = false;
 
     private Stage hintsStage = null;
     private HintsController hintsController = null;
@@ -88,17 +60,22 @@ public class GameBoardController {
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
+    public void setFromArchive(boolean fromArchive) { this.fromArchive = fromArchive;}
 
     @FXML
     public void initialize() {
         setupTimer();
-        loadImages();
+        GridHelper.loadImages();
     }
 
     // Sets size based on the selected game (passed from MainMenuController)
     public void setBoardSize(int size) {
         this.boardSize = size;
         resetGame();
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     // Initializes a timer that updates the display every second to track elapsed game time.
@@ -112,38 +89,6 @@ public class GameBoardController {
         gameTimer.setCycleCount(Animation.INDEFINITE);
     }
 
-    // Load images to cache
-    private void loadImages() {
-        try {
-            imageCache.put("bulb_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_OFF_IMAGE))));
-            imageCache.put("bulb_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(BULB_ON_IMAGE))));
-
-            imageCache.put("power_1", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_1_IMAGE))));
-            imageCache.put("power_2", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_2_IMAGE))));
-            imageCache.put("power_2ud", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_2ud_IMAGE))));
-            imageCache.put("power_3", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_3_IMAGE))));
-            imageCache.put("power_4", new Image(Objects.requireNonNull(getClass().getResourceAsStream(POWER_4_IMAGE))));
-
-            imageCache.put("cross_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CROSS_OFF_IMAGE))));
-            imageCache.put("half_cross_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HALF_CROSS_OFF_IMAGE))));
-            imageCache.put("corner_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CORNER_OFF_IMAGE))));
-            imageCache.put("long_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(LONG_OFF_IMAGE))));
-            imageCache.put("short_off", new Image(Objects.requireNonNull(getClass().getResourceAsStream(SHORT_OFF_IMAGE))));
-
-            imageCache.put("cross_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CROSS_ON_IMAGE))));
-            imageCache.put("half_cross_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HALF_CROSS_ON_IMAGE))));
-            imageCache.put("corner_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(CORNER_ON_IMAGE))));
-            imageCache.put("long_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(LONG_ON_IMAGE))));
-            imageCache.put("short_on", new Image(Objects.requireNonNull(getClass().getResourceAsStream(SHORT_ON_IMAGE))));
-
-            imageCache.put("hint1", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HINT1_IMAGE))));
-            imageCache.put("hint2", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HINT2_IMAGE))));
-            imageCache.put("hint3", new Image(Objects.requireNonNull(getClass().getResourceAsStream(HINT3_IMAGE))));
-        } catch (NullPointerException e) {
-            System.err.println("Error loading images: " + e.getMessage());
-        }
-    }
-
     // Start new game
     private void resetGame() {
         stopTimer();
@@ -154,13 +99,15 @@ public class GameBoardController {
 
     // Initialize a new game with a ready board and randomly rotated connectors
     private void createGameBoard() {
-        this.game = Game.generate(boardSize, boardSize);
-        this.game.randomizeRotations();
+        if(!fromArchive) {
+            this.game = Game.generate(boardSize, boardSize);
+            this.game.randomizeRotations();
+        }
         this.cellSize = FIELD_SIZE / boardSize;
-
+        fromArchive = false;
         clearGameGrid();
         setupGridConstraints();
-        GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick, imageCache);
+        GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick);
     }
 
     // Delete game
@@ -197,7 +144,7 @@ public class GameBoardController {
             for (int r = 0; r < boardSize; r++) {
                 for (int c = 0; c < boardSize; c++) {
                     boolean animate = (r == row && c == col); //for smooth rotation
-                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
+                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
                             animate, false);
                 }
             }
@@ -263,7 +210,7 @@ public class GameBoardController {
                 Parent root = loader.load();
 
                 hintsController = loader.getController();
-                hintsController.init(game, cellSize, boardSize, imageCache);
+                hintsController.init(game, cellSize, boardSize);
 
                 hintsStage = new Stage();
                 hintsStage.setTitle("Hints");
@@ -307,16 +254,7 @@ public class GameBoardController {
 
     // Switch to the Main Menu scene
     private void loadMainMenu() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_menu.fxml"));
-            Parent root = loader.load();
-            MainMenuController controller = loader.getController();
-            controller.setPrimaryStage(primaryStage);
-            primaryStage.setScene(new Scene(root, 800, 600));
-            primaryStage.setTitle("Light Bulb Game");
-        } catch (IOException e) {
-            System.err.println("Error loading main menu: " + e.getMessage());
-        }
+        GridHelper.loadMainMenu(primaryStage);
     }
 
     private void startTimer() {
@@ -387,34 +325,11 @@ public class GameBoardController {
         );
     }
 
-    //TODO
     @FXML public void getUndo() {
-        boolean undo = game.undo();
-        if (undo){
-            int row = game.getLastTurnedNode().getRow() - 1;
-            int col = game.getLastTurnedNode().getCol() - 1;
-            for (int r = 0; r < boardSize; r++) {
-                for (int c = 0; c < boardSize; c++) {
-                    boolean animation = r == row && c == col;
-                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
-                            animation, true);
-                }
-            }
-        }
+        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, true);
     }
 
     @FXML public void getRedo() {
-        boolean redo = game.redo();
-        if(redo) {
-            int row = game.getLastTurnedNode().getRow() - 1;
-            int col = game.getLastTurnedNode().getCol() - 1;
-            for (int r = 0; r < boardSize; r++) {
-                for (int c = 0; c < boardSize; c++) {
-                    boolean animation = r == row && c == col;
-                    GridHelper.fillCell(game, gameGrid, cellSize, imageCache, r, c, this::handleCellClick,
-                            animation, false);
-                }
-            }
-        }
+        GridHelper.redo(game, boardSize, gameGrid, cellSize, this::handleCellClick, false);
     }
 }
