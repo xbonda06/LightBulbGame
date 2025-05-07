@@ -55,7 +55,7 @@ public class MultiplayerController {
         GameClient client = new GameClient(server.getIpAddress(), portNumber);
         client.start();
 
-        FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/wait_for_connection.fxml"));
+        FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/wait_server.fxml"));
         Parent root = loader.load();
 
         MultiplayerConnectionController controller = loader.getController();
