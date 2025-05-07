@@ -10,9 +10,12 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -293,6 +296,40 @@ public class GridHelper {
             return true;
         }
         return false;
+    }
+
+    public static void loadDialog(StackPane rootPane, Stage primaryStage, String path) {
+        try {
+            Rectangle overlay = new Rectangle(rootPane.getWidth(), rootPane.getHeight(), Color.rgb(0, 0, 0, 0.7));
+            overlay.widthProperty().bind(rootPane.widthProperty());
+            overlay.heightProperty().bind(rootPane.heightProperty());
+            rootPane.getChildren().add(overlay);
+
+            FXMLLoader loader = new FXMLLoader(HintsController.class.getResource(path));
+            Parent root = loader.load();
+
+            JoinDialogController controller = loader.getController();
+
+            Stage dialogStage = new Stage(StageStyle.UNDECORATED);
+            controller.setDialogStage(dialogStage);
+
+            openDialog(dialogStage, root, primaryStage, rootPane, overlay);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void openDialog(Stage dialogStage, Parent root, Stage primaryStage, StackPane rootPane, Rectangle overlay) {
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setScene(new Scene(root));
+        dialogStage.show();
+        double centerX = primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2;
+        double centerY = primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2;
+        dialogStage.setX(centerX);
+        dialogStage.setY(centerY);
+
+        dialogStage.setOnHidden(e -> rootPane.getChildren().remove(overlay));
     }
 }
 

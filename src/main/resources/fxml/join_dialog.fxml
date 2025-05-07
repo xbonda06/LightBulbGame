@@ -3,13 +3,24 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="248.0" prefWidth="285.0" spacing="25.0" style="-fx-background-color: #412E60;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.JoinDialogController">
-    <VBox alignment="CENTER" prefHeight="103.0" prefWidth="283.0">
-        <Label prefHeight="45.0" prefWidth="250.0" style="-fx-font-size: 20px; -fx-font-weight: bold;"
-               text="Enter Server IP" textFill="WHITE"/>
-        <TextField fx:id="textEnter" maxHeight="40.0" maxWidth="250.0" prefHeight="40.0" prefWidth="250.0"/>
+<VBox alignment="CENTER" prefHeight="291.0" prefWidth="285.0" spacing="25.0" style="-fx-background-color: #412E60;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.JoinDialogController">
+    <VBox alignment="CENTER" prefHeight="178.0" prefWidth="285.0">
+        <Label prefHeight="45.0" prefWidth="250.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Enter Server IP" textFill="WHITE">
+         <font>
+            <Font size="10.0" />
+         </font></Label>
+        <TextField fx:id="ipEnter" maxHeight="40.0" maxWidth="250.0" prefHeight="40.0" prefWidth="250.0" />
+      <Label layoutX="28.0" layoutY="19.0" prefHeight="45.0" prefWidth="250.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Enter Port" textFill="WHITE" />
+      <TextField fx:id="portEnter" layoutX="28.0" layoutY="64.0" maxHeight="41.0" maxWidth="250.0" prefHeight="41.0" prefWidth="250.0" />
     </VBox>
-     <Button fx:id="joinButton" onAction="#joinGame" prefHeight="35.0" prefWidth="150.0" styleClass="buttonJoin" stylesheets="@../css/styles.css" text="JOIN" />
+    <HBox alignment="CENTER" prefHeight="61.0" prefWidth="285.0" spacing="20.0">
+        <Button fx:id="joinButton" onAction="#joinGame" prefHeight="35.0" prefWidth="150.0" styleClass="buttonVictory"
+                stylesheets="@../css/styles.css" text="JOIN"/>
+        <Button fx:id="closeButton" onAction="#closeDialog" prefHeight="35.0" prefWidth="150.0" styleClass="buttonVictory"
+                stylesheets="@../css/styles.css" text="CLOSE"/>
+    </HBox>
 </VBox>

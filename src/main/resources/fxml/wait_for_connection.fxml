@@ -23,26 +23,25 @@
              </VBox>
       </bottom>
       <center>
-          <VBox alignment="CENTER" maxHeight="400.0" minHeight="333.0" prefHeight="339.0" prefWidth="602.0"
-                spacing="20.0" BorderPane.alignment="BOTTOM_CENTER">
-              <Label fx:id="ipAddress" alignment="CENTER" contentDisplay="CENTER" maxWidth="600.0" minWidth="600.0"
-                     prefHeight="0.0" prefWidth="600.0" text="Server IP: 1234" textFill="WHITE">
+          <VBox alignment="CENTER" maxHeight="400.0" minHeight="333.0" prefHeight="339.0" prefWidth="602.0" spacing="20.0" BorderPane.alignment="BOTTOM_CENTER">
+              <Label fx:id="ipAddress" alignment="CENTER" contentDisplay="CENTER" maxWidth="600.0" minWidth="600.0" prefHeight="0.0" prefWidth="600.0" text="Server IP: 1234" textFill="WHITE">
                  <font>
-                     <Font size="51.0"/>
+                     <Font size="51.0" />
                  </font>
               </Label>
-              <Label fx:id="playerCount" alignment="CENTER" contentDisplay="CENTER" layoutX="11.0" layoutY="210.0"
-                     maxWidth="600.0" minWidth="600.0" prefHeight="0.0" prefWidth="600.0" text="Players: 2"
-                     textFill="WHITE">
+            <Label fx:id="port" alignment="CENTER" contentDisplay="CENTER" layoutX="110.0" layoutY="57.0" maxWidth="600.0" minWidth="600.0" prefHeight="0.0" prefWidth="600.0" text="Port: 5678" textFill="WHITE">
+               <font>
+                  <Font size="43.0" />
+               </font>
+            </Label>
+              <Label fx:id="playerCount" alignment="CENTER" contentDisplay="CENTER" layoutX="11.0" layoutY="210.0" maxWidth="600.0" minWidth="600.0" prefHeight="0.0" prefWidth="600.0" text="Players: 2" textFill="#5f5394">
                  <font>
-                     <Font size="27.0"/>
+                     <Font size="27.0" />
                  </font>
               </Label>
-              <Label alignment="CENTER" contentDisplay="CENTER" layoutX="11.0" layoutY="237.0" maxWidth="300.0"
-                     minWidth="300.0" prefHeight="153.0" prefWidth="300.0" style="-fx-wrap-text: true;"
-                     text="Waiting for connection..." textAlignment="CENTER" textFill="WHITE">
+              <Label alignment="CENTER" contentDisplay="CENTER" layoutX="11.0" layoutY="237.0" maxWidth="300.0" minWidth="300.0" prefHeight="117.0" prefWidth="300.0" style="-fx-wrap-text: true;" text="Waiting for connection..." textAlignment="CENTER" textFill="#553c6f">
                  <font>
-                     <Font size="28.0"/>
+                     <Font size="28.0" />
                  </font>
               </Label>
           </VBox>

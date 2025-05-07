@@ -187,15 +187,7 @@ public class GameBoardController {
             controller.setOnYesAction(this::resetGame);
             controller.setOnNoAction(this::loadMainMenu);
 
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setScene(new Scene(root));
-            dialogStage.show();
-            double centerX = primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2;
-            double centerY = primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2;
-            dialogStage.setX(centerX);
-            dialogStage.setY(centerY);
-
-            dialogStage.setOnHidden(e -> rootPane.getChildren().remove(overlay));
+            GridHelper.openDialog(dialogStage, root, primaryStage, rootPane, overlay);
 
         } catch (IOException ex) {
             ex.printStackTrace();
