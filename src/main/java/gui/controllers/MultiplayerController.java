@@ -12,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import multiplayer.GameClient;
 import multiplayer.GameServer;
 import java.io.IOException;
 import java.util.Random;
@@ -34,6 +35,8 @@ public class MultiplayerController {
     @FXML public Button startButton;
     @FXML public Label ipAddress;
     @FXML public Label playerCount;
+    private GameServer gameServer;
+
 
     // From the game mode -> multiplayer_main.fxml
 
@@ -54,9 +57,13 @@ public class MultiplayerController {
         int difficulty = 5;
 
         GameServer server = new GameServer(portNumber, difficulty);
+        gameServer = server;
         Thread serverThread = new Thread(server::start);
         serverThread.setDaemon(true);
         serverThread.start();
+
+        GameClient client = new GameClient(server.getIpAddress(), portNumber);
+        client.start();
 
         FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/wait_for_connection.fxml"));
         Parent root = loader.load();
@@ -65,6 +72,7 @@ public class MultiplayerController {
         controller.setPrimaryStage(primaryStage);
         controller.port.setText("Port: " + portNumber);
         controller.ipAddress.setText("Server IP: " + server.getIpAddress());
+        controller.gameServer = server;
 
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - Multiplayer");
@@ -100,11 +108,20 @@ public class MultiplayerController {
         }
     }
 
-    private void joinGameSend() {
-
+    public void startClient(String ip, int port) throws IOException {
+        GameClient client = new GameClient(ip, port);
+        client.start();
+        FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/wait_client.fxml"));
+        Parent root = loader.load();
+        MultiplayerController controller = loader.getController();
+        controller.setPrimaryStage(primaryStage);
+        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setTitle("Light Bulb Game - Multiplayer");
     }
 
+
     @FXML public void toTheMain() {
+        gameServer.stop();
         GridHelper.loadMainMenu(primaryStage);
     }
 

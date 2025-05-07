@@ -15,10 +15,11 @@
     <BorderPane>
       <bottom>
 
-             <VBox alignment="CENTER" spacing="20" BorderPane.alignment="CENTER">
+             <VBox alignment="CENTER" prefHeight="141.0" prefWidth="800.0" spacing="20" BorderPane.alignment="CENTER">
                  <Button fx:id="startButton" onAction="#startGame" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="START GAME" />
+            <Button fx:id="toTheMain" alignment="CENTER" contentDisplay="CENTER" layoutX="310.0" layoutY="10.0" onAction="#toTheMain" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="TO THE MAIN" />
             <padding>
-               <Insets bottom="90.0" />
+               <Insets bottom="50.0" />
             </padding>
              </VBox>
       </bottom>

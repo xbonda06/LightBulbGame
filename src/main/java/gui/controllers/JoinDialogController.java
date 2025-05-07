@@ -5,12 +5,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class JoinDialogController {
     public Button joinButton;
     public TextField ipEnter;
     public TextField portEnter;
     public Button closeButton;
     private Stage dialogStage;
+    private MultiplayerController multiplayerController;
+
+    public void setMultiplayerController(MultiplayerController controller) {
+        this.multiplayerController = controller;
+    }
 
     public String getIp() {
         return ipEnter.getText();
@@ -30,9 +37,37 @@ public class JoinDialogController {
 
     @FXML
     public void joinGame() {
-        System.out.println("JOINING TO: " + getIp() + ":" + getPort());
-        if (dialogStage != null) dialogStage.close();
+        String ip = getIp();
+        int port = getPort();
+
+        boolean hasError = false;
+
+        ipEnter.setStyle("");
+        portEnter.setStyle("");
+
+        if (ip == null || ip.isEmpty() || !ip.matches("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b")) {
+            ipEnter.setStyle("-fx-border-color: red;");
+            hasError = true;
+        }
+
+        if (port < 1000 || port > 9999) {
+            portEnter.setStyle("-fx-border-color: red;");
+            hasError = true;
+        }
+
+        if (hasError) {
+            return;
+        }
+
+        try {
+            multiplayerController.startClient(ip, port);
+            if (dialogStage != null) dialogStage.close();
+        } catch (IOException ex) {
+            ipEnter.setStyle("-fx-border-color: red;");
+            portEnter.setStyle("-fx-border-color: red;");
+        }
     }
+
 
     public void closeDialog() {
         if (dialogStage != null) dialogStage.close();

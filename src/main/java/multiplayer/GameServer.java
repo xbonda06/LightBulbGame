@@ -18,6 +18,7 @@ public class GameServer {
     private final GameSerializer gameSerializer = new GameSerializer();
     private final List<ClientHandler> clients = new ArrayList<>();
     private final ExecutorService pool = Executors.newFixedThreadPool(maxPlayers);
+    private ServerSocket serverSocket;
 
     private Game game;
     private String gameJson;
@@ -27,8 +28,25 @@ public class GameServer {
         this.difficulty = difficulty;
     }
 
+    public void stop() {
+        try {
+            System.out.println("SERVER: Stopping server...");
+            for (ClientHandler client : clients) {
+                client.close();
+            }
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+            pool.shutdownNow();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
+            this.serverSocket = serverSocket;
             System.out.println("SERVER: Server is started on address " + InetAddress.getLocalHost().getHostAddress() + ":" + port + ", waiting for other players...");
 
             this.game = Game.generate(difficulty, difficulty);
@@ -46,7 +64,10 @@ public class GameServer {
                 System.out.println("SERVER: Player " + handler.playerId + " connected.");
             }
 
-        } catch (IOException e) {
+        }catch (SocketException e) {
+            System.out.println("SERVER: Server socket was closed. Server is shutting down.");
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -110,5 +131,12 @@ public class GameServer {
             return obj.toString();
         }
 
+        public void close() {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
