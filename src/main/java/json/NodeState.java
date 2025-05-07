@@ -8,6 +8,5 @@ public class NodeState {
     public boolean isPower;
     public boolean isBulb;
     public boolean isLink;
-    public boolean isLit;
     public List<String> connectors;
 }
