@@ -143,7 +143,7 @@ public class GameClient {
 
     private Game deserializeGame(String gameJson) {
         try {
-            Path temp = Files.createTempFile("game", ".json");
+            Path temp = Files.createTempFile("temp_game_", ".json");
             Files.writeString(temp, gameJson);
             GameDeserializer deserializer = new GameDeserializer(temp);
             return deserializer.getGame();
