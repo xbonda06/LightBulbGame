@@ -51,6 +51,10 @@ public class GameServer {
         }
     }
 
+    public String getIpAddress() throws UnknownHostException {
+        return InetAddress.getLocalHost().getHostAddress();
+    }
+
     public void broadcast(String message, ClientHandler sender) {
         for (ClientHandler client : clients) {
             if (client != sender) {

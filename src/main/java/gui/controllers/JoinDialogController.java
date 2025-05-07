@@ -10,8 +10,19 @@ public class JoinDialogController {
     public TextField ipEnter;
     public TextField portEnter;
     public Button closeButton;
-
     private Stage dialogStage;
+
+    public String getIp() {
+        return ipEnter.getText();
+    }
+
+    public int getPort() {
+        try {
+            return Integer.parseInt(portEnter.getText());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
 
     public void setDialogStage(Stage stage) {
         this.dialogStage = stage;
@@ -19,6 +30,8 @@ public class JoinDialogController {
 
     @FXML
     public void joinGame() {
+        System.out.println("JOINING TO: " + getIp() + ":" + getPort());
+        if (dialogStage != null) dialogStage.close();
     }
 
     public void closeDialog() {

@@ -186,8 +186,8 @@ public class GameBoardController {
 
             controller.setOnYesAction(this::resetGame);
             controller.setOnNoAction(this::loadMainMenu);
-
-            GridHelper.openDialog(dialogStage, root, primaryStage, rootPane, overlay);
+            GridHelper.openDialog(dialogStage, root, primaryStage);
+            dialogStage.setOnHidden(e -> rootPane.getChildren().remove(overlay));
 
         } catch (IOException ex) {
             ex.printStackTrace();
