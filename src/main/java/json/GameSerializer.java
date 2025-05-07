@@ -18,7 +18,7 @@ import java.util.Stack;
 public class GameSerializer {
     private static final Path DATA_DIRECTORY = Paths.get("data");
 
-    private final Path logFile;
+    private Path logFile;
     private final Gson gson;
 
     private List<NodeDto> initialNodes;
@@ -139,5 +139,9 @@ public class GameSerializer {
             this.undoHistory  = undo;
             this.redoHistory  = redo;
         }
+
+    }
+    public void setFixedFile(int id) {
+        this.logFile = DATA_DIRECTORY.resolve(id + ".json");
     }
 }

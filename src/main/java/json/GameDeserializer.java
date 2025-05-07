@@ -39,8 +39,10 @@ public class GameDeserializer {
             } else if (n.isLink) {
                 node.setLink(n.connectors.toArray(new Side[0]));
             }
+            node.addObserver(game);
         }
         game.init();
+
 
         fullHistory = new ArrayList<>(snapshot.undoHistory);
         for (int i = snapshot.redoHistory.size() - 1; i >= 0; i--) {
@@ -49,6 +51,8 @@ public class GameDeserializer {
 
         goToStep(0);
         game.loadHistory(snapshot.undoHistory, snapshot.redoHistory);
+        int id = Integer.parseInt(jsonFile.getFileName().toString().replace(".json", ""));
+        game.setSaveFileId(id);
     }
 
     public Game getGame() {
@@ -114,4 +118,5 @@ public class GameDeserializer {
         boolean isPower, isBulb, isLink, isLit;
         List<Side> connectors;
     }
+
 }

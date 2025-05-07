@@ -510,4 +510,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
+    public void setSaveFileId(int id) {
+        this.serializer.setFixedFile(id);
+    }
+
 }
