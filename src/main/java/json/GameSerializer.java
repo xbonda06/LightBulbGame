@@ -21,6 +21,8 @@ public class GameSerializer {
     private Path logFile;
     private final Gson gson;
 
+    private String json;
+
     private List<NodeDto> initialNodes;
     private boolean initialCaptured = false;
 
@@ -94,7 +96,7 @@ public class GameSerializer {
                 redoHistory
         );
 
-        String json = gson.toJson(dto);
+        json = gson.toJson(dto);
         try (FileWriter w = new FileWriter(logFile.toFile(), false)) {
             w.write(json);
             w.write(System.lineSeparator());
@@ -103,11 +105,15 @@ public class GameSerializer {
         }
     }
 
-    /**
-     * Captures the layout and type of all nodes on the board.
-     * @param game the current game instance
-     * @return a list of serializable node descriptors
-     */
+    public String getJson() {
+        return json;
+    }
+
+   /**
+   * Captures the layout and type of all nodes on the board.
+   * @param game the current game instance
+   * @return a list of serializable node descriptors
+   */
     private List<NodeDto> captureNodes(Game game) {
         List<NodeDto> list = new ArrayList<>();
         for (int r = 1; r <= game.rows(); r++) {
