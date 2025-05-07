@@ -29,7 +29,7 @@
                         <Button fx:id="undoButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#getUndo" prefHeight="122.0" styleClass="buttonUndoRedo" stylesheets="@../css/styles.css" text="&lt;" />
                         <Button fx:id="redoButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#getRedo" styleClass="buttonUndoRedo" stylesheets="@../css/styles.css" text="&gt;" />
                     </HBox>
-                    <Button alignment="CENTER" onAction="#toMainMenu" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="TO THE MAIN MENU" />
+                    <Button alignment="CENTER" onAction="#toTheMain" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="TO THE MAIN MENU" />
                 </VBox>
             </HBox>
         </center>

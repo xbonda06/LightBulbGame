@@ -32,17 +32,8 @@ public class MultiplayerController {
     @FXML public Button createButton;
     @FXML public Button joinGame;
     @FXML public Button mainButton;
-    @FXML public Button startButton;
-    @FXML public Label ipAddress;
-    @FXML public Label playerCount;
-    private GameServer gameServer;
-
 
     // From the game mode -> multiplayer_main.fxml
-
-    @FXML public void toMainMenu() {
-    }
-
     @FXML public void getRedo() {
     }
 
@@ -57,7 +48,6 @@ public class MultiplayerController {
         int difficulty = 5;
 
         GameServer server = new GameServer(portNumber, difficulty);
-        gameServer = server;
         Thread serverThread = new Thread(server::start);
         serverThread.setDaemon(true);
         serverThread.start();
@@ -68,16 +58,15 @@ public class MultiplayerController {
         FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/wait_for_connection.fxml"));
         Parent root = loader.load();
 
-        MultiplayerController controller = loader.getController();
+        MultiplayerConnectionController controller = loader.getController();
         controller.setPrimaryStage(primaryStage);
         controller.port.setText("Port: " + portNumber);
         controller.ipAddress.setText("Server IP: " + server.getIpAddress());
-        controller.gameServer = server;
+        controller.setServer(server);
 
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - Multiplayer");
     }
-
 
     @FXML public void joinGame() {
         try {
@@ -93,6 +82,7 @@ public class MultiplayerController {
 
             Stage dialogStage = new Stage(StageStyle.UNDECORATED);
             controller.setDialogStage(dialogStage);
+            controller.setMultiplayerController(this);
 
             dialogStage.setOnHidden(e -> {
                 rootPane.getChildren().remove(overlay);
@@ -113,29 +103,16 @@ public class MultiplayerController {
         client.start();
         FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/wait_client.fxml"));
         Parent root = loader.load();
-        MultiplayerController controller = loader.getController();
+        MultiplayerWaitController controller = loader.getController();
         controller.setPrimaryStage(primaryStage);
+        controller.setGameClient(client);
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - Multiplayer");
     }
 
-
     @FXML public void toTheMain() {
-        gameServer.stop();
         GridHelper.loadMainMenu(primaryStage);
-    }
-
-    // From waiting screen -> wait_for_connection.fxml
-
-    @FXML public void startGame() {
     }
 }
 
-//NEW GAME:
-//instance Server. Port random
-//instance client + connect
-
-//JOIN GAME:
-//IP and Port
-//instance client
 

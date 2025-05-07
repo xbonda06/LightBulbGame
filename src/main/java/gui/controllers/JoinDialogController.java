@@ -45,11 +45,6 @@ public class JoinDialogController {
         ipEnter.setStyle("");
         portEnter.setStyle("");
 
-        if (ip == null || ip.isEmpty() || !ip.matches("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b")) {
-            ipEnter.setStyle("-fx-border-color: red;");
-            hasError = true;
-        }
-
         if (port < 1000 || port > 9999) {
             portEnter.setStyle("-fx-border-color: red;");
             hasError = true;
@@ -63,6 +58,7 @@ public class JoinDialogController {
             multiplayerController.startClient(ip, port);
             if (dialogStage != null) dialogStage.close();
         } catch (IOException ex) {
+            System.out.println(ex.getMessage());
             ipEnter.setStyle("-fx-border-color: red;");
             portEnter.setStyle("-fx-border-color: red;");
         }
