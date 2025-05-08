@@ -10,22 +10,28 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameServer {
-    private final int difficulty; // standard easy
+    private final int difficulty;
     private final int port;
     private final int maxPlayers = 4;
     private final GameSerializer gameSerializer = new GameSerializer();
-    private final List<ClientHandler> clients = new ArrayList<>();
-    private final ExecutorService pool = Executors.newFixedThreadPool(maxPlayers);
+    private final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
+    private final ExecutorService pool = Executors.newCachedThreadPool();
     private ServerSocket serverSocket;
+    private final Deque<Integer> availablePlayerIds = new ConcurrentLinkedDeque<>();
 
     private Game game;
     private String gameJson;
+    private final AtomicBoolean gameStarted = new AtomicBoolean(false);
 
     public GameServer(int port, int difficulty) {
         this.port = port;
         this.difficulty = difficulty;
+        for (int i = 1; i <= maxPlayers; i++) {
+            availablePlayerIds.add(i);
+        }
     }
 
     public void stop() {
@@ -50,27 +56,39 @@ public class GameServer {
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             this.serverSocket = serverSocket;
-            System.out.println("SERVER: Server is started on address " + getIpAddress() + ":" + port + ", waiting for other players...");
+            System.out.println("SERVER: Server is started on address " + getIpAddress() + ":" + port + ", waiting for players...");
 
             this.game = Game.generate(difficulty, difficulty);
             game.randomizeRotations();
             gameSerializer.serialize(game, 1);
             gameJson = gameSerializer.getJson();
 
-            int playerId = 1;
-
-            while (clients.size() < maxPlayers) {
+            while (!serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();
-                ClientHandler handler = new ClientHandler(clientSocket, playerId++);
+
+                if (gameStarted.get()) {
+                    System.out.println("SERVER: Game already started. Rejecting new connection.");
+                    clientSocket.close();
+                    continue;
+                }
+
+                Integer assignedId = availablePlayerIds.poll();
+
+                if (assignedId == null) {
+                    System.out.println("SERVER: Server is full. Rejecting connection.");
+                    clientSocket.close();
+                    continue;
+                }
+
+                ClientHandler handler = new ClientHandler(clientSocket, assignedId);
                 clients.add(handler);
                 pool.execute(handler);
                 System.out.println("SERVER: Player " + handler.playerId + " connected.");
             }
 
-        }catch (SocketException e) {
+        } catch (SocketException e) {
             System.out.println("SERVER: Server socket was closed. Server is shutting down.");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -126,15 +144,28 @@ public class GameServer {
 
                 String line;
                 while ((line = in.readLine()) != null) {
-                    System.out.println("SERVER: Received from player " + playerId + ": " + line);
-                    broadcast(line, this);
-                }
+                    JsonObject obj = JsonParser.parseString(line).getAsJsonObject();
+                    String type = obj.get("type").getAsString();
 
+                    if ("start_game".equals(type) && playerId == 1) {
+                        gameStarted.set(true);
+                        JsonObject startMsg = new JsonObject();
+                        startMsg.addProperty("type", "start_game");
+                        broadcast(startMsg.toString(), null);
+                    } else {
+                        broadcast(line, this);
+                    }
+                }
             } catch (IOException e) {
                 System.out.println("SERVER: Player " + playerId + " disconnected.");
             } finally {
                 try {
                     socket.close();
+                    clients.remove(this);
+                    if (!gameStarted.get()) {
+                        availablePlayerIds.addFirst(playerId);
+                        System.out.println("SERVER: Player " + playerId + " ID released.");
+                    }
                 } catch (IOException ignored) {}
             }
         }

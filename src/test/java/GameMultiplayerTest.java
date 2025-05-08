@@ -8,6 +8,8 @@ import game.Game;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameMultiplayerTest {
@@ -262,5 +264,135 @@ public class GameMultiplayerTest {
         Thread.sleep(500);
         int afterRedo = client.getOwnGame().node(move).getConnectors().hashCode();
         assertEquals(after, afterRedo, "Sender applies redo locally, not through message.");
+    }
+
+    @Test
+    public void testGameStartNotification() throws Exception {
+        int port = 8900;
+        int difficulty = 5;
+
+        AtomicBoolean serverStarted = new AtomicBoolean(false);
+        new Thread(() -> {
+            new GameServer(port, difficulty).start();
+            serverStarted.set(true);
+        }).start();
+        Thread.sleep(1000);
+
+        GameClient admin = new GameClient("localhost", port);
+        GameClient client = new GameClient("localhost", port);
+        admin.start();
+        client.start();
+        Thread.sleep(1500);
+
+        admin.sendStartGame();
+        Thread.sleep(1000);
+
+        assertTrue(admin.isGameStarted(), "Admin should receive game start");
+        assertTrue(client.isGameStarted(), "Client should receive game start");
+    }
+
+    @Test
+    public void testPlayerIdReuseBeforeGameStart() throws Exception {
+        int port = 8901;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient c1 = new GameClient("localhost", port);
+        c1.start();
+        Thread.sleep(500);
+        int c1Id = c1.getPlayerId();
+        c1.stop();
+        Thread.sleep(1500);
+
+        GameClient c2 = new GameClient("localhost", port);
+        c2.start();
+        Thread.sleep(500);
+
+        assertEquals(c1Id, c2.getPlayerId(), "New client should get reused ID");
+    }
+
+    @Test
+    public void testIdsLockedAfterGameStart() throws Exception {
+        int port = 8902;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient admin = new GameClient("localhost", port);
+        admin.start();
+        Thread.sleep(500);
+        admin.sendStartGame();
+        Thread.sleep(500);
+        admin.stop();
+
+        GameClient newClient = new GameClient("localhost", port);
+        newClient.start();
+        Thread.sleep(1000);
+
+        assertEquals(-1, newClient.getPlayerId(), "Server should reject connections after game start");
+    }
+
+    @Test
+    public void testOnlyAdminCanStartGame() throws Exception {
+        int port = 8903;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient c1 = new GameClient("localhost", port);
+        GameClient c2 = new GameClient("localhost", port);
+        c1.start();
+        c2.start();
+        Thread.sleep(1500);
+
+        c2.sendStartGame();
+        Thread.sleep(1000);
+
+        assertFalse(c1.isGameStarted(), "Game should not start from non-admin player");
+        assertFalse(c2.isGameStarted(), "Game should not start from non-admin player");
+    }
+
+    @Test
+    public void testPlayerReconnectionAfterStart() throws Exception {
+        int port = 8904;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient admin = new GameClient("localhost", port);
+        admin.start();
+        Thread.sleep(500);
+        admin.sendStartGame();
+        Thread.sleep(500);
+        admin.stop();
+
+        GameClient newClient = new GameClient("localhost", port);
+        newClient.start();
+        Thread.sleep(1000);
+
+        assertEquals(-1, newClient.getPlayerId(), "Should not allow new connections after game start");
+    }
+
+    @Test
+    public void testMultipleAdminsCannotExist() throws Exception {
+        int port = 8905;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient c1 = new GameClient("localhost", port);
+        GameClient c2 = new GameClient("localhost", port);
+        c1.start();
+        c2.start();
+        Thread.sleep(1500);
+
+        assertEquals(1, c1.getPlayerId(), "First client should be admin");
+        assertNotEquals(1, c2.getPlayerId(), "Second client should not be admin");
     }
 }
