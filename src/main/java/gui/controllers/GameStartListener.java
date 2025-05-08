@@ -1,5 +1,7 @@
 package gui.controllers;
 
+import java.io.IOException;
+
 public interface GameStartListener {
-    void onGameStarted();
+    void onGameStarted() throws IOException;
 }
