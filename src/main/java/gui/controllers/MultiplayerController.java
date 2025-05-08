@@ -45,6 +45,7 @@ public class MultiplayerController {
 
         MultiplayerConnectionController controller = loader.getController();
         controller.setPrimaryStage(primaryStage);
+        controller.setClient(client);
         controller.port.setText("Port: " + portNumber);
         controller.ipAddress.setText("Server IP: " + server.getIpAddress());
         controller.setServer(server);

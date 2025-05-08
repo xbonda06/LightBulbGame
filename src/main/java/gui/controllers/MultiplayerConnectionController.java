@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import multiplayer.GameClient;
 import multiplayer.GameServer;
 
 import java.io.IOException;
@@ -18,9 +19,11 @@ public class MultiplayerConnectionController {
     @FXML public Label port;
     private Stage primaryStage;
     private GameServer server;
+    private GameClient client;
 
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
     public void setServer(GameServer server) {this.server = server;}
+    public void setClient(GameClient client) {this.client = client;}
 
     @FXML public void toTheMain() {
         server.stop();
@@ -33,7 +36,9 @@ public class MultiplayerConnectionController {
 
         MultiplayerGameController controller = loader.getController();
         controller.setServer(server);
+        controller.setClient(client);
         controller.setPrimaryStage(primaryStage);
+        controller.showGame();
 
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - ");
