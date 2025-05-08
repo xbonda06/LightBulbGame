@@ -24,6 +24,7 @@ public class GameClient {
     private int playerId;
     private Game ownGame;
     private final Map<Integer, Game> opponentGames = new HashMap<>();
+    private volatile boolean gameStarted = false;
 
     private final Gson gson = new Gson();
 
@@ -57,6 +58,7 @@ public class GameClient {
     }
 
     private void listen() {
+        playerId = -1;
         try {
             String line;
             while ((line = in.readLine()) != null) {
@@ -134,6 +136,12 @@ public class GameClient {
                             }
                         }
                     }
+
+                    case "start_game" -> {
+                        gameStarted = true;
+                        System.out.println("CLIENT: Game started!");
+                        // TODO: Notify the game that it has started
+                    }
                 }
             }
         } catch (IOException e) {
@@ -149,6 +157,14 @@ public class GameClient {
             return deserializer.getGame();
         } catch (Exception e) {
             throw new RuntimeException("Deserialization Error", e);
+        }
+    }
+
+    public void sendStartGame() {
+        if (playerId == 1) { // Only player 1 can start the game
+            JsonObject msg = new JsonObject();
+            msg.addProperty("type", "start_game");
+            out.println(msg);
         }
     }
 
@@ -179,6 +195,7 @@ public class GameClient {
         out.println(msg);
     }
 
+    public boolean isGameStarted() { return gameStarted; }
     public Game getOwnGame() { return ownGame; }
     public Game getOpponentGame(int id) { return opponentGames.get(id); }
     public Set<Integer> getOpponentIds() { return opponentGames.keySet(); }
