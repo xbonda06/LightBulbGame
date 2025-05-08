@@ -114,6 +114,7 @@ public class MultiplayerGameController {
 
             MultiplayerOpponentGameController opponentController = loader.getController();
             opponentController.setGame(client.getOpponentGame(id));
+            opponentController.setGameClient(client);
             opponentController.showGame();
             opponentController.playerId.setText("Player " + id);
 

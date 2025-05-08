@@ -3,6 +3,7 @@ package multiplayer;
 import common.Position;
 import game.Game;
 import gui.controllers.GameStartListener;
+import gui.controllers.GameUpdateListener;
 import json.GameDeserializer;
 import com.google.gson.*;
 
@@ -30,6 +31,7 @@ public class GameClient {
     private volatile boolean gameStarted = false;
 
     private GameStartListener startListener;
+    private GameUpdateListener gameUpdateListener;
 
     private final Gson gson = new Gson();
 
@@ -103,6 +105,10 @@ public class GameClient {
                                 opponentUndoStacks.get(sender).push(pos);
                                 opponentRedoStacks.get(sender).clear();
                             }
+
+                            if (gameUpdateListener != null) {
+                                gameUpdateListener.onGameUpdate();
+                            }
                         }
                     }
 
@@ -120,6 +126,10 @@ public class GameClient {
                                     g.updatePowerPropagation();
                                 }
                                 redoStack.push(pos);
+                            }
+
+                            if (gameUpdateListener != null) {
+                                gameUpdateListener.onGameUpdate();
                             }
                         }
                     }
@@ -139,6 +149,10 @@ public class GameClient {
                                 }
                                 undoStack.push(pos);
                             }
+                        }
+
+                        if (gameUpdateListener != null) {
+                            gameUpdateListener.onGameUpdate();
                         }
                     }
 
@@ -217,15 +231,13 @@ public class GameClient {
         System.out.println("CLIENT: Player count requested.");
     }
 
-    public void setGameStartListener(GameStartListener listener) { this.startListener = listener; }
-
-    public int getLatestPlayerCount() {
-        return latestPlayerCount;
-    }
-    public List<Integer> getLatestPlayerIds() {
-        return new ArrayList<>(latestPlayerIds);
-    }
     public boolean isGameStarted() { return gameStarted; }
+
+    public void setGameStartListener(GameStartListener listener) { this.startListener = listener; }
+    public void setGameUpdateListener(GameUpdateListener gameUpdateListener) { this.gameUpdateListener = gameUpdateListener; }
+
+    public int getLatestPlayerCount() { return latestPlayerCount; }
+    public List<Integer> getLatestPlayerIds() { return new ArrayList<>(latestPlayerIds); }
     public Game getOwnGame() { return ownGame; }
     public Game getOpponentGame(int id) { return opponentGames.get(id); }
     public Set<Integer> getOpponentIds() { return opponentGames.keySet(); }
