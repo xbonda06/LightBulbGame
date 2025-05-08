@@ -203,8 +203,6 @@ public class GridHelper {
         if (animate && !(node.isBulb() && node.light())) {
 
             double previousRotation = isUndo ? (rotationAngle + 90 + 360) % 360 : (rotationAngle - 90 + 360) % 360;
-            System.out.println("Prev: " + previousRotation);
-            System.out.println("Rotate: " + rotationAngle);
             RotateTransition rotate = new RotateTransition(Duration.millis(220), imageView);
             rotate.setFromAngle(previousRotation);
             double rotation = isUndo ? -90 : 90;
