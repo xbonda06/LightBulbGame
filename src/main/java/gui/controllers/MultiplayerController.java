@@ -61,6 +61,12 @@ public class MultiplayerController {
 
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - Multiplayer");
+        primaryStage.setOnCloseRequest(e -> closeScene(server));
+    }
+
+    private void closeScene(GameServer server){
+        server.stop();
+        primaryStage.close();
     }
 
     @FXML public void joinGame() {
@@ -103,6 +109,12 @@ public class MultiplayerController {
         controller.setGameClient(client);
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - Multiplayer");
+        primaryStage.setOnCloseRequest(e -> closeClient(client));
+    }
+
+    private void closeClient(GameClient client){
+        client.stop();
+        primaryStage.close();
     }
 
     @FXML public void toTheMain() {

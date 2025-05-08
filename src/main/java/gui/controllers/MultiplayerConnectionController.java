@@ -51,5 +51,11 @@ public class MultiplayerConnectionController {
 
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - ");
+        primaryStage.setOnCloseRequest(e -> {controller.closeOpponents(); closeScene(server);});
+    }
+
+    private void closeScene(GameServer server){
+        server.stop();
+        primaryStage.close();
     }
 }

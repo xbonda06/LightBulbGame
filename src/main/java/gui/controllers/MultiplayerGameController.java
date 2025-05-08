@@ -139,11 +139,7 @@ public class MultiplayerGameController {
     }
 
     public void toTheMain() {
-        for (Stage stage : opponentStages) {
-            stage.close();
-        }
-        opponentStages.clear();
-
+        closeOpponents();
         client.stop();
         if(server != null) {
             server.stop();
@@ -226,4 +222,10 @@ public class MultiplayerGameController {
         timerLabel.setText(String.format("%d:%02d", minutes, seconds));
     }
 
+    public void closeOpponents() {
+        for (Stage stage : opponentStages) {
+            stage.close();
+        }
+        opponentStages.clear();
+    }
 }
