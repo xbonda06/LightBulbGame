@@ -10,7 +10,10 @@ package gui.controllers;
 
 import common.GameNode;
 import game.Game;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -31,6 +34,9 @@ import java.util.List;
 
 public class MultiplayerGameController {
     private static final int FIELD_SIZE = 400;
+    private int secondsElapsed = 0;
+    private int stepsTaken = 0;
+    private Timeline gameTimer;
     private int cellSize;
     private Stage primaryStage;
     private GameServer server;
@@ -52,6 +58,9 @@ public class MultiplayerGameController {
 
     public void showGame() throws IOException {
         this.game = client.getOwnGame();
+        setupTimer();
+        startTimer();
+
         opponentsGame();
         createGameBoard();
     }
@@ -174,18 +183,47 @@ public class MultiplayerGameController {
     }
 
     private void handleCellClick(GameNode node) {
-            game.setLastTurnedNode(node.getPosition());
-            node.turn();
-            client.sendTurn(node.getPosition());
-            int row = node.getPosition().getRow() - 1;
-            int col = node.getPosition().getCol() - 1;
-            for (int r = 0; r < boardSize; r++) {
-                for (int c = 0; c < boardSize; c++) {
-                    boolean animate = (r == row && c == col); //for smooth rotation
-                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
-                            animate, false);
-                }
+        game.setLastTurnedNode(node.getPosition());
+        node.turn();
+        client.sendTurn(node.getPosition());
+        int row = node.getPosition().getRow() - 1;
+        int col = node.getPosition().getCol() - 1;
+        for (int r = 0; r < boardSize; r++) {
+            for (int c = 0; c < boardSize; c++) {
+                boolean animate = (r == row && c == col); //for smooth rotation
+                GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
+                        animate, false);
             }
         }
+    }
+
+    private void setupTimer() {
+        gameTimer = new Timeline(
+                new KeyFrame(Duration.seconds(1), event -> {
+                    secondsElapsed++;
+                    updateTimerDisplay();
+                })
+        );
+        gameTimer.setCycleCount(Animation.INDEFINITE);
+    }
+
+    private void startTimer() {
+        secondsElapsed = 0;
+        stepsTaken = 0;
+        updateTimerDisplay();
+        gameTimer.play();
+    }
+
+    private void stopTimer() {
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
+    }
+
+    private void updateTimerDisplay() {
+        int minutes = secondsElapsed / 60;
+        int seconds = secondsElapsed % 60;
+        timerLabel.setText(String.format("%d:%02d", minutes, seconds));
+    }
 
 }
