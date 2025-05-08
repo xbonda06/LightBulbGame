@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
 
 public class GameMultiplayerTest {
 
@@ -395,4 +396,34 @@ public class GameMultiplayerTest {
         assertEquals(1, c1.getPlayerId(), "First client should be admin");
         assertNotEquals(1, c2.getPlayerId(), "Second client should not be admin");
     }
+
+    @Test
+    public void testPlayerCountQuery() throws Exception {
+        int port = 8345;
+        int difficulty = 5;
+
+        new Thread(() -> new GameServer(port, difficulty).start()).start();
+        Thread.sleep(500);
+
+        GameClient c1 = new GameClient("localhost", port);
+        GameClient c2 = new GameClient("localhost", port);
+        GameClient c3 = new GameClient("localhost", port);
+
+        c1.start();
+        c2.start();
+        c3.start();
+        Thread.sleep(1500);
+
+        c2.requestPlayerCount();
+        Thread.sleep(500);
+
+        int count = c2.getLatestPlayerCount();
+        List<Integer> ids = c2.getLatestPlayerIds();
+
+        assertEquals(3, count, "There should be 3 connected players.");
+        assertTrue(ids.contains(c1.getPlayerId()), "Should include player 1");
+        assertTrue(ids.contains(c2.getPlayerId()), "Should include player 2");
+        assertTrue(ids.contains(c3.getPlayerId()), "Should include player 3");
+    }
+
 }

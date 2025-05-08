@@ -11,6 +11,7 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import com.google.gson.JsonArray;
 
 public class GameServer {
     private final int difficulty;
@@ -152,6 +153,21 @@ public class GameServer {
                         JsonObject startMsg = new JsonObject();
                         startMsg.addProperty("type", "start_game");
                         broadcast(startMsg.toString(), null);
+                    } else if ("player_count".equals(type)) {
+                        JsonObject resp = new JsonObject();
+                        resp.addProperty("type", "player_count_response");
+
+                        List<Integer> ids = clients.stream()
+                                .map(handler -> handler.playerId)
+                                .toList();
+
+                        resp.addProperty("count", ids.size());
+
+                        JsonArray arr = new JsonArray();
+                        for (int id : ids) arr.add(id);
+                        resp.add("playerIds", arr);
+
+                        out.println(resp);
                     } else {
                         broadcast(line, this);
                     }
