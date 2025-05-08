@@ -226,10 +226,12 @@ public class GridHelper {
         if (clickHandler != null)
             imageView.setOnMouseClicked(event -> clickHandler.accept(node));
 
-        if (connectorView != null && clickHandler != null) {
-            connectorView.setOnMouseClicked(event -> {
-                clickHandler.accept(node);
-            });
+        if (connectorView != null) {
+            if (clickHandler != null){
+                connectorView.setOnMouseClicked(event -> {
+                    clickHandler.accept(node);
+                });
+            }
             grid.add(connectorView, col, row);
         }
         grid.add(imageView, col, row);
