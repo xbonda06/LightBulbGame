@@ -50,7 +50,7 @@ public class GameServer {
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             this.serverSocket = serverSocket;
-            System.out.println("SERVER: Server is started on address " + InetAddress.getLocalHost().getHostAddress() + ":" + port + ", waiting for other players...");
+            System.out.println("SERVER: Server is started on address " + getIpAddress() + ":" + port + ", waiting for other players...");
 
             this.game = Game.generate(difficulty, difficulty);
             game.randomizeRotations();
@@ -75,8 +75,26 @@ public class GameServer {
         }
     }
 
-    public String getIpAddress() throws UnknownHostException {
-        return InetAddress.getLocalHost().getHostAddress();
+    public String getIpAddress() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface iface = interfaces.nextElement();
+                if (iface.isLoopback() || !iface.isUp()) continue;
+
+                Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress() && !addr.isLinkLocalAddress()
+                            && !addr.isMulticastAddress() && !addr.isAnyLocalAddress() && !addr.isSiteLocalAddress()) {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return "127.0.0.1"; // fallback
     }
 
     public void broadcast(String message, ClientHandler sender) {
