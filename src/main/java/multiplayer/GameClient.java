@@ -23,6 +23,8 @@ public class GameClient {
 
     private int playerId;
     private Game ownGame;
+    private int latestPlayerCount = -1;
+    private List<Integer> latestPlayerIds = new ArrayList<>();
     private final Map<Integer, Game> opponentGames = new HashMap<>();
     private volatile boolean gameStarted = false;
 
@@ -142,6 +144,14 @@ public class GameClient {
                         System.out.println("CLIENT: Game started!");
                         // TODO: Notify the game that it has started
                     }
+
+                    case "player_count_response" -> {
+                        latestPlayerCount = obj.get("count").getAsInt();
+                        latestPlayerIds.clear();
+                        for (JsonElement el : obj.getAsJsonArray("playerIds")) {
+                            latestPlayerIds.add(el.getAsInt());
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
@@ -193,6 +203,20 @@ public class GameClient {
         msg.addProperty("type", "redo");
         msg.addProperty("playerId", playerId);
         out.println(msg);
+    }
+
+    public void requestPlayerCount() {
+        JsonObject msg = new JsonObject();
+        msg.addProperty("type", "player_count");
+        out.println(msg);
+    }
+
+    public int getLatestPlayerCount() {
+        return latestPlayerCount;
+    }
+
+    public List<Integer> getLatestPlayerIds() {
+        return new ArrayList<>(latestPlayerIds);
     }
 
     public boolean isGameStarted() { return gameStarted; }
