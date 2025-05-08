@@ -43,6 +43,9 @@ public class GameServer {
         }
     }
 
+    public Game getGame () {
+        return game;
+    }
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {

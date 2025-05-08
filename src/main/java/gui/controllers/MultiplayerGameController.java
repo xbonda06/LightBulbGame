@@ -8,10 +8,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import multiplayer.GameClient;
+import multiplayer.GameServer;
 
 public class MultiplayerGameController {
     private Stage primaryStage;
+    private GameServer server;
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
+    public void setServer(GameServer server) {this.server = server;}
 
     @FXML
     public StackPane rootPane;
@@ -29,6 +32,7 @@ public class MultiplayerGameController {
     }
 
     public void toTheMain() {
+        server.stop();
         GridHelper.loadMainMenu(primaryStage);
     }
 }
