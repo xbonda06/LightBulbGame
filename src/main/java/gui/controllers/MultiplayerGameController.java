@@ -57,7 +57,7 @@ public class MultiplayerGameController {
 
     private void opponentsGame() throws IOException {
         Set<Integer> ids = client.getOpponentIds();
-        Integer[] idArray = ids.toArray(new Integer[0]);
+        int size = ids.size();
 
         double mainWidth = 800;
         double mainHeight = 600;
@@ -73,44 +73,50 @@ public class MultiplayerGameController {
         primaryStage.setX(mainX);
         primaryStage.setY(mainY);
 
-        if (idArray.length > 0) {
-            showOpponentWindow(idArray[0],
+        if (size > 0) {
+            showOpponentWindow(2,
                     mainX - opponentWidth - spacing,
                     mainY - 50);
         }
-        if (idArray.length > 1) {
-            showOpponentWindow(idArray[1],
+        if (size > 1) {
+            showOpponentWindow(3,
                     mainX - opponentWidth - spacing,
                     mainY + (opponentHeight) + spacing);
         }
-        if (idArray.length > 2) {
-            showOpponentWindow(idArray[2],
+        if (size > 2) {
+            showOpponentWindow(4,
                     mainX + mainWidth + spacing,
                     mainY - 50);
         }
     }
 
     private void showOpponentWindow(Integer id, double x, double y) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/multiplayer_other.fxml"));
-        Parent root = loader.load();
 
-        MultiplayerOpponentGameController opponentController = loader.getController();
-        opponentController.setGame(client.getOpponentGame(id));
+        Game gameOpponent = client.getOpponentGame(id);
+        if (gameOpponent != null) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/multiplayer_other.fxml"));
+            Parent root = loader.load();
 
-        Stage opponentStage = new Stage();
-        opponentStage.setTitle("Player " + id);
-        opponentStage.setScene(new Scene(root, 350, 350));
-        opponentStage.setResizable(false);
-        opponentStage.setX(x);
-        opponentStage.setY(y);
-        opponentStage.show();
+            MultiplayerOpponentGameController opponentController = loader.getController();
+            opponentController.setGame(client.getOpponentGame(id));
+            opponentController.showGame();
+            opponentController.playerId.setText("Player " + id);
 
-        opponentStages.add(opponentStage);
+            Stage opponentStage = new Stage();
+            opponentStage.setTitle("Player " + id);
+            opponentStage.setScene(new Scene(root, 350, 350));
+            opponentStage.setResizable(false);
+            opponentStage.setX(x);
+            opponentStage.setY(y);
+            opponentStage.show();
+
+            opponentStages.add(opponentStage);
+        }
     }
 
     @FXML public void getUndo() {
         client.sendUndo();
-        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, true);
+        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, false);
     }
 
     @FXML public void getRedo() {
