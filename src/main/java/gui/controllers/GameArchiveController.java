@@ -1,3 +1,12 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * This controller displays a previously played game in archive mode.
+ * The game is shown in a read-only format with limited interaction: only undo/redo steps are allowed.
+ * Users can view the board, inspect the game's progress, and optionally restart the game from its archived state.
+ */
+
 package gui.controllers;
 
 import common.GameNode;

@@ -1,3 +1,13 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * Controller for the Join Game dialog in the multiplayer mode.
+ * Handles user input for IP address and port, validates it,
+ * and attempts to connect to a multiplayer server.
+ * Closes the dialog on success or by user action.
+ */
+
 package gui.controllers;
 
 import javafx.fxml.FXML;

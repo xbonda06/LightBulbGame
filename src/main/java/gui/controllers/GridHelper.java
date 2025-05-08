@@ -1,3 +1,15 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * Helper Abstract class for managing the game grid in the Light Bulb Game.
+ *
+ * It handles loading and caching of image resources, rendering and updating
+ * game nodes on the JavaFX GridPane, managing click handlers, animations for
+ * rotating connectors, and transitioning between different UI scenes (main menu,
+ * archive, game board).
+ */
+
 package gui.controllers;
 
 import common.GameNode;
@@ -10,13 +22,11 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -193,8 +203,6 @@ public class GridHelper {
         if (animate && !(node.isBulb() && node.light())) {
 
             double previousRotation = isUndo ? (rotationAngle + 90 + 360) % 360 : (rotationAngle - 90 + 360) % 360;
-            System.out.println("Prev: " + previousRotation);
-            System.out.println("Rotate: " + rotationAngle);
             RotateTransition rotate = new RotateTransition(Duration.millis(220), imageView);
             rotate.setFromAngle(previousRotation);
             double rotation = isUndo ? -90 : 90;
@@ -219,10 +227,11 @@ public class GridHelper {
             imageView.setOnMouseClicked(event -> clickHandler.accept(node));
 
         if (connectorView != null) {
-            connectorView.setOnMouseClicked(event -> {
-                assert clickHandler != null;
-                clickHandler.accept(node);
-            });
+            if (clickHandler != null){
+                connectorView.setOnMouseClicked(event -> {
+                    clickHandler.accept(node);
+                });
+            }
             grid.add(connectorView, col, row);
         }
         grid.add(imageView, col, row);

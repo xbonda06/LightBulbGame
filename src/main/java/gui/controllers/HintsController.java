@@ -1,3 +1,17 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * This controller manages the hints window for the puzzle game.
+ * It displays a read-only version of the current game board and overlays hint icons
+ * indicating the suggested number of rotations for each cell.
+ *
+ * Features:
+ * - Initializes the board based on the current game state.
+ * - Updates and redraws hints dynamically during gameplay.
+ * - Provides a method to close the hints window programmatically.
+ */
+
 package gui.controllers;
 
 import common.GameNode;
