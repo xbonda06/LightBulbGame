@@ -10,6 +10,7 @@ package gui.controllers;
 
 import common.GameNode;
 import game.Game;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,12 +22,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import multiplayer.GameClient;
 import multiplayer.GameServer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class MultiplayerGameController {
     private static final int FIELD_SIZE = 400;
@@ -56,8 +57,12 @@ public class MultiplayerGameController {
     }
 
     private void opponentsGame() throws IOException {
-        Set<Integer> ids = client.getOpponentIds();
-        int size = ids.size();
+        client.requestPlayerCount();
+        PauseTransition pause = new PauseTransition(Duration.millis(700));
+        pause.play();
+        int count = client.getLatestPlayerCount();
+        System.out.println(count);
+        List<Integer> ids = client.getLatestPlayerIds();
 
         double mainWidth = 800;
         double mainHeight = 600;
@@ -73,18 +78,18 @@ public class MultiplayerGameController {
         primaryStage.setX(mainX);
         primaryStage.setY(mainY);
 
-        if (size > 0) {
-            showOpponentWindow(2,
+        if (count > 1) {
+            showOpponentWindow(ids.get(1),
                     mainX - opponentWidth - spacing,
                     mainY - 50);
         }
-        if (size > 1) {
-            showOpponentWindow(3,
+        if (count > 2) {
+            showOpponentWindow(ids.get(2),
                     mainX - opponentWidth - spacing,
                     mainY + (opponentHeight) + spacing);
         }
-        if (size > 2) {
-            showOpponentWindow(4,
+        if (count > 3) {
+            showOpponentWindow(ids.get(3),
                     mainX + mainWidth + spacing,
                     mainY - 50);
         }
