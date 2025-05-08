@@ -214,6 +214,7 @@ public class GameClient {
         JsonObject msg = new JsonObject();
         msg.addProperty("type", "player_count");
         out.println(msg);
+        System.out.println("CLIENT: Player count requested.");
     }
 
     public void setGameStartListener(GameStartListener listener) { this.startListener = listener; }
