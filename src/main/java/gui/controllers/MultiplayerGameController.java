@@ -182,6 +182,7 @@ public class MultiplayerGameController {
     private void handleCellClick(GameNode node) {
         game.setLastTurnedNode(node.getPosition());
         node.turn();
+        updateStepsDisplay();
         client.sendTurn(node.getPosition());
         int row = node.getPosition().getRow() - 1;
         int col = node.getPosition().getCol() - 1;
@@ -222,6 +223,11 @@ public class MultiplayerGameController {
         int seconds = secondsElapsed % 60;
         timerLabel.setText(String.format("%d:%02d", minutes, seconds));
     }
+
+    private void updateStepsDisplay() {
+        stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
+    }
+
 
     public void closeOpponents() {
         for (Stage stage : opponentStages) {
