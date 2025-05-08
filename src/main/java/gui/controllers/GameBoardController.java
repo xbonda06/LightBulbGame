@@ -47,7 +47,6 @@ public class GameBoardController {
     private int boardSize = 5;
     private int cellSize;
     private int secondsElapsed = 0;
-    private int hintsUsed = 0;
     private int stepsTaken = 0;
     Stage primaryStage;
     private Timeline gameTimer;
@@ -263,7 +262,6 @@ public class GameBoardController {
     private void startTimer() {
         secondsElapsed = 0;
         stepsTaken = 0;
-        hintsUsed = 0;
         updateTimerDisplay();
         updateStepsDisplay();
         updateHintsDisplay();
@@ -287,7 +285,7 @@ public class GameBoardController {
     }
 
     private void updateHintsDisplay() {
-        hintButton.setText(String.format("HINT %d/2", hintsUsed));
+        hintButton.setText("HINTS");
     }
 
     private void closeHintsAndCenterMain() {
@@ -329,7 +327,7 @@ public class GameBoardController {
     }
 
     @FXML public void getUndo() {
-        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, true);
+        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, false);
     }
 
     @FXML public void getRedo() {
