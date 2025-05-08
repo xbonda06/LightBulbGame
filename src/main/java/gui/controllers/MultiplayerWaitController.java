@@ -1,6 +1,13 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * Controller for the client-side waiting screen in multiplayer mode.
+ * Waits for the game to start and transitions to the main multiplayer game view once it begins.
+ */
+
 package gui.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.stage.Stage;
 import multiplayer.GameClient;
 

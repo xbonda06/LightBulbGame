@@ -1,3 +1,9 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ */
+
 package gui.controllers;
 
 import game.Game;

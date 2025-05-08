@@ -1,3 +1,14 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * This is the main entry point for the Light Bulb Game application. The application
+ * uses JavaFX for the user interface and loads the main menu scene from an FXML file.
+ * The MainApp class extends the Application class and overrides the `start` method to
+ * set up the primary stage, load the FXML file for the main menu, and configure the scene
+ * with the appropriate controller.
+ */
+
 package gui;
 
 import gui.controllers.MainMenuController;

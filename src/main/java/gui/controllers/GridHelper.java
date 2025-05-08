@@ -1,3 +1,15 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * Helper Abstract class for managing the game grid in the Light Bulb Game.
+ *
+ * It handles loading and caching of image resources, rendering and updating
+ * game nodes on the JavaFX GridPane, managing click handlers, animations for
+ * rotating connectors, and transitioning between different UI scenes (main menu,
+ * archive, game board).
+ */
+
 package gui.controllers;
 
 import common.GameNode;
@@ -10,13 +22,11 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

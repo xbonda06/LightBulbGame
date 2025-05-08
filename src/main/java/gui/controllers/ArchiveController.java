@@ -1,3 +1,12 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * This controller manages the archive menu, where all previously played games are listed.
+ * Games are grouped and sorted by date (from newest to oldest).
+ * Each game can be selected to view its progress in a read-only mode via the GameArchiveController.
+ */
+
 package gui.controllers;
 
 import game.Game;

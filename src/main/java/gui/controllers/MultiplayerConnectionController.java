@@ -1,3 +1,12 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * This controller manages the multiplayer connection waiting screen.
+ * It displays connection details (IP address, port, and player count) and allows the user to either start the game
+ * (which transitions to the multiplayer game window) or exit to the main menu.
+ */
+
 package gui.controllers;
 
 import javafx.fxml.FXML;
@@ -9,7 +18,6 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import multiplayer.GameClient;
 import multiplayer.GameServer;
-
 import java.io.IOException;
 
 public class MultiplayerConnectionController {
@@ -38,6 +46,7 @@ public class MultiplayerConnectionController {
         controller.setServer(server);
         controller.setClient(client);
         controller.setPrimaryStage(primaryStage);
+        client.sendStartGame();
         controller.showGame();
 
         primaryStage.setScene(new Scene(root, 800, 600));

@@ -1,3 +1,12 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * Controller for handling multiplayer menu interactions.
+ * Allows the user to create or join a multiplayer game,manages transitions to appropriate scenes,
+ * and sets up game server and client communication.
+ */
+
 package gui.controllers;
 
 import javafx.fxml.FXML;

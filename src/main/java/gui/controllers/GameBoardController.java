@@ -1,8 +1,19 @@
 /*
-* Author: Olha Tomylko (xtomylo00)
-*
-* Description:
-*/
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * This controller manages the main game screen of the Light Bulb puzzle game.
+ * It handles game initialization, player interaction with the board, timer updates,
+ * and win condition logic. The controller also supports undo/redo functionality,
+ * hint window management, and transitions to/from the main menu.
+ *
+ * Core features:
+ * - Initializes a new game or continues from an archived state.
+ * - Listens to user clicks and rotates connectors accordingly.
+ * - Animates cell rotation and tracks game steps and time.
+ * - Displays a hint window showing solution suggestions.
+ * - Shows a win dialog when the puzzle is completed.
+ */
 
 package gui.controllers;
 

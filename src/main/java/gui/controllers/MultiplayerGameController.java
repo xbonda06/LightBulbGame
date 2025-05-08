@@ -1,3 +1,11 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * Controller for the multiplayer game screen. Handles UI initialization, player moves,
+ * opponent game windows, and interactions between the client and server during gameplay.
+ */
+
 package gui.controllers;
 
 import common.GameNode;
