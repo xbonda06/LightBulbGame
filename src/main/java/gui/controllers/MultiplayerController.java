@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -18,30 +17,16 @@ import java.io.IOException;
 import java.util.Random;
 
 public class MultiplayerController {
-    public Label port;
     private Stage primaryStage;
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
 
     @FXML public StackPane rootPane;
-    @FXML public Label playerId;
     @FXML public GridPane gameGrid;
-    @FXML public Button undoButton;
-    @FXML public Button redoButton;
-    @FXML public Label stepsLabel;
-    @FXML public Label timerLabel;
     @FXML public Button createButton;
     @FXML public Button joinGame;
     @FXML public Button mainButton;
 
-    // From the game mode -> multiplayer_main.fxml
-    @FXML public void getRedo() {
-    }
-
-    @FXML public void getUndo() {
-    }
-
     // From the menu when choosing CREATE or JOIN -> multiplayer_menu.fxml
-
     @FXML
     public void createGame() throws IOException {
         int portNumber = new Random().nextInt(9000) + 1000;
