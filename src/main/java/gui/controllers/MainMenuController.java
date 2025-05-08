@@ -1,6 +1,5 @@
 package gui.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -39,5 +38,14 @@ public class MainMenuController {
 
     @FXML public void openArchive() throws IOException {
         GridHelper.loadArchive(primaryStage);
+    }
+
+    @FXML public void startMultiplayer() throws IOException {
+        FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/multiplayer_menu.fxml"));
+        Parent root = loader.load();
+        MultiplayerController controller = loader.getController();
+        controller.setPrimaryStage(primaryStage);
+        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setTitle("Light Bulb Game - Multiplayer");
     }
 }

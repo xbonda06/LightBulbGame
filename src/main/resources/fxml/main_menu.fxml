@@ -40,7 +40,7 @@
             </font>
         </Button>
 
-        <Button fx:id="multiplayerButton" onAction="#handleDifficulty" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Multiplayer">
+        <Button fx:id="multiplayerButton" onAction="#startMultiplayer" prefHeight="35.0" prefWidth="200.0" styleClass="buttonMain" stylesheets="@../css/styles.css" text="Multiplayer">
             <font>
                 <Font size="22.0" />
             </font>

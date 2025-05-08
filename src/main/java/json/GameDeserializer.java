@@ -59,7 +59,10 @@ public class GameDeserializer {
         goToStep(0);
         game.loadHistory(snapshot.undoHistory, snapshot.redoHistory);
         // Assign the original save ID (e.g., 3.json → ID 3)
-        int id = Integer.parseInt(jsonFile.getFileName().toString().replace(".json", ""));
+        String fileName = jsonFile.getFileName().toString();
+        int id = -1;
+        if(!fileName.startsWith("temp_game_"))
+            id = Integer.parseInt(fileName.replace(".json", ""));
         game.setSaveFileId(id);
     }
 

@@ -37,6 +37,18 @@ public class GameClient {
         this.port = port;
     }
 
+    public void stop() {
+        try {
+            if (out != null) out.close();
+            if (in != null) in.close();
+            if (socket != null && !socket.isClosed()) socket.close();
+            System.out.println("CLIENT: Disconnected from server.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public void start() throws IOException {
         socket = new Socket(host, port);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -131,7 +143,7 @@ public class GameClient {
 
     private Game deserializeGame(String gameJson) {
         try {
-            Path temp = Files.createTempFile("game", ".json");
+            Path temp = Files.createTempFile("temp_game_", ".json");
             Files.writeString(temp, gameJson);
             GameDeserializer deserializer = new GameDeserializer(temp);
             return deserializer.getGame();

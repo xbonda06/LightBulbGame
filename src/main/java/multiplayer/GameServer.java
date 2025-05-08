@@ -18,6 +18,7 @@ public class GameServer {
     private final GameSerializer gameSerializer = new GameSerializer();
     private final List<ClientHandler> clients = new ArrayList<>();
     private final ExecutorService pool = Executors.newFixedThreadPool(maxPlayers);
+    private ServerSocket serverSocket;
 
     private Game game;
     private String gameJson;
@@ -27,9 +28,29 @@ public class GameServer {
         this.difficulty = difficulty;
     }
 
+    public void stop() {
+        try {
+            System.out.println("SERVER: Stopping server...");
+            for (ClientHandler client : clients) {
+                client.close();
+            }
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+            pool.shutdownNow();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Game getGame () {
+        return game;
+    }
+
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("SERVER: Server is started on address " + InetAddress.getLocalHost().getHostAddress() + ":" + port + ", waiting for other players...");
+            this.serverSocket = serverSocket;
+            System.out.println("SERVER: Server is started on address " + getIpAddress() + ":" + port + ", waiting for other players...");
 
             this.game = Game.generate(difficulty, difficulty);
             game.randomizeRotations();
@@ -46,9 +67,34 @@ public class GameServer {
                 System.out.println("SERVER: Player " + handler.playerId + " connected.");
             }
 
-        } catch (IOException e) {
+        }catch (SocketException e) {
+            System.out.println("SERVER: Server socket was closed. Server is shutting down.");
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getIpAddress() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface iface = interfaces.nextElement();
+                if (iface.isLoopback() || !iface.isUp()) continue;
+
+                Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress() && !addr.isLinkLocalAddress()
+                            && !addr.isMulticastAddress() && !addr.isAnyLocalAddress() && !addr.isSiteLocalAddress()) {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return "127.0.0.1"; // fallback
     }
 
     public void broadcast(String message, ClientHandler sender) {
@@ -106,5 +152,12 @@ public class GameServer {
             return obj.toString();
         }
 
+        public void close() {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
