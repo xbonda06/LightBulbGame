@@ -228,9 +228,8 @@ public class GridHelper {
         if (clickHandler != null)
             imageView.setOnMouseClicked(event -> clickHandler.accept(node));
 
-        if (connectorView != null) {
+        if (connectorView != null && clickHandler != null) {
             connectorView.setOnMouseClicked(event -> {
-                assert clickHandler != null;
                 clickHandler.accept(node);
             });
             grid.add(connectorView, col, row);
