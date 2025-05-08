@@ -9,7 +9,6 @@ import ija.ija2024.tool.common.ToolField;
 
 import json.GameSerializer;
 
-import java.nio.file.Paths;
 
 import java.util.*;
 
@@ -37,7 +36,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         this.rows = rows;
         this.cols = cols;
         this.nodes = new GameNode[rows][cols];
-        this.serializer = new GameSerializer(Paths.get("logs", gameId + ".json"));
+        this.serializer = new GameSerializer();
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
                 this.nodes[r - 1][c - 1] = new GameNode(new Position(r, c));
@@ -93,8 +92,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
             Position neighborPos = switch (side) {
                 case NORTH -> new Position(pos.getRow() - 1, pos.getCol());
                 case SOUTH -> new Position(pos.getRow() + 1, pos.getCol());
-                case EAST  -> new Position(pos.getRow(), pos.getCol() + 1);
-                case WEST  -> new Position(pos.getRow(), pos.getCol() - 1);
+                case EAST -> new Position(pos.getRow(), pos.getCol() + 1);
+                case WEST -> new Position(pos.getRow(), pos.getCol() - 1);
             };
 
             int nr = neighborPos.getRow() - 1;
@@ -106,8 +105,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
             Side opposite = switch (side) {
                 case NORTH -> Side.SOUTH;
                 case SOUTH -> Side.NORTH;
-                case EAST  -> Side.WEST;
-                case WEST  -> Side.EAST;
+                case EAST -> Side.WEST;
+                case WEST -> Side.EAST;
             };
 
             if (neighbor.containsConnector(opposite)) {
@@ -136,19 +135,21 @@ public class Game implements ToolEnvironment, Observable.Observer {
     public int rows() {
         return this.rows;
     }
+
     public int cols() {
         return this.cols;
     }
+
     public GameNode node(Position p) {
         return this.nodes[p.getRow() - 1][p.getCol() - 1];
     }
 
     // Is called in GameBoardController when click before turn
-    public void setLastTurnedNode(Position p){
+    public void setLastTurnedNode(Position p) {
         lastTurnedNode = p;
     }
 
-    public Position getLastTurnedNode(){
+    public Position getLastTurnedNode() {
         return lastTurnedNode;
     }
 
@@ -169,11 +170,11 @@ public class Game implements ToolEnvironment, Observable.Observer {
             return null;
         }
 
-        if (sides.length == 0 || sides.length > 4){
+        if (sides.length == 0 || sides.length > 4) {
             return null;
         }
 
-        if (this.isPower){
+        if (this.isPower) {
             return null;
         }
 
@@ -185,12 +186,12 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return node;
     }
 
-    public GameNode createLinkNode (Position p, Side...sides){
+    public GameNode createLinkNode(Position p, Side... sides) {
         if (p.getRow() < 1 || p.getRow() > this.rows || p.getCol() < 1 || p.getCol() > this.cols) {
             return null;
         }
 
-        if (sides.length < 2 || sides.length > 4){
+        if (sides.length < 2 || sides.length > 4) {
             return null;
         }
 
@@ -205,27 +206,49 @@ public class Game implements ToolEnvironment, Observable.Observer {
         if (rows <= 0 || cols <= 0)
             throw new IllegalArgumentException("Invalid game size.");
 
-        Game game = new Game(rows, cols);
-        Random random = new Random();
+        final int maxAttempts = 10;
+        int attempt = 0;
 
-        // Set power to random position
-        Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
-        GameNode power = game.createPowerNode(powerPos, Side.NORTH); // Default direction - will be changed in generation process
-        validatePowerConnections(power, ++rows, ++cols);
+        while (attempt < maxAttempts) {
+            Game game = new Game(rows, cols);
+            Random random = new Random();
 
-        for (Side side : Side.values()) {
-            Position neighbor = game.neighbor(powerPos, side);
-            if (neighbor != null) {
-                game.connectNodes(powerPos, neighbor, side);
+            // Set power to random position
+            Position powerPos = new Position(random.nextInt(rows) + 1, random.nextInt(cols) + 1);
+            GameNode power = game.createPowerNode(powerPos, Side.NORTH);
+            validatePowerConnections(power, rows + 1, cols + 1);
+
+            for (Side side : Side.values()) {
+                Position neighbor = game.neighbor(powerPos, side);
+                if (neighbor != null) {
+                    game.connectNodes(powerPos, neighbor, side);
+                }
             }
+
+            // Generate tree of connections and fill the grid
+            game.generateFullConnections(powerPos);
+
+            // Count number of bulbs
+            int bulbCount = 0;
+            for (int r = 1; r <= rows; r++) {
+                for (int c = 1; c <= cols; c++) {
+                    if (game.node(new Position(r, c)).isBulb()) {
+                        bulbCount++;
+                    }
+                }
+            }
+
+            if ((bulbCount >= 1 && game.cols() <= 4 && game.rows() <= 4) ||
+                    (bulbCount >= 3 && game.cols() >= 5 && game.rows() >= 5)) {
+                game.init();
+                game.clearHistory();
+                return game;
+            }
+
+            attempt++;
         }
 
-        // Generate connection tree
-        game.generateFullConnections(powerPos);
-
-        game.init();
-        game.clearHistory();
-        return game;
+        throw new IllegalStateException("Unable to generate valid game with at least one bulb after " + maxAttempts + " attempts.");
     }
 
     private static void validatePowerConnections(GameNode node, int rows, int cols) {
@@ -285,6 +308,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
     }
 
     public void randomizeRotations() {
+        suppressRecording = true;
         Random random = new Random();
         for (int r = 1; r <= rows; r++) {
             for (int c = 1; c <= cols; c++) {
@@ -297,6 +321,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
         moveCount = 0;
         clearHistory();
+        suppressRecording = false;
+        this.serializer.serialize(this, moveCount);
     }
 
     // Checks whether all bulbs in the game are lit
@@ -356,13 +382,16 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return this.nodes[i][i1];
     }
 
+    /**
+     * Called when a GameNode changes. Updates light propagation,
+     * records the move for undo/redo, and saves the game state.
+     */
     @Override
     public void update(Observable observable) {
         updatePowerPropagation();
 
         if (!suppressRecording && observable instanceof GameNode changed) {
             Position pos = changed.getPosition();
-            // record every turn, even if it's the same cell
             undoStack.push(pos);
             lastTurnedNode = pos;
         }
@@ -374,10 +403,9 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
-    /*--------------------------------------------------*
-     *  Undo / Redo support                             *
-     *--------------------------------------------------*/
-
+    /**
+     * Undoes the last player action.
+     */
     public boolean undo() {
         if (undoStack.isEmpty()) return false;
         Position last = undoStack.pop();
@@ -392,11 +420,33 @@ public class Game implements ToolEnvironment, Observable.Observer {
         redoStack.push(last);
         serializer.serialize(this, moveCount);
 
-        System.out.println("UNDO → undo=" + formatStack(undoStack)
-                + ", redo=" + formatStack(redoStack));
         return true;
     }
 
+    /**
+     * Special undo used in archive replay mode (reverse order).
+     */
+    public boolean undoArchive() {
+        if (undoStack.isEmpty()) return false;
+        Position last = undoStack.getFirst();
+        undoStack.removeFirst();
+
+        GameNode n = node(last);
+
+        suppressRecording = true;
+        n.turn();
+        suppressRecording = false;
+
+        lastTurnedNode = last;
+        redoStack.insertElementAt(last, 0);
+        serializer.serialize(this, moveCount);
+
+        return true;
+    }
+
+    /**
+     * Redoes the last undone move. Applies the next step and updates state.
+     */
     public boolean redo() {
         if (redoStack.isEmpty()) return false;
         Position next = redoStack.pop();
@@ -411,12 +461,33 @@ public class Game implements ToolEnvironment, Observable.Observer {
         undoStack.push(next);
         serializer.serialize(this, moveCount);
 
-        System.out.println("REDO → undo=" + formatStack(undoStack)
-                + ", redo=" + formatStack(redoStack));
         return true;
     }
 
-    /** Helper to render a Position stack as “[(r1,c1),(r2,c2),…]” */
+    /**
+     * Special redo used in archive replay mode (reverse order).
+     */
+    public boolean redoArchive() {
+        if (redoStack.isEmpty()) return false;
+        Position next = redoStack.getFirst();
+        redoStack.removeFirst();
+
+        GameNode n = node(next);
+
+        suppressRecording = true;
+        n.turnBack();
+        suppressRecording = false;
+
+        lastTurnedNode = next;
+        undoStack.insertElementAt(next, 0);
+        serializer.serialize(this, moveCount);
+
+        return true;
+    }
+
+    /**
+     * Formats a stack of positions as a readable string (e.g., [(1,2),(2,3)]).
+     */
     private String formatStack(Stack<Position> stack) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < stack.size(); i++) {
@@ -431,10 +502,31 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return sb.toString();
     }
 
+    /**
+     * Clears the undo/redo history and resets move count.
+     */
     public void clearHistory() {
         undoStack.clear();
         redoStack.clear();
         moveCount = 0;
     }
 
+    /**
+     * Loads undo and redo history into the game.
+     */
+    public void loadHistory(List<Position> undoHistory, List<Position> redoHistory) {
+        undoStack.clear();
+        redoStack.clear();
+        undoStack.addAll(undoHistory);
+        for (int i = redoHistory.size() - 1; i >= 0; i--) {
+            redoStack.push(redoHistory.get(i));
+        }
+    }
+
+    /**
+     * Sets the fixed ID for the save file to ensure consistent serialization.
+     */
+    public void setSaveFileId(int id) {
+        this.serializer.setFixedFile(id);
+    }
 }

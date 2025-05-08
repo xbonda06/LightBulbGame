@@ -10,14 +10,14 @@ public class GameGenerationTests {
 
     @Test
     public void testCreateValidSize() {
-        Game game = Game.generate("default", 10, 12);
+        Game game = Game.generate(10, 12);
         assertEquals(10, game.rows(), "Incorrect number of rows.");
         assertEquals(12, game.cols(), "Incorrect number of cols.");
     }
 
     @Test
     public void testExactlyOnePowerNode() {
-        Game game = Game.generate("default", 8, 8);
+        Game game = Game.generate(8, 8);
         int powerCount = 0;
         for (int r = 1; r <= game.rows(); r++) {
             for (int c = 1; c <= game.cols(); c++) {
@@ -32,8 +32,8 @@ public class GameGenerationTests {
     @Test
     public void testPowerIsAlwaysGenerated() {
         for (int i = 0; i < 50; i++) {
-            int size = i/10 + 1;
-            Game game = Game.generate("default", size, size);
+            int size = i/10 + 3;
+            Game game = Game.generate(size, size);
             boolean powerFound = false;
             for (int r = 1; r <= game.rows(); r++) {
                 for (int c = 1; c <= game.cols(); c++) {
@@ -50,7 +50,7 @@ public class GameGenerationTests {
 
     @Test
     public void testAllNodesConnected() {
-        Game game = Game.generate("default", 5, 5);
+        Game game = Game.generate(5, 5);
 
         for (int r = 1; r <= game.rows(); r++) {
             for (int c = 1; c <= game.cols(); c++) {
@@ -62,7 +62,7 @@ public class GameGenerationTests {
 
     @Test
     public void testAllNodesNonEmpty() {
-        Game game = Game.generate("default", 7, 7);
+        Game game = Game.generate( 7, 7);
 
         for (int r = 1; r <= game.rows(); r++) {
             for (int c = 1; c <= game.cols(); c++) {
@@ -75,7 +75,7 @@ public class GameGenerationTests {
 
     @Test
     public void testBulbsAtLeaves() {
-        Game game = Game.generate("default", 9, 9);
+        Game game = Game.generate(9, 9);
 
         for (int r = 1; r <= game.rows(); r++) {
             for (int c = 1; c <= game.cols(); c++) {

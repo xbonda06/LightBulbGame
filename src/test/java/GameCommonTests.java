@@ -31,11 +31,11 @@ public class GameCommonTests {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> Game.create("default", -1, 8),
+                () -> Game.create(-1, 8),
                 "Chybne vytvoreni hry, musi generovat vyjimku."
         );
 
-        game = Game.create("default", 15, 10);
+        game = Game.create(15, 10);
         assertEquals(15, game.rows(), "Test spravneho poctu radku.");
         assertEquals(10, game.cols(), "Test spravneho poctu sloupcu.");
 
@@ -59,7 +59,7 @@ public class GameCommonTests {
         Game game;
         GameNode node;
 
-        game = Game.create("default", 15, 10);
+        game = Game.create(15, 10);
 
         node = game.createBulbNode(new Position(16, 1), Side.NORTH);
         assertNull(node);
@@ -82,7 +82,7 @@ public class GameCommonTests {
         Game game;
         GameNode node;
 
-        game = Game.create("default", 15, 10);
+        game = Game.create(15, 10);
 
         node = game.createLinkNode(new Position(16, 1), Side.NORTH, Side.WEST);
         assertNull(node);
@@ -108,7 +108,7 @@ public class GameCommonTests {
         Game game;
         GameNode node;
 
-        game = Game.create("default", 15, 10);
+        game = Game.create(15, 10);
 
         node = game.createPowerNode(new Position(16, 1), Side.NORTH);
         assertNull(node);
@@ -134,7 +134,7 @@ public class GameCommonTests {
         Game game;
         GameNode node;
 
-        game = Game.create("default", 15, 10);
+        game = Game.create(15, 10);
         game.createPowerNode(new Position(2, 8), Side.NORTH, Side.WEST);
         game.createLinkNode(new Position(8, 2), Side.EAST, Side.SOUTH, Side.WEST);
         game.createLinkNode(new Position(12, 8), Side.EAST, Side.WEST);

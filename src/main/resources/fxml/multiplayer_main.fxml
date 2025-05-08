@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="rootPane" style="-fx-background-color: #1D1033;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.MultiplayerGameController">
+
+    <fx:include source="background_pane.fxml" />
+
+    <BorderPane>
+        <top>
+            <HBox alignment="CENTER" spacing="20" style="-fx-padding: 10;">
+                <Label fx:id="stepsLabel" style="-fx-font-size: 16; -fx-font-weight: bold;" text="Steps: 0/25" textFill="WHITE" />
+                <Label fx:id="timerLabel" style="-fx-font-size: 16;" text="0:00" textFill="WHITE" />
+            </HBox>
+        </top>
+
+        <center>
+            <HBox alignment="CENTER" spacing="20" style="-fx-padding: 10;">
+                <GridPane fx:id="gameGrid" gridLinesVisible="true" maxHeight="400" maxWidth="400" minHeight="400" minWidth="400" prefHeight="400" prefWidth="400" />
+
+                <VBox alignment="CENTER" spacing="50.0" style="-fx-padding: 10;">
+                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                        <Button fx:id="undoButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#getUndo" prefHeight="122.0" styleClass="buttonUndoRedo" stylesheets="@../css/styles.css" text="&lt;" />
+                        <Button fx:id="redoButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#getRedo" styleClass="buttonUndoRedo" stylesheets="@../css/styles.css" text="&gt;" />
+                    </HBox>
+                    <Button alignment="CENTER" onAction="#toTheMain" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="TO THE MAIN MENU" />
+                </VBox>
+            </HBox>
+        </center>
+    </BorderPane>
+</StackPane>

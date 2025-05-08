@@ -1,0 +1,1024 @@
+{
+  "moveNumber": 4,
+  "timestamp": 1746442189619,
+  "rows": 10,
+  "cols": 12,
+  "initialNodes": [
+    {
+      "row": 1,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 6,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 7,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 1,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 6,
+      "isPower": false,
+      "isBulb": true,
+      "isLink": false,
+      "connectors": [
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 2,
+      "col": 7,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 2,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "isPower": false,
+      "isBulb": true,
+      "isLink": false,
+      "connectors": [
+        "NORTH"
+      ]
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "WEST"
+      ]
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "isPower": true,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": [
+        "WEST",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 3,
+      "col": 6,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "WEST"
+      ]
+    },
+    {
+      "row": 3,
+      "col": 7,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 3,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 3,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 3,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 3,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 3,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "NORTH",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 4,
+      "col": 6,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 4,
+      "col": 7,
+      "isPower": false,
+      "isBulb": true,
+      "isLink": false,
+      "connectors": [
+        "WEST"
+      ]
+    },
+    {
+      "row": 4,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 4,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 4,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 4,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 4,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "NORTH",
+        "WEST"
+      ]
+    },
+    {
+      "row": 5,
+      "col": 6,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "NORTH",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 5,
+      "col": 7,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 5,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 5,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 5,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 5,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 5,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 4,
+      "isPower": false,
+      "isBulb": true,
+      "isLink": false,
+      "connectors": [
+        "NORTH"
+      ]
+    },
+    {
+      "row": 6,
+      "col": 5,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 6,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 7,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 6,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 4,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 5,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 6,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 7,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 7,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 4,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 5,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 6,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 7,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 8,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 4,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 5,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 6,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 7,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 9,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 4,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 5,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 6,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 7,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 8,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 9,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 10,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 11,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    },
+    {
+      "row": 10,
+      "col": 12,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": false,
+      "connectors": []
+    }
+  ],
+  "undoHistory": [
+    {
+      "row": 3,
+      "col": 5
+    },
+    {
+      "row": 5,
+      "col": 5
+    },
+    {
+      "row": 5,
+      "col": 6
+    },
+    {
+      "row": 3,
+      "col": 3
+    }
+  ],
+  "redoHistory": []
+}

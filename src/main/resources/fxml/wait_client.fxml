@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:id="rootPane" style="-fx-background-color: #1D1033;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.MultiplayerWaitController">
+
+    <fx:include source="background_pane.fxml" />
+
+    <BorderPane>
+        <bottom>
+
+            <VBox alignment="CENTER" prefHeight="141.0" prefWidth="800.0" spacing="20" BorderPane.alignment="CENTER">
+                <Button fx:id="toTheMain" alignment="CENTER" contentDisplay="CENTER" layoutX="310.0" layoutY="10.0" onAction="#toTheMain" prefWidth="200.0" style="-fx-font-size: 16;" stylesheets="@../css/styles.css" text="TO THE MAIN" />
+                <padding>
+                    <Insets bottom="50.0" />
+                </padding>
+            </VBox>
+        </bottom>
+        <center>
+            <VBox alignment="CENTER" maxHeight="400.0" minHeight="333.0" prefHeight="339.0" prefWidth="602.0" spacing="20.0" BorderPane.alignment="BOTTOM_CENTER">
+                <Label fx:id="playerCount" alignment="CENTER" contentDisplay="CENTER" layoutX="11.0" layoutY="210.0" maxWidth="600.0" minWidth="600.0" prefHeight="0.0" prefWidth="600.0" text="Players: 2" textFill="#5f5394">
+                    <font>
+                        <Font size="27.0" />
+                    </font>
+                </Label>
+                <Label alignment="CENTER" contentDisplay="CENTER" layoutX="11.0" layoutY="237.0" maxWidth="300.0" minWidth="300.0" prefHeight="117.0" prefWidth="300.0" style="-fx-wrap-text: true;" text="Waiting for the game creator to press START to begin." textAlignment="CENTER" textFill="#cab4e1">
+                    <font>
+                        <Font size="28.0" />
+                    </font>
+                </Label>
+            </VBox>
+        </center>
+    </BorderPane>
+</StackPane>

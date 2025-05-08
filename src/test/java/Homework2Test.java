@@ -45,7 +45,7 @@ public class Homework2Test {
 
     @BeforeEach
     public void setUp() {
-        game = Game.create("default", 10, 12);
+        game = Game.create(10, 12);
 
         for (Object[] n : def) {
             String type = (String)n[0];

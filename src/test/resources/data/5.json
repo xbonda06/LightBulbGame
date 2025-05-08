@@ -1,0 +1,116 @@
+{
+  "moveNumber": 1,
+  "timestamp": 1746442189645,
+  "rows": 3,
+  "cols": 3,
+  "initialNodes": [
+    {
+      "row": 1,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "WEST",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "WEST",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "isPower": false,
+      "isBulb": true,
+      "isLink": true,
+      "connectors": [
+        "WEST"
+      ]
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "isPower": true,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "NORTH",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "NORTH",
+        "WEST"
+      ]
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "WEST",
+        "SOUTH"
+      ]
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "NORTH"
+      ]
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "EAST",
+        "WEST"
+      ]
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "isPower": false,
+      "isBulb": false,
+      "isLink": true,
+      "connectors": [
+        "NORTH",
+        "WEST"
+      ]
+    }
+  ],
+  "undoHistory": [
+    {
+      "row": 1,
+      "col": 1
+    }
+  ],
+  "redoHistory": []
+}
