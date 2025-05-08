@@ -7,7 +7,11 @@
 package gui.controllers;
 
 import game.Game;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -45,7 +49,17 @@ public class MultiplayerOpponentGameController implements GameUpdateListener {
 
     @Override
     public void onGameUpdate() {
-
+        Platform.runLater(() -> {
+            try {
+                for (int row = 0; row < 5; row++) {
+                    for (int col = 0; col < 5; col++) {
+                        GridHelper.fillCell(game, gameGrid, cellSize, row, col, null, false, false);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     // Delete game
