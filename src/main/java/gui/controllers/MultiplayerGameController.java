@@ -55,6 +55,7 @@ public class MultiplayerGameController implements GameWinListener {
     @FXML public Button redoButton;
     @FXML public Label stepsLabel;
     @FXML public Label timerLabel;
+    @FXML public Label PlayerWinId;
 
     public void showGame() throws IOException {
         this.client.setGameWinListener(this);
@@ -68,7 +69,20 @@ public class MultiplayerGameController implements GameWinListener {
 
     @Override
     public void onGameWin(int winnerId) {
-
+//        try {
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/win_multiplayer.fxml"));
+//            Parent root = loader.load();
+//            PlayerWinId.setText("Player " + winnerId + " wins");
+//            Stage dialogStage = new Stage();
+//            dialogStage.setTitle("Victory");
+//            dialogStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
+//            dialogStage.initOwner(primaryStage);
+//            dialogStage.setResizable(false);
+//            dialogStage.setScene(new Scene(root));
+//            dialogStage.showAndWait();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void opponentsGame() throws IOException {
@@ -232,6 +246,7 @@ public class MultiplayerGameController implements GameWinListener {
     }
 
     private void updateStepsDisplay() {
+        ++stepsTaken;
         stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
     }
 
