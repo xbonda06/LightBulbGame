@@ -4,6 +4,7 @@ import common.Position;
 import game.Game;
 import gui.controllers.GameStartListener;
 import gui.controllers.GameUpdateListener;
+import gui.controllers.GameWinListener;
 import json.GameDeserializer;
 import com.google.gson.*;
 
@@ -32,6 +33,7 @@ public class GameClient {
 
     private GameStartListener startListener;
     private GameUpdateListener gameUpdateListener;
+    private GameWinListener gameWinListener;
 
     private final Gson gson = new Gson();
 
@@ -171,6 +173,18 @@ public class GameClient {
                             latestPlayerIds.add(el.getAsInt());
                         }
                     }
+
+                    case "win" -> {
+                        int winnerId = obj.get("winnerId").getAsInt();
+                        if(winnerId == playerId) {
+                            System.out.println("CLIENT: You win!");
+                        } else {
+                            System.out.println("CLIENT: Player " + winnerId + " wins!");
+                        }
+                        if (gameWinListener != null) {
+                            gameWinListener.onGameWin(winnerId);
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
@@ -224,6 +238,13 @@ public class GameClient {
         out.println(msg);
     }
 
+    public void sendWin() {
+        JsonObject msg = new JsonObject();
+        msg.addProperty("type", "win");
+        msg.addProperty("winnerId", playerId);
+        out.println(msg);
+    }
+
     public void requestPlayerCount() {
         JsonObject msg = new JsonObject();
         msg.addProperty("type", "player_count");
@@ -235,6 +256,7 @@ public class GameClient {
 
     public void setGameStartListener(GameStartListener listener) { this.startListener = listener; }
     public void setGameUpdateListener(GameUpdateListener gameUpdateListener) { this.gameUpdateListener = gameUpdateListener; }
+    public void setGameWinListener(GameWinListener gameWinListener) { this.gameWinListener = gameWinListener;}
 
     public int getLatestPlayerCount() { return latestPlayerCount; }
     public List<Integer> getLatestPlayerIds() { return new ArrayList<>(latestPlayerIds); }

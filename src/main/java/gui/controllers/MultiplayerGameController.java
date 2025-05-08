@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiplayerGameController {
+public class MultiplayerGameController implements GameWinListener {
     private static final int FIELD_SIZE = 400;
     private int secondsElapsed = 0;
     private int stepsTaken = 0;
@@ -57,12 +57,18 @@ public class MultiplayerGameController {
     @FXML public Label timerLabel;
 
     public void showGame() throws IOException {
+        this.client.setGameWinListener(this);
         this.game = client.getOwnGame();
         setupTimer();
         startTimer();
 
         opponentsGame();
         createGameBoard();
+    }
+
+    @Override
+    public void onGameWin(int winnerId) {
+
     }
 
     private void opponentsGame() throws IOException {
