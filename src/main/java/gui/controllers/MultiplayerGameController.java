@@ -67,11 +67,9 @@ public class MultiplayerGameController {
 
     private void opponentsGame() throws IOException {
         client.requestPlayerCount();
-        PauseTransition pause = new PauseTransition(Duration.millis(700));
-        pause.play();
         int count = client.getLatestPlayerCount();
-        System.out.println(count);
         List<Integer> ids = client.getLatestPlayerIds();
+        ids.remove(Integer.valueOf(client.getPlayerId()));
 
         double mainWidth = 800;
         double mainHeight = 600;
@@ -88,17 +86,17 @@ public class MultiplayerGameController {
         primaryStage.setY(mainY);
 
         if (count > 1) {
-            showOpponentWindow(ids.get(1),
+            showOpponentWindow(ids.getFirst(),
                     mainX - opponentWidth - spacing,
                     mainY - 50);
         }
         if (count > 2) {
-            showOpponentWindow(ids.get(2),
+            showOpponentWindow(ids.get(1),
                     mainX - opponentWidth - spacing,
                     mainY + (opponentHeight) + spacing);
         }
         if (count > 3) {
-            showOpponentWindow(ids.get(3),
+            showOpponentWindow(ids.get(2),
                     mainX + mainWidth + spacing,
                     mainY - 50);
         }
@@ -107,6 +105,9 @@ public class MultiplayerGameController {
     private void showOpponentWindow(Integer id, double x, double y) throws IOException {
 
         Game gameOpponent = client.getOpponentGame(id);
+        if (gameOpponent == null) {
+            System.out.println("Opponent game is null");
+        }
         if (gameOpponent != null) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/multiplayer_other.fxml"));
             Parent root = loader.load();
