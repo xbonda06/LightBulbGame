@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="rootPane" prefHeight="343.0" prefWidth="322.0" style="-fx-background-color: #1D1033;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.MultiplayerGameController">
+<StackPane fx:id="rootPane" prefHeight="343.0" prefWidth="322.0" style="-fx-background-color: #1D1033;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.MultiplayerOpponentGameController">
 
     <BorderPane>
         <top>

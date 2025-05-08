@@ -1,3 +1,12 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * This controller manages the victory dialog, which is displayed when the player wins the game.
+ * It provides two options: to start a new game (Yes) or to return to the main menu (No).
+ * The appropriate action is executed via provided callback functions.
+ */
+
 package gui.controllers;
 
 import javafx.fxml.FXML;

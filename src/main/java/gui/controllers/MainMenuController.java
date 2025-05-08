@@ -1,3 +1,12 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * Controller for the main menu of the game. Handles user interactions
+ * for selecting difficulty levels, accessing the multiplayer menu,
+ * and opening the archive. Initiates corresponding game scenes.
+ */
+
 package gui.controllers;
 
 import javafx.fxml.FXML;

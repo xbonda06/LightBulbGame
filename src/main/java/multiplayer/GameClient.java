@@ -2,6 +2,7 @@ package multiplayer;
 
 import common.Position;
 import game.Game;
+import gui.controllers.GameStartListener;
 import json.GameDeserializer;
 import com.google.gson.*;
 
@@ -27,6 +28,8 @@ public class GameClient {
     private List<Integer> latestPlayerIds = new ArrayList<>();
     private final Map<Integer, Game> opponentGames = new HashMap<>();
     private volatile boolean gameStarted = false;
+
+    private GameStartListener startListener;
 
     private final Gson gson = new Gson();
 
@@ -142,7 +145,9 @@ public class GameClient {
                     case "start_game" -> {
                         gameStarted = true;
                         System.out.println("CLIENT: Game started!");
-                        // TODO: Notify the game that it has started
+                        if (startListener != null) {
+                            startListener.onGameStarted();
+                        }
                     }
 
                     case "player_count_response" -> {
@@ -211,14 +216,14 @@ public class GameClient {
         out.println(msg);
     }
 
+    public void setGameStartListener(GameStartListener listener) { this.startListener = listener; }
+
     public int getLatestPlayerCount() {
         return latestPlayerCount;
     }
-
     public List<Integer> getLatestPlayerIds() {
         return new ArrayList<>(latestPlayerIds);
     }
-
     public boolean isGameStarted() { return gameStarted; }
     public Game getOwnGame() { return ownGame; }
     public Game getOpponentGame(int id) { return opponentGames.get(id); }

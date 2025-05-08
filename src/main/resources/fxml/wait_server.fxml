@@ -35,7 +35,7 @@
                   <Font size="43.0" />
                </font>
             </Label>
-              <Label fx:id="playerCount" alignment="CENTER" contentDisplay="CENTER" layoutX="11.0" layoutY="210.0" maxWidth="600.0" minWidth="600.0" prefHeight="0.0" prefWidth="600.0" text="Players: 2" textFill="#5f5394">
+              <Label fx:id="playerCount" alignment="CENTER" contentDisplay="CENTER" layoutX="11.0" layoutY="210.0" maxWidth="600.0" minWidth="600.0" prefHeight="0.0" prefWidth="600.0" text="Players: 1" textFill="#5f5394">
                  <font>
                      <Font size="27.0" />
                  </font>

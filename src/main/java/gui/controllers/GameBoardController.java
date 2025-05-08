@@ -1,8 +1,19 @@
 /*
-* Author: Olha Tomylko (xtomylo00)
-*
-* Description:
-*/
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * This controller manages the main game screen of the Light Bulb puzzle game.
+ * It handles game initialization, player interaction with the board, timer updates,
+ * and win condition logic. The controller also supports undo/redo functionality,
+ * hint window management, and transitions to/from the main menu.
+ *
+ * Core features:
+ * - Initializes a new game or continues from an archived state.
+ * - Listens to user clicks and rotates connectors accordingly.
+ * - Animates cell rotation and tracks game steps and time.
+ * - Displays a hint window showing solution suggestions.
+ * - Shows a win dialog when the puzzle is completed.
+ */
 
 package gui.controllers;
 
@@ -36,7 +47,6 @@ public class GameBoardController {
     private int boardSize = 5;
     private int cellSize;
     private int secondsElapsed = 0;
-    private int hintsUsed = 0;
     private int stepsTaken = 0;
     Stage primaryStage;
     private Timeline gameTimer;
@@ -252,7 +262,6 @@ public class GameBoardController {
     private void startTimer() {
         secondsElapsed = 0;
         stepsTaken = 0;
-        hintsUsed = 0;
         updateTimerDisplay();
         updateStepsDisplay();
         updateHintsDisplay();
@@ -276,7 +285,7 @@ public class GameBoardController {
     }
 
     private void updateHintsDisplay() {
-        hintButton.setText(String.format("HINT %d/2", hintsUsed));
+        hintButton.setText("HINTS");
     }
 
     private void closeHintsAndCenterMain() {
@@ -318,7 +327,7 @@ public class GameBoardController {
     }
 
     @FXML public void getUndo() {
-        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, true);
+        GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, false);
     }
 
     @FXML public void getRedo() {

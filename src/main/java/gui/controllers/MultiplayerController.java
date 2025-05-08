@@ -1,3 +1,12 @@
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * Controller for handling multiplayer menu interactions.
+ * Allows the user to create or join a multiplayer game,manages transitions to appropriate scenes,
+ * and sets up game server and client communication.
+ */
+
 package gui.controllers;
 
 import javafx.fxml.FXML;
@@ -45,12 +54,19 @@ public class MultiplayerController {
 
         MultiplayerConnectionController controller = loader.getController();
         controller.setPrimaryStage(primaryStage);
+        controller.setClient(client);
         controller.port.setText("Port: " + portNumber);
         controller.ipAddress.setText("Server IP: " + server.getIpAddress());
         controller.setServer(server);
 
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - Multiplayer");
+        primaryStage.setOnCloseRequest(e -> closeScene(server));
+    }
+
+    private void closeScene(GameServer server){
+        server.stop();
+        primaryStage.close();
     }
 
     @FXML public void joinGame() {
@@ -93,6 +109,12 @@ public class MultiplayerController {
         controller.setGameClient(client);
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - Multiplayer");
+        primaryStage.setOnCloseRequest(e -> closeClient(client));
+    }
+
+    private void closeClient(GameClient client){
+        client.stop();
+        primaryStage.close();
     }
 
     @FXML public void toTheMain() {
