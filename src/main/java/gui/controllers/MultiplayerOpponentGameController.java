@@ -45,7 +45,11 @@ public class MultiplayerOpponentGameController implements GameUpdateListener {
 
     @Override
     public void onGameUpdate() {
-
+        for (int row = 0; row < 5; row++) {
+            for (int col = 0; col < 5; col++) {
+                GridHelper.fillCell(game, gameGrid, cellSize, row, col, null, false, false);
+            }
+        }
     }
 
     // Delete game
