@@ -398,7 +398,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
             Position pos = changed.getPosition();
             undoStack.push(pos);
             lastTurnedNode = pos;
-            logger.log("Player TURNED node at position: " + pos.getRow() + "," + pos.getCol());
+            logger.log("TURN at the position: " + pos.getRow() + "," + pos.getCol());
         }
 
         if (!suppressRecording) {
@@ -425,7 +425,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         redoStack.push(last);
         serializer.serialize(this, moveCount);
 
-        logger.log("Player made UNDO move at position: " + last.getRow() + "," + last.getCol());
+        logger.log("UNDO at the position: " + last.getRow() + "," + last.getCol());
 
         return true;
     }
@@ -468,7 +468,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         undoStack.push(next);
         serializer.serialize(this, moveCount);
 
-        logger.log("Player made REDO move at position: " + next.getRow() + "," + next.getCol());
+        logger.log("REDO at the position: " + next.getRow() + "," + next.getCol());
 
         return true;
     }
