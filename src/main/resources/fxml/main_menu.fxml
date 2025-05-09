@@ -16,7 +16,7 @@
             <URL value="@/css/styles.css" />
         </stylesheets>
 
-        <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 60;" text="DUMBBULB">
+        <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 60;" text="LIGHT BULB">
             <font>
                 <Font size="24" />
             </font>
