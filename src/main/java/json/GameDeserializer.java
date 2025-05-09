@@ -1,3 +1,16 @@
+/**
+ * This class handles the deserialization of saved game data from a JSON file.
+ * <p>
+ * The deserialization process reconstructs the game object, initializes its state,
+ * and replays all previous moves to restore the game as it was when saved.
+ * </p>
+ *
+ * <p>
+ * Additional helper methods allow navigation through move history step by step.
+ * </p>
+ *
+ * @author Alina Paliienko (xpaliia00)
+ */
 package json;
 
 import com.google.gson.Gson;
@@ -21,9 +34,9 @@ public class GameDeserializer {
 
     /**
      * Reads and reconstructs a saved game from the given JSON file.
-     * Initializes the game board, nodes, and history, and sets the initial step.
-     * @param jsonFile path to the saved game file (e.g., "3.json")
-     * @throws Exception if reading or parsing fails
+     *
+     * @param jsonFile path to the saved game file (e.g., {@code "3.json"})
+     * @throws Exception if the file cannot be read or parsed correctly
      */
     public GameDeserializer(Path jsonFile) throws Exception {
         SnapshotWithHistory snapshot;
@@ -66,26 +79,48 @@ public class GameDeserializer {
         game.setSaveFileId(id);
     }
 
+    /**
+     * Returns the reconstructed {@code Game} instance loaded from the JSON file.
+     *
+     * @return the deserialized {@code Game} object
+     */
     public Game getGame() {
         return game;
     }
 
+    /**
+     * Returns a copy of the full move history (undo + redo) in order of execution.
+     *
+     * @return an unmodifiable list of all moves performed in the game
+     */
     public List<Position> getFullHistory() {
         return List.copyOf(fullHistory);
     }
 
+    /**
+     * Returns the index of the current step within the full move history.
+     *
+     * @return the current step number (0-based index)
+     */
     public int getCurrentStep() {
         return currentStep;
     }
 
+    /**
+     * Returns the total number of steps (i.e., size of the full move history).
+     *
+     * @return the total number of moves in the game history
+     */
     public int getTotalSteps() {
         return fullHistory.size();
     }
 
     /**
-     * Moves the game state to a specific step in history,
-     * resetting and replaying previous moves.
-     * @param step the step number to reach (0 to total steps)
+     * Moves the game state to a specific step in the move history,
+     * resetting the board and replaying all moves up to that point.
+     *
+     * @param step the step number to reach (0 ≤ step ≤ total steps)
+     * @throws IllegalArgumentException if the step is out of bounds
      */
     public void goToStep(int step) {
         if (step < 0 || step > fullHistory.size()) {
@@ -105,8 +140,10 @@ public class GameDeserializer {
 
 
     /**
-     * Moves forward by one step if possible.
-     * @return true if successful, false if at end
+     * Advances the game state by one step in the move history, if possible.
+     *
+     * @return {@code true} if the step was successful,
+     * {@code false} if already at the end
      */
     public boolean nextStep() {
         if (currentStep < fullHistory.size()) {
@@ -117,8 +154,10 @@ public class GameDeserializer {
     }
 
     /**
-     * Moves back by one step if possible.
-     * @return true if successful, false if at beginning
+     * Reverts the game state by one step in the move history, if possible.
+     *
+     * @return {@code true} if the step was successful,
+     * {@code false} if already at the beginning
      */
     public boolean previousStep() {
         if (currentStep > 0) {
@@ -129,8 +168,9 @@ public class GameDeserializer {
     }
 
     /**
-     * The full snapshot of a game, including
-     * board size, node layout, and move history.
+     * Represents the complete snapshot of a saved game.
+     * This includes metadata (move count, timestamp, board size),
+     * the layout of all initial nodes, and the full undo/redo move history.
      */
     private static class SnapshotWithHistory {
         @SerializedName("moveNumber")    int moveNumber;
@@ -143,7 +183,9 @@ public class GameDeserializer {
     }
 
     /**
-     * One saved node on the board.
+     * Represents a single node on the board as saved in the JSON file.
+     * Stores the node's position, type (power, bulb, or link),
+     * whether it is currently lit, and its connector directions.
      */
     private static class NodeDto {
         int row, col;

@@ -1,3 +1,12 @@
+/**
+ * This class is responsible for serializing the state of a game to a JSON file.
+ * <p>
+ * The serialized output is written to the {@code data/} directory, and formatted
+ * using the GSON library for readability.
+ * </p>
+ *
+ * @author Alina Paliienko (xpaliia00)
+ */
 package json;
 
 import com.google.gson.Gson;
@@ -28,8 +37,10 @@ public class GameSerializer {
 
 
     /**
-     * Creates a new serializer, prepares the data directory,
-     * and allocates a unique save file name (e.g., 1.json, 2.json, ...).
+     * Constructs a new {@code GameSerializer}, ensures the data directory exists,
+     * and allocates a unique save file name (e.g., {@code 1.json}, {@code 2.json}, ...).
+     *
+     * @throws RuntimeException if the data directory cannot be created
      */
     public GameSerializer() {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
@@ -44,8 +55,11 @@ public class GameSerializer {
 
     /**
      * Finds the next available numeric ID for a new save file.
-     * Skips missing numbers (e.g., [1, 2, 4] → next ID is 3).
-     * @return the next unused game ID
+     * Existing saved game files in the {@code data/} directory are scanned,
+     * and the smallest missing positive integer is returned
+     * (e.g., for files {@code [1.json, 2.json, 4.json]}, the next ID is {@code 3}).
+     *
+     * @return the next unused game ID, or {@code 1} if the directory cannot be read
      */
     private int allocateNextId() {
         try {
@@ -75,9 +89,11 @@ public class GameSerializer {
 
     /**
      * Saves the current game state to the assigned JSON file.
-     * Captures the board layout, move count, and undo/redo history.
-     * @param game       the game instance to serialize
-     * @param moveCount  the number of moves performed
+     * The serialized data includes the initial board layout (captured only once),
+     * the current move count, and the undo/redo history stacks.
+     *
+     * @param game       the {@code Game} instance to serialize
+     * @param moveCount  the number of moves performed so far
      */
     public void serialize(Game game, int moveCount) {
         if (!initialCaptured) {
@@ -109,11 +125,15 @@ public class GameSerializer {
         return json;
     }
 
-   /**
-   * Captures the layout and type of all nodes on the board.
-   * @param game the current game instance
-   * @return a list of serializable node descriptors
-   */
+    /**
+     * Captures the layout and properties of all nodes on the game board.
+     * Iterates over the board by rows and columns and collects a list of
+     * {@code NodeDto} objects representing each node's position and state,
+     * including whether it's a power source, bulb, link, and its connectors.
+     *
+     * @param game the current {@code Game} instance to inspect
+     * @return a list of {@code NodeDto} objects describing each node on the board
+     */
     private List<NodeDto> captureNodes(Game game) {
         List<NodeDto> list = new ArrayList<>();
         for (int r = 1; r <= game.rows(); r++) {
@@ -127,10 +147,14 @@ public class GameSerializer {
 
 
     /**
-     * Uses reflection to extract the undo/redo stacks from the game object.
-     * @param game      the game instance
-     * @param fieldName the name of the stack field ("undoStack" or "redoStack")
-     * @return a copy of the stack as a list
+     * Uses reflection to extract a stack field (e.g., undo or redo history) from the {@code Game} object.
+     * The specified field must be a {@code Stack<Position>} declared in the {@code Game} class.
+     * This method is typically used for accessing private fields like {@code "undoStack"} or {@code "redoStack"}.
+     *
+     * @param game      the {@code Game} instance from which to extract the stack
+     * @param fieldName the name of the field to extract ({@code "undoStack"} or {@code "redoStack"})
+     * @return a copy of the extracted stack as a {@code List<Position>}
+     * @throws RuntimeException if the field does not exist or cannot be accessed
      */
     @SuppressWarnings("unchecked")
     private List<Position> extractStack(Game game, String fieldName) {
@@ -158,12 +182,28 @@ public class GameSerializer {
         }
     }
 
+    /**
+     * Represents a snapshot of the game state for serialization,
+     * including metadata such as move count, board dimensions,
+     * initial node layout, and undo/redo history.
+     */
     private static class SnapshotWithHistory {
         int moveNumber;
         long timestamp;
         int rows, cols;
         List<NodeDto> initialNodes;
         List<Position> undoHistory, redoHistory;
+        /**
+         * Constructs a new snapshot with the specified game data.
+         *
+         * @param mn    the move number
+         * @param ts    the timestamp (in milliseconds since epoch)
+         * @param r     number of rows in the game board
+         * @param c     number of columns in the game board
+         * @param init  list of initial nodes describing the board state
+         * @param undo  undo history stack as a list of positions
+         * @param redo  redo history stack as a list of positions
+         */
         SnapshotWithHistory(int mn, long ts, int r, int c,
                             List<NodeDto> init,
                             List<Position> undo,
@@ -181,6 +221,7 @@ public class GameSerializer {
 
     /**
      * Updates the save file path to a fixed ID (used when reloading existing games).
+     *
      * @param id the fixed game ID (e.g., 3 → "3.json")
      */
     public void setFixedFile(int id) {
