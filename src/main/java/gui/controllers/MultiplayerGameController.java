@@ -26,6 +26,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import multiplayer.GameClient;
 import multiplayer.GameServer;
@@ -81,7 +82,7 @@ public class MultiplayerGameController implements GameWinListener {
                 controller.setClient(client);
                 controller.setServer(server);
 
-                Stage dialogStage = new Stage();
+                Stage dialogStage = new Stage(StageStyle.UNDECORATED);
                 controller.setDialogStage(dialogStage);
                 dialogStage.setTitle("Victory");
                 GridHelper.openDialog(dialogStage, root, primaryStage);
