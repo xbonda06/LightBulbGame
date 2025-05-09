@@ -338,6 +338,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
                 }
             }
         }
+        logger.log("Player WON the game!");
         return true;
     }
 
@@ -397,7 +398,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
             Position pos = changed.getPosition();
             undoStack.push(pos);
             lastTurnedNode = pos;
-            logger.log("Player turned node at position: " + pos.getRow() + "," + pos.getCol());
+            logger.log("Player TURNED node at position: " + pos.getRow() + "," + pos.getCol());
         }
 
         if (!suppressRecording) {
@@ -424,7 +425,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         redoStack.push(last);
         serializer.serialize(this, moveCount);
 
-        logger.log("Undo move at " + last.getRow() + "," + last.getCol());
+        logger.log("Player made UNDO move at position: " + last.getRow() + "," + last.getCol());
 
         return true;
     }
@@ -467,7 +468,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         undoStack.push(next);
         serializer.serialize(this, moveCount);
 
-        logger.log("Redo move at " + next.getRow() + "," + next.getCol());
+        logger.log("Player made REDO move at position: " + next.getRow() + "," + next.getCol());
 
         return true;
     }
