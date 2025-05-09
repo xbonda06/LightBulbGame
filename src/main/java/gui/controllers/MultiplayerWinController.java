@@ -1,4 +1,10 @@
-
+/*
+ * Author: Olha Tomylko (xtomylo00)
+ *
+ * Description:
+ * This controller manages the victory dialog, which is displayed when one of the players wins the game.
+ * It sets text "You win" for the winner and the "Player x wins" for other players
+ */
 package gui.controllers;
 
 import javafx.fxml.FXML;

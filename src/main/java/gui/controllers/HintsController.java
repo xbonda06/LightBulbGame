@@ -64,7 +64,6 @@ public class HintsController {
         GameNode node = game.node(new Position(row + 1, col + 1));
         Image img;
         int hints = node.getHint();
-        System.out.println("Hint at (" + row + "," + col + "): " + hints);
         img = switch (hints) {
             case 1 -> GridHelper.getImage("hint1");
             case 2 -> GridHelper.getImage("hint2");
