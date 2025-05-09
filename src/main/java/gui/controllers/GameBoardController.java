@@ -28,9 +28,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -115,31 +113,9 @@ public class GameBoardController {
         }
         this.cellSize = FIELD_SIZE / boardSize;
         fromArchive = false;
-        clearGameGrid();
-        setupGridConstraints();
+        GridHelper.clearGameGrid(gameGrid);
+        GridHelper.setupGridConstraints(boardSize, gameGrid, FIELD_SIZE);
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick);
-    }
-
-    // Delete game
-    private void clearGameGrid() {
-        gameGrid.getChildren().clear();
-        gameGrid.getColumnConstraints().clear();
-        gameGrid.getRowConstraints().clear();
-    }
-
-    // Configure grid size and set fixed cell dimensions based on the board size
-    private void setupGridConstraints() {
-        int cellSize = FIELD_SIZE / boardSize;
-        gameGrid.setMinSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setPrefSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setMaxSize(FIELD_SIZE, FIELD_SIZE);
-
-        for (int i = 0; i < boardSize; i++) {
-            ColumnConstraints colConst = new ColumnConstraints(cellSize, cellSize, cellSize);
-            RowConstraints rowConst = new RowConstraints(cellSize, cellSize, cellSize);
-            gameGrid.getColumnConstraints().add(colConst);
-            gameGrid.getRowConstraints().add(rowConst);
-        }
     }
 
     // Rotate the clicked node by 90 degrees and refresh the game board to reflect the change
@@ -149,15 +125,9 @@ public class GameBoardController {
             updateStepsDisplay();
             game.setLastTurnedNode(node.getPosition());
             node.turn();
+            GridHelper.updateAfterClick(node, boardSize, game, gameGrid, cellSize, this::handleCellClick);
             int row = node.getPosition().getRow() - 1;
             int col = node.getPosition().getCol() - 1;
-            for (int r = 0; r < boardSize; r++) {
-                for (int c = 0; c < boardSize; c++) {
-                    boolean animate = (r == row && c == col); //for smooth rotation
-                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
-                            animate, false);
-                }
-            }
             if (this.hints_on)
                 hintsController.reloadHints(game, row, col);
             if (game.checkWin()){

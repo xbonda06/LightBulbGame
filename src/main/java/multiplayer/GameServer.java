@@ -142,8 +142,8 @@ public class GameServer {
                 out = new PrintWriter(socket.getOutputStream(), true);
 
                 out.println(initMessage());
-
                 out.println(playerCountMessage());
+                broadcast(playerCountMessage().toString(), this);
 
                 String line;
                 while ((line = in.readLine()) != null) {

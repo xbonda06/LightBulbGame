@@ -9,22 +9,24 @@
 package gui.controllers;
 
 import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import multiplayer.GameClient;
 
-import java.io.IOException;
-
-public class MultiplayerWaitController implements GameStartListener{
+public class MultiplayerWaitController implements GameStartListener, GamePlayerCountListener{
+    @FXML public Label playerCount;
     private Stage primaryStage;
     private GameClient client;
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
 
     public void setGameClient(GameClient gameClient) {
         this.client = gameClient;
-        gameClient.setGameStartListener(this);
+        this.client.setGameStartListener(this);
+        this.client.setPlayerCountListener(this);
     }
 
     public void toTheMain() {
@@ -56,6 +58,13 @@ public class MultiplayerWaitController implements GameStartListener{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        });
+    }
+
+    @Override
+    public void onPlayerCountChanged(int count) {
+        Platform.runLater(() -> {
+            playerCount.setText("Players: " + count);
         });
     }
 

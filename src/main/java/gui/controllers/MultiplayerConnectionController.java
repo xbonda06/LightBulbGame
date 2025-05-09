@@ -10,6 +10,7 @@
 package gui.controllers;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,7 +23,7 @@ import multiplayer.GameClient;
 import multiplayer.GameServer;
 import java.io.IOException;
 
-public class MultiplayerConnectionController {
+public class MultiplayerConnectionController implements GamePlayerCountListener {
     @FXML public Button startButton;
     @FXML public Label ipAddress;
     @FXML public Label playerCount;
@@ -30,10 +31,15 @@ public class MultiplayerConnectionController {
     private Stage primaryStage;
     private GameServer server;
     private GameClient client;
+    private int players = 1;
 
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
     public void setServer(GameServer server) {this.server = server;}
-    public void setClient(GameClient client) {this.client = client;}
+
+    public void setClient(GameClient client) {
+        this.client = client;
+        this.client.setPlayerCountListener(this);
+    }
 
     @FXML public void toTheMain() {
         server.stop();
@@ -41,10 +47,7 @@ public class MultiplayerConnectionController {
     }
 
     public void startGame() throws IOException {
-        client.requestPlayerCount();
-        int count = client.getLatestPlayerCount();
-        playerCount.setText("Players: " + count); //todo
-        if (count > 1) {
+        if (players > 1) {
             FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/multiplayer_main.fxml"));
             Parent root = loader.load();
 
@@ -73,6 +76,14 @@ public class MultiplayerConnectionController {
             });
             resetStyle.play();
         }
+    }
+
+    @Override
+    public void onPlayerCountChanged(int count) {
+        Platform.runLater(() -> {
+            playerCount.setText("Players: " + count);
+            this.players = count;
+        });
     }
 
     private void closeScene(GameServer server){

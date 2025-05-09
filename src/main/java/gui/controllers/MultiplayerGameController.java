@@ -12,7 +12,6 @@ import common.GameNode;
 import game.Game;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
-import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -21,9 +20,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -57,7 +54,6 @@ public class MultiplayerGameController implements GameWinListener {
     @FXML public Button redoButton;
     @FXML public Label stepsLabel;
     @FXML public Label timerLabel;
-    @FXML public Label PlayerWinId;
 
     public void showGame() throws IOException {
         this.client.setGameWinListener(this);
@@ -180,32 +176,10 @@ public class MultiplayerGameController implements GameWinListener {
     // Initialize a new game with a ready board and randomly rotated connectors
     private void createGameBoard() {
         this.cellSize = FIELD_SIZE / boardSize;
-        clearGameGrid();
-        setupGridConstraints();
+        GridHelper.clearGameGrid(gameGrid);
+        GridHelper.setupGridConstraints(boardSize, gameGrid, FIELD_SIZE);
         GridHelper.loadImages();
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick);
-    }
-
-    // Delete game
-    private void clearGameGrid() {
-        gameGrid.getChildren().clear();
-        gameGrid.getColumnConstraints().clear();
-        gameGrid.getRowConstraints().clear();
-    }
-
-    // Configure grid size and set fixed cell dimensions based on the board size
-    private void setupGridConstraints() {
-        int cellSize = FIELD_SIZE / boardSize;
-        gameGrid.setMinSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setPrefSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setMaxSize(FIELD_SIZE, FIELD_SIZE);
-
-        for (int i = 0; i < 5; i++) {
-            ColumnConstraints colConst = new ColumnConstraints(cellSize, cellSize, cellSize);
-            RowConstraints rowConst = new RowConstraints(cellSize, cellSize, cellSize);
-            gameGrid.getColumnConstraints().add(colConst);
-            gameGrid.getRowConstraints().add(rowConst);
-        }
     }
 
     private void handleCellClick(GameNode node) {
@@ -213,17 +187,11 @@ public class MultiplayerGameController implements GameWinListener {
         node.turn();
         updateStepsDisplay();
         client.sendTurn(node.getPosition());
-        int row = node.getPosition().getRow() - 1;
-        int col = node.getPosition().getCol() - 1;
-        for (int r = 0; r < boardSize; r++) {
-            for (int c = 0; c < boardSize; c++) {
-                boolean animate = (r == row && c == col); //for smooth rotation
-                GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
-                        animate, false);
-            }
-        }
-        if(game.checkWin())
+        GridHelper.updateAfterClick(node, boardSize, game, gameGrid, cellSize, this::handleCellClick);
+        if(game.checkWin()) {
+            stopTimer();
             client.sendWin();
+        }
     }
 
     private void setupTimer() {
