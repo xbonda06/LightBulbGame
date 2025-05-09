@@ -243,6 +243,9 @@ public class GameClient {
         msg.addProperty("type", "win");
         msg.addProperty("winnerId", playerId);
         out.println(msg);
+        if(gameWinListener != null) {
+            gameWinListener.onGameWin(playerId);
+        }
     }
 
     public void requestPlayerCount() {
