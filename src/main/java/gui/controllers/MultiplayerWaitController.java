@@ -25,8 +25,8 @@ public class MultiplayerWaitController implements GameStartListener, GamePlayerC
 
     public void setGameClient(GameClient gameClient) {
         this.client = gameClient;
-        gameClient.setGameStartListener(this);
-        gameClient.setPlayerCountListener(this);
+        this.client.setGameStartListener(this);
+        this.client.setPlayerCountListener(this);
     }
 
     public void toTheMain() {

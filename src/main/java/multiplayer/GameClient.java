@@ -176,6 +176,7 @@ public class GameClient {
                         }
 
                         if(playerCountListener != null) {
+                            System.out.println("CLIENT: Player count: " + latestPlayerCount);
                             playerCountListener.onPlayerCountChanged(latestPlayerCount);
                         }
                     }

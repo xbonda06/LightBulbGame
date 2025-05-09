@@ -38,7 +38,7 @@ public class MultiplayerConnectionController implements GamePlayerCountListener 
 
     public void setClient(GameClient client) {
         this.client = client;
-        client.setPlayerCountListener(this);
+        this.client.setPlayerCountListener(this);
     }
 
     @FXML public void toTheMain() {
