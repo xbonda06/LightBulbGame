@@ -316,7 +316,7 @@ public class GameBoardController {
      * Updates the steps display with the current number of steps taken.
      */
     private void updateStepsDisplay() {
-        stepsLabel.setText(String.format("Steps: %d/%d", stepsTaken, game.turnsToWin()));
+        stepsLabel.setText(String.format("Steps taken: %d / Steps to win: %d", stepsTaken, game.turnsToWin()));
     }
 
 
