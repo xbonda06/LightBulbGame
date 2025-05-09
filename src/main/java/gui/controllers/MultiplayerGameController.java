@@ -77,10 +77,10 @@ public class MultiplayerGameController implements GameWinListener {
                 Parent root = loader.load();
 
                 MultiplayerWinController controller = loader.getController();
-                controller.setWinnerId(winnerId);
-                controller.setStages(primaryStage, opponentStages);
                 controller.setClient(client);
+                controller.setStages(primaryStage, opponentStages);
                 controller.setServer(server);
+                controller.setWinnerId(winnerId);
 
                 Stage dialogStage = new Stage(StageStyle.UNDECORATED);
                 controller.setDialogStage(dialogStage);
