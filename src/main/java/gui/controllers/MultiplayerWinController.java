@@ -18,7 +18,10 @@ public class MultiplayerWinController {
     private Stage dialogStage;
 
     public void setWinnerId(int id) {
-        PlayerWinId.setText("Player " + id + " wins");
+        if(id != client.getPlayerId())
+            PlayerWinId.setText("Player " + id + " wins");
+        else
+            PlayerWinId.setText("You win!");
     }
     public void setStages(Stage primaryStage, List<Stage> opponents) {this.primaryStage = primaryStage; this.opponentsStages = opponents;}
     public void setClient(GameClient client) {this.client = client;}
