@@ -1,3 +1,5 @@
+package common;
+
 /**
  * Enum representing the four cardinal directions on the game board.
  * <p>
@@ -6,8 +8,6 @@
  *
  * @author Andrii Bondarenko (xbonda06)
  */
-package common;
-
 public enum Side {
     /**
      * Right direction (positive column).

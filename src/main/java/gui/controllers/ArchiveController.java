@@ -1,12 +1,3 @@
-/*
- * Author: Olha Tomylko (xtomylo00)
- *
- * Description:
- * This controller manages the archive menu, where all previously played games are listed.
- * Games are grouped and sorted by date (from newest to oldest).
- * Each game can be selected to view its progress in a read-only mode via the GameArchiveController.
- */
-
 package gui.controllers;
 
 import javafx.fxml.FXML;
@@ -18,16 +9,31 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import json.GameArchive;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Controller responsible for managing the archive menu UI.
+ * <p>
+ * It displays a list of previously played games, grouped by date (from newest to oldest),
+ * and allows the user to select a game to view its progress in a read-only mode.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class ArchiveController {
     private Stage primaryStage;
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
     public VBox contentBox;
 
+    /**
+     * Loads and displays all archived games grouped by date.
+     * <p>
+     * For each date, a header is created, followed by a list of buttons representing individual games.
+     * Games and dates are sorted in descending (newest-first) order.
+     * </p>
+     */
     public void showGames() {
         contentBox.getChildren().clear();
 
@@ -61,6 +67,13 @@ public class ArchiveController {
         }
     }
 
+    /**
+     * Creates a button for the given game ID.
+     * When clicked, the button opens the selected game in archive view mode.
+     *
+     * @param gameId the ID of the archived game
+     * @return a styled Button instance associated with the game ID
+     */
     private Button getButton(Integer gameId) {
         Button gameButton = new Button("Game " + gameId);
         gameButton.setStyle("""
@@ -80,6 +93,12 @@ public class ArchiveController {
         return gameButton;
     }
 
+    /**
+     * Loads the archived game with the specified ID and switches the scene to archive view.
+     *
+     * @param gameId the ID of the archived game to load
+     * @throws IOException if the FXML file for archive view cannot be loaded
+     */
     private void loadGameFromArchive(int gameId) throws IOException {
         FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/archive_game.fxml"));
         Parent root = loader.load();
@@ -92,6 +111,10 @@ public class ArchiveController {
         primaryStage.setTitle("Archive Game");
     }
 
+    /**
+     * Handles the action of returning to the main menu.
+     * Triggered by the corresponding FXML button.
+     */
     @FXML public void toTheMain() {
         GridHelper.loadMainMenu(primaryStage);
     }
