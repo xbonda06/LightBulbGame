@@ -3,6 +3,7 @@ package game;
 import common.GameNode;
 import common.Position;
 import common.Side;
+import log.GameLogger;
 import ija.ija2024.tool.common.Observable;
 import ija.ija2024.tool.common.ToolEnvironment;
 import ija.ija2024.tool.common.ToolField;
@@ -30,6 +31,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
     private final Stack<Position> undoStack = new Stack<>();
     private final Stack<Position> redoStack = new Stack<>();
 
+    private final GameLogger logger;
 
     private Game(int rows, int cols) {
         this.gameId = nextId++;
@@ -42,6 +44,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
                 this.nodes[r - 1][c - 1] = new GameNode(new Position(r, c));
             }
         }
+        this.logger = new GameLogger(gameId);
     }
 
     public static Game create(int rows, int cols) {
@@ -335,6 +338,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
                 }
             }
         }
+        logger.log("Player WON the game!");
         return true;
     }
 
@@ -394,6 +398,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
             Position pos = changed.getPosition();
             undoStack.push(pos);
             lastTurnedNode = pos;
+            logger.log("TURN at the position: " + pos.getRow() + "," + pos.getCol());
         }
 
         if (!suppressRecording) {
@@ -419,6 +424,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
         lastTurnedNode = last;
         redoStack.push(last);
         serializer.serialize(this, moveCount);
+
+        logger.log("UNDO at the position: " + last.getRow() + "," + last.getCol());
 
         return true;
     }
@@ -460,6 +467,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
         lastTurnedNode = next;
         undoStack.push(next);
         serializer.serialize(this, moveCount);
+
+        logger.log("REDO at the position: " + next.getRow() + "," + next.getCol());
 
         return true;
     }
@@ -509,6 +518,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
         undoStack.clear();
         redoStack.clear();
         moveCount = 0;
+        logger.log("History cleared");
     }
 
     /**
