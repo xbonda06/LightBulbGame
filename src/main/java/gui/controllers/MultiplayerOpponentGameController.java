@@ -1,58 +1,82 @@
-/*
- * Author: Olha Tomylko (xtomylo00)
- *
- * Description:
- */
-
 package gui.controllers;
 
 import game.Game;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import multiplayer.GameClient;
 
+/**
+ * Controller for displaying the opponent's game board in a multiplayer match.
+ * <p>
+ * This class manages the UI for one of the opponent's boards, initializes the game grid,
+ * and updates the display in real-time based on received game updates.
+ * </p>
+ *
+ * <p>
+ * Used in the multiplayer mode to show the current state of other players’ boards
+ * without allowing interaction.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class MultiplayerOpponentGameController implements GameUpdateListener {
     @FXML public StackPane rootPane;
     @FXML public Label playerId;
     @FXML public GridPane gameGrid;
     private Game game;
     private int cellSize;
-    private GameClient client;
+    private final int boardSize = 5;
 
+    /**
+     * Sets the game state for the opponent's board.
+     *
+     * @param opponentGame the {@link Game} instance representing the opponent's game
+     */
     public void setGame(Game opponentGame) {this.game = opponentGame;}
 
+
+    /**
+     * Registers this controller to listen for updates from the specified game client.
+     *
+     * @param gameClient the {@link GameClient} that provides game state updates
+     */
     public void setGameClient(GameClient gameClient) {
-        this.client = gameClient;
-        this.client.setGameUpdateListener(this);
+        gameClient.setGameUpdateListener(this);
     }
 
+    /**
+     * Initializes and displays the opponent's game board.
+     */
     public void showGame() {
         createGameBoard();
     }
 
-    // Initialize a new game with a ready board and randomly rotated connectors
+    /**
+     * Creates the opponent's game board UI using static data.
+     * Initializes the grid layout, loads images, and fills in the cells.
+     */
     private void createGameBoard() {
-        this.cellSize = 250 / 5;
-        clearGameGrid();
-        setupGridConstraints();
+        int field_size = 250;
+        this.cellSize = field_size / boardSize;
+        GridHelper.clearGameGrid(gameGrid);
+        GridHelper.setupGridConstraints(boardSize, gameGrid, field_size);
         GridHelper.loadImages();
         GridHelper.createCells(game, gameGrid, cellSize, 5, null);
     }
 
+    /**
+     * Callback for game state updates received from the server.
+     * Re-renders the opponent's game board on the JavaFX Application Thread.
+     */
     @Override
     public void onGameUpdate() {
         Platform.runLater(() -> {
             try {
-                for (int row = 0; row < 5; row++) {
-                    for (int col = 0; col < 5; col++) {
+                for (int row = 0; row < boardSize; row++) {
+                    for (int col = 0; col < boardSize; col++) {
                         GridHelper.fillCell(game, gameGrid, cellSize, row, col, null, false, false);
                     }
                 }
@@ -60,27 +84,5 @@ public class MultiplayerOpponentGameController implements GameUpdateListener {
                 e.printStackTrace();
             }
         });
-    }
-
-    // Delete game
-    private void clearGameGrid() {
-        gameGrid.getChildren().clear();
-        gameGrid.getColumnConstraints().clear();
-        gameGrid.getRowConstraints().clear();
-    }
-
-    // Configure grid size and set fixed cell dimensions based on the board size
-    private void setupGridConstraints() {
-        int cellSize = 250 / 5;
-        gameGrid.setMinSize(250, 250);
-        gameGrid.setPrefSize(250, 250);
-        gameGrid.setMaxSize(250, 250);
-
-        for (int i = 0; i < 5; i++) {
-            ColumnConstraints colConst = new ColumnConstraints(cellSize, cellSize, cellSize);
-            RowConstraints rowConst = new RowConstraints(cellSize, cellSize, cellSize);
-            gameGrid.getColumnConstraints().add(colConst);
-            gameGrid.getRowConstraints().add(rowConst);
-        }
     }
 }

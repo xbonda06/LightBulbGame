@@ -2,19 +2,27 @@ package multiplayer;
 
 import common.Position;
 import game.Game;
+import gui.controllers.GamePlayerCountListener;
 import gui.controllers.GameStartListener;
 import gui.controllers.GameUpdateListener;
 import gui.controllers.GameWinListener;
 import json.GameDeserializer;
 import com.google.gson.*;
-
 import java.io.*;
 import java.net.Socket;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * Represents a multiplayer game client that connects to a game server.
+ * <p>
+ * Handles game communication, deserialization of game data, and propagates game events
+ * to registered listeners. Each client manages its own game state and observes opponents' moves.
+ * </p>
+ *
+ * @author Andrii Bondarenko (xbonda06)
+ */
 public class GameClient {
 
     private final String host;
@@ -34,6 +42,7 @@ public class GameClient {
     private GameStartListener startListener;
     private GameUpdateListener gameUpdateListener;
     private GameWinListener gameWinListener;
+    private GamePlayerCountListener playerCountListener;
 
     private final Gson gson = new Gson();
 
@@ -42,11 +51,20 @@ public class GameClient {
     private final Map<Integer, Stack<Position>> opponentUndoStacks = new HashMap<>();
     private final Map<Integer, Stack<Position>> opponentRedoStacks = new HashMap<>();
 
+    /**
+     * Constructs a new GameClient instance.
+     *
+     * @param host the host address of the server
+     * @param port the port number of the server
+     */
     public GameClient(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
+    /**
+     * Disconnects the client from the server.
+     */
     public void stop() {
         try {
             if (out != null) out.close();
@@ -58,7 +76,11 @@ public class GameClient {
         }
     }
 
-
+    /**
+     * Establishes a connection to the server and starts listening in a new thread.
+     *
+     * @throws IOException if the connection cannot be established
+     */
     public void start() throws IOException {
         socket = new Socket(host, port);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -66,6 +88,9 @@ public class GameClient {
         new Thread(this::listen).start();
     }
 
+    /**
+     * Listens to server messages and handles game synchronization and events.
+     */
     private void listen() {
         playerId = -1;
         try {
@@ -172,6 +197,10 @@ public class GameClient {
                         for (JsonElement el : obj.getAsJsonArray("playerIds")) {
                             latestPlayerIds.add(el.getAsInt());
                         }
+
+                        if(playerCountListener != null) {
+                            playerCountListener.onPlayerCountChanged(latestPlayerCount);
+                        }
                     }
 
                     case "win" -> {
@@ -203,6 +232,9 @@ public class GameClient {
         }
     }
 
+    /**
+     * Sends a request to the server to start the game (only player 1 is allowed).
+     */
     public void sendStartGame() {
         if (playerId == 1) { // Only player 1 can start the game
             JsonObject msg = new JsonObject();
@@ -211,6 +243,11 @@ public class GameClient {
         }
     }
 
+    /**
+     * Sends a move (turn) to the server.
+     *
+     * @param pos the position to be turned
+     */
     public void sendTurn(Position pos) {
         JsonObject msg = new JsonObject();
         msg.addProperty("type", "turn");
@@ -224,6 +261,9 @@ public class GameClient {
         out.println(msg);
     }
 
+    /**
+     * Sends an undo command to the server.
+     */
     public void sendUndo() {
         JsonObject msg = new JsonObject();
         msg.addProperty("type", "undo");
@@ -231,6 +271,9 @@ public class GameClient {
         out.println(msg);
     }
 
+    /**
+     * Sends an undo command to the server.
+     */
     public void sendRedo() {
         JsonObject msg = new JsonObject();
         msg.addProperty("type", "redo");
@@ -238,6 +281,9 @@ public class GameClient {
         out.println(msg);
     }
 
+    /**
+     * Sends a win notification to the server.
+     */
     public void sendWin() {
         JsonObject msg = new JsonObject();
         msg.addProperty("type", "win");
@@ -248,6 +294,9 @@ public class GameClient {
         }
     }
 
+    /**
+     * Requests the current player count from the server.
+     */
     public void requestPlayerCount() {
         JsonObject msg = new JsonObject();
         msg.addProperty("type", "player_count");
@@ -255,19 +304,82 @@ public class GameClient {
         System.out.println("CLIENT: Player count requested.");
     }
 
+    /**
+     * Checks if the game has started.
+     *
+     * @return true if the game has started, false otherwise
+     */
     public boolean isGameStarted() { return gameStarted; }
 
+    /**
+     * Sets the listener that will be triggered when the game starts.
+     *
+     * @param listener the listener to register
+     */
     public void setGameStartListener(GameStartListener listener) { this.startListener = listener; }
-    public void setGameUpdateListener(GameUpdateListener gameUpdateListener) { this.gameUpdateListener = gameUpdateListener; }
-    public void setGameWinListener(GameWinListener gameWinListener) { this.gameWinListener = gameWinListener;}
 
+    /**
+     * Sets the listener that will be triggered when the game updates.
+     *
+     * @param gameUpdateListener the listener to register
+     */
+    public void setGameUpdateListener(GameUpdateListener gameUpdateListener) { this.gameUpdateListener = gameUpdateListener; }
+
+    /**
+     * Sets the listener that will be triggered when a player wins.
+     *
+     * @param gameWinListener the listener to register
+     */
+    public void setGameWinListener(GameWinListener gameWinListener) { this.gameWinListener = gameWinListener;}
+    public void setPlayerCountListener(GamePlayerCountListener playerCountListener) { this.playerCountListener = playerCountListener; }
+
+    /**
+     * Returns the most recently received player count.
+     *
+     * @return the latest player count
+     */
     public int getLatestPlayerCount() { return latestPlayerCount; }
+
+    /**
+     * Returns the list of player IDs currently connected to the server.
+     *
+     * @return a list of player IDs
+     */
     public List<Integer> getLatestPlayerIds() { return new ArrayList<>(latestPlayerIds); }
+
+    /**
+     * Returns the current game instance of the client.
+     *
+     * @return the client's game instance
+     */
     public Game getOwnGame() { return ownGame; }
+
+    /**
+     * Returns the game instance of an opponent.
+     *
+     * @param id the ID of the opponent
+     * @return the opponent's game or null if not available
+     */
     public Game getOpponentGame(int id) { return opponentGames.get(id); }
+
+    /**
+     * Returns the set of all opponent player IDs.
+     *
+     * @return a set of opponent IDs
+     */
     public Set<Integer> getOpponentIds() { return opponentGames.keySet(); }
-    public int getPlayerId() {
-        return playerId;
-    }
+
+    /**
+     * Returns the ID of the current player.
+     *
+     * @return the player's ID
+     */
+    public int getPlayerId() { return playerId; }
+
+    /**
+     * Returns a list of all received move positions from opponents.
+     *
+     * @return list of received positions
+     */
     public List<Position> getReceivedMoves() { return receivedMoves; }
 }

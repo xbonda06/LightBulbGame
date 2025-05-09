@@ -1,20 +1,3 @@
-/*
- * Author: Olha Tomylko (xtomylo00)
- *
- * Description:
- * This controller manages the main game screen of the Light Bulb puzzle game.
- * It handles game initialization, player interaction with the board, timer updates,
- * and win condition logic. The controller also supports undo/redo functionality,
- * hint window management, and transitions to/from the main menu.
- *
- * Core features:
- * - Initializes a new game or continues from an archived state.
- * - Listens to user clicks and rotates connectors accordingly.
- * - Animates cell rotation and tracks game steps and time.
- * - Displays a hint window showing solution suggestions.
- * - Shows a win dialog when the puzzle is completed.
- */
-
 package gui.controllers;
 
 import common.GameNode;
@@ -28,9 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -39,6 +20,21 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Controller that manages the main game screen of the Light Bulb puzzle game.
+ * Handles game initialization, player interactions, timer updates, win condition logic,
+ * undo/redo functionality, hint window management, and transitions to/from the main menu.
+ * <p>
+ * Core features:
+ * - Initializes a new game or continues from an archived state.
+ * - Listens to user clicks and rotates connectors accordingly.
+ * - Animates cell rotation and tracks game steps and time.
+ * - Displays a hint window showing solution suggestions.
+ * - Shows a win dialog when the puzzle is completed.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class GameBoardController {
     // Game constants
     private static final int FIELD_SIZE = 400;
@@ -67,28 +63,54 @@ public class GameBoardController {
     @FXML public Button undoButton;
     @FXML public Button redoButton;
 
+    /**
+     * Sets the reference to the primary application stage.
+     *
+     * @param primaryStage the main stage of the application
+     */
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
+
+    /**
+     * Sets whether the game is loaded from an archived state.
+     *
+     * @param fromArchive true if the game is loaded from the archive, false otherwise
+     */
     public void setFromArchive(boolean fromArchive) { this.fromArchive = fromArchive;}
 
+    /**
+     * Initializes the game controller and sets up the timer.
+     */
     @FXML
     public void initialize() {
         setupTimer();
         GridHelper.loadImages();
     }
 
-    // Sets size based on the selected game (passed from MainMenuController)
+    /**
+     * Sets the board size for the game.
+     *
+     * @param size the size of the board (e.g., 5 for a 5x5 grid)
+     */
     public void setBoardSize(int size) {
         this.boardSize = size;
         resetGame();
     }
 
+
+    /**
+     * Sets the current game object.
+     *
+     * @param game the game object to be used in this controller
+     */
     public void setGame(Game game) {
         this.game = game;
     }
 
-    // Initializes a timer that updates the display every second to track elapsed game time.
+    /**
+     * Initializes a timer that updates the display every second to track the elapsed game time.
+     */
     private void setupTimer() {
         gameTimer = new Timeline(
                 new KeyFrame(Duration.seconds(1), event -> {
@@ -99,7 +121,10 @@ public class GameBoardController {
         gameTimer.setCycleCount(Animation.INDEFINITE);
     }
 
-    // Start new game
+
+    /**
+     * Starts a new game by resetting the board and starting the timer.
+     */
     private void resetGame() {
         stopTimer();
         createGameBoard();
@@ -107,7 +132,10 @@ public class GameBoardController {
         this.disableGame = false;
     }
 
-    // Initialize a new game with a ready board and randomly rotated connectors
+
+    /**
+     * Initializes the game board, either by creating a new game or by using an archived game.
+     */
     private void createGameBoard() {
         if(!fromArchive) {
             this.game = Game.generate(boardSize, boardSize);
@@ -115,49 +143,25 @@ public class GameBoardController {
         }
         this.cellSize = FIELD_SIZE / boardSize;
         fromArchive = false;
-        clearGameGrid();
-        setupGridConstraints();
+        GridHelper.clearGameGrid(gameGrid);
+        GridHelper.setupGridConstraints(boardSize, gameGrid, FIELD_SIZE);
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick);
     }
 
-    // Delete game
-    private void clearGameGrid() {
-        gameGrid.getChildren().clear();
-        gameGrid.getColumnConstraints().clear();
-        gameGrid.getRowConstraints().clear();
-    }
-
-    // Configure grid size and set fixed cell dimensions based on the board size
-    private void setupGridConstraints() {
-        int cellSize = FIELD_SIZE / boardSize;
-        gameGrid.setMinSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setPrefSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setMaxSize(FIELD_SIZE, FIELD_SIZE);
-
-        for (int i = 0; i < boardSize; i++) {
-            ColumnConstraints colConst = new ColumnConstraints(cellSize, cellSize, cellSize);
-            RowConstraints rowConst = new RowConstraints(cellSize, cellSize, cellSize);
-            gameGrid.getColumnConstraints().add(colConst);
-            gameGrid.getRowConstraints().add(rowConst);
-        }
-    }
-
-    // Rotate the clicked node by 90 degrees and refresh the game board to reflect the change
+    /**
+     * Handles the rotation of the clicked node by 90 degrees and updates the board.
+     *
+     * @param node the node clicked by the user
+     */
     private void handleCellClick(GameNode node) {
         if(!disableGame){
             stepsTaken++;
             updateStepsDisplay();
             game.setLastTurnedNode(node.getPosition());
             node.turn();
+            GridHelper.updateAfterClick(node, boardSize, game, gameGrid, cellSize, this::handleCellClick);
             int row = node.getPosition().getRow() - 1;
             int col = node.getPosition().getCol() - 1;
-            for (int r = 0; r < boardSize; r++) {
-                for (int c = 0; c < boardSize; c++) {
-                    boolean animate = (r == row && c == col); //for smooth rotation
-                    GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
-                            animate, false);
-                }
-            }
             if (this.hints_on)
                 hintsController.reloadHints(game, row, col);
             if (game.checkWin()){
@@ -166,7 +170,10 @@ public class GameBoardController {
         }
     }
 
-    // Waits for 0.7 seconds and then displays a modal dialog with a "YOU WON!" message
+
+    /**
+     * Handles the win condition, stops the timer, and displays the victory dialog.
+     */
     private void gameWin() {
         stopTimer();
         closeHintsAndCenterMain();
@@ -176,9 +183,10 @@ public class GameBoardController {
         pause.play();
     }
 
-    // Displays a modal victory dialog window when the player wins.
-    // Sets up the controller with appropriate actions
-    // (resetting the game or returning to the main menu), and shows the dialog as a blocking window.
+    /**
+     * Displays the victory dialog window when the player wins.
+     * Allows the user to either reset the game or return to the main menu.
+     */
     private void showVictoryDialog() {
         try {
             Rectangle overlay = new Rectangle(rootPane.getWidth(), rootPane.getHeight(), Color.rgb(0, 0, 0, 0.7));
@@ -204,6 +212,9 @@ public class GameBoardController {
         }
     }
 
+    /**
+     * Opens the hint window for the game, showing the solution suggestions.
+     */
     @FXML
     private void useHint() {
         if (hintsStage == null || !hintsStage.isShowing()) {
@@ -241,12 +252,21 @@ public class GameBoardController {
         }
     }
 
+    /**
+     * Resets the game board, closes any open hint windows, and restarts the game.
+     */
     @FXML
     private void resetBoard() {
         closeHintsAndCenterMain();
         resetGame();
     }
 
+    /**
+     * Transitions to the main menu.
+     * <p>
+     * Stops the timer, closes the hint window, and loads the main menu scene.
+     * </p>
+     */
     @FXML
     private void toMainMenu() {
         stopTimer();
@@ -254,11 +274,17 @@ public class GameBoardController {
         loadMainMenu();
     }
 
-    // Switch to the Main Menu scene
+
+    /**
+     * Loads the main menu scene.
+     */
     private void loadMainMenu() {
         GridHelper.loadMainMenu(primaryStage);
     }
 
+    /**
+     * Starts the game timer and initializes step count and display.
+     */
     private void startTimer() {
         secondsElapsed = 0;
         stepsTaken = 0;
@@ -268,26 +294,42 @@ public class GameBoardController {
         gameTimer.play();
     }
 
+    /**
+     * Stops the game timer.
+     */
     private void stopTimer() {
         if (gameTimer != null) {
             gameTimer.stop();
         }
     }
 
+    /**
+     * Updates the timer display with the current elapsed time.
+     */
     private void updateTimerDisplay() {
         int minutes = secondsElapsed / 60;
         int seconds = secondsElapsed % 60;
         timerLabel.setText(String.format("%d:%02d", minutes, seconds));
     }
 
+    /**
+     * Updates the steps display with the current number of steps taken.
+     */
     private void updateStepsDisplay() {
-        stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
+        stepsLabel.setText(String.format("Steps: %d/%d", stepsTaken, game.turnsToWin()));
     }
 
+
+    /**
+     * Updates the hint button display.
+     */
     private void updateHintsDisplay() {
         hintButton.setText("HINTS");
     }
 
+    /**
+     * Closes the hint window and re-centers the main game window.
+     */
     private void closeHintsAndCenterMain() {
         if (hintsStage != null) {
             hintsStage.close();
@@ -311,6 +353,14 @@ public class GameBoardController {
         moveMain.play();
     }
 
+    /**
+     * Creates a timeline for animating the main stage's movement to its new position.
+     *
+     * @param mainStage the main stage
+     * @param centerX the new x-coordinate
+     * @param centerY the new y-coordinate
+     * @return the timeline animation
+     */
     private static Timeline getTimeline(Stage mainStage, double centerX, double centerY) {
         DoubleProperty stageX = new SimpleDoubleProperty(mainStage.getX());
         DoubleProperty stageY = new SimpleDoubleProperty(mainStage.getY());
@@ -326,10 +376,24 @@ public class GameBoardController {
         );
     }
 
+    /**
+     * Handles the undo action by reverting the game state to the previous step.
+     * <p>
+     * Calls the undo method in the GridHelper class to undo the last move.
+     * The game board is updated accordingly, and the state of the game is reverted.
+     * </p>
+     */
     @FXML public void getUndo() {
         GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, false);
     }
 
+    /**
+     * Handles the redo action by reapplying the last undone move.
+     * <p>
+     * Calls the redo method in the GridHelper class to redo the previous undo.
+     * The game board is updated accordingly, and the state of the game is restored.
+     * </p>
+     */
     @FXML public void getRedo() {
         GridHelper.redo(game, boardSize, gameGrid, cellSize, this::handleCellClick, false);
     }

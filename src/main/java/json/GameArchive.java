@@ -14,12 +14,29 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Provides functionality for managing saved games in JSON format.
+ * <p>
+ * This class supports listing, loading, deleting, and retrieving metadata
+ * (such as the saved date) for saved game files stored in the {@code data/} directory.
+ * </p>
+ *
+ * <p>
+ * Saved games are expected to be stored as JSON files named by their numeric ID
+ * (e.g., {@code 3.json}).
+ * </p>
+ *
+ * @author Alina Paliienko (xpaliia00)
+ */
 public class GameArchive {
 
     /**
      * Returns a sorted list of all saved game IDs.
-     * The IDs are extracted from filenames in the data/ directory
-     * (e.g., "3.json" → ID 3).
+     * The IDs are extracted from filenames in the {@code data/} directory
+     * (e.g., {@code "3.json"} → ID {@code 3}).
+     *
+     * @return a sorted list of saved game IDs as {@code Integer}s
+     * @throws UncheckedIOException if the files in the {@code data/} directory cannot be listed
      */
     public static List<Integer> listSavedGameIds() {
         Path dataDir = findDataDirectory();
@@ -40,9 +57,12 @@ public class GameArchive {
 
     /**
      * Loads the given game ID from disk by reading the corresponding JSON file
-     * and returning a GameDeserializer instance.
-     * @param gameId the numeric ID of the saved game (e.g., 3 for "3.json")
-     * @return a GameDeserializer initialized with the game state
+     * and returning a {@code GameDeserializer} instance.
+     *
+     * @param gameId the numeric ID of the saved game (e.g., {@code 3} for {@code "3.json"})
+     * @return a {@code GameDeserializer} initialized with the game state from the file
+     * @throws IllegalArgumentException if the save file with the given ID does not exist
+     * @throws RuntimeException if an error occurs while reading or deserializing the file
      */
     public static GameDeserializer load(int gameId) {
         Path file = findDataDirectory().resolve(gameId + ".json");
@@ -58,7 +78,9 @@ public class GameArchive {
 
     /**
      * Deletes the saved-game file associated with the given ID.
-     * @param gameId the ID of the game to delete
+     *
+     * @param gameId the ID of the game to delete (e.g., {@code 3} for {@code "3.json"})
+     * @throws UncheckedIOException if an I/O error occurs while attempting to delete the file
      */
     public static void delete(int gameId) {
         Path file = findDataDirectory().resolve(gameId + ".json");
@@ -69,7 +91,14 @@ public class GameArchive {
         }
     }
 
-    /** Returns the date (without time) of the saved game by ID. */
+    /**
+     * Returns the date (without time) when the game with the given ID was saved.
+     * The date is extracted from the {@code "timestamp"} field in the JSON file.
+     *
+     * @param gameId the ID of the saved game (e.g., {@code 3} for {@code "3.json"})
+     * @return the {@code LocalDate} representing the date the game was saved
+     * @throws RuntimeException if the file cannot be read or the timestamp is missing/invalid
+     */
     public static LocalDate getGameDate(int gameId) {
         Path file = findDataDirectory().resolve(gameId + ".json");
         try (FileReader reader = new FileReader(file.toFile())) {
@@ -84,8 +113,11 @@ public class GameArchive {
 
     /**
      * Locates the directory where saved games are stored.
-     * Searches the "data/" directory first, then "src/test/resources/data/" for testing.
-     * @return the resolved data directory path
+     * Searches for the {@code "data/"} directory; intended fallback to
+     * {@code "src/test/resources/data/"} for testing is currently disabled.
+     *
+     * @return the resolved path to the data directory
+     * @throws UncheckedIOException if the data directory does not exist
      */
     private static Path findDataDirectory() {
         Path top = Paths.get("data");
@@ -98,9 +130,11 @@ public class GameArchive {
     }
 
     /**
-     * Checks whether a string contains only numeric digits.
+     * Checks whether the given string contains only numeric digits (0–9).
+     *
      * @param s the string to check
-     * @return true if the string is numeric, false otherwise
+     * @return {@code true} if the string is non-empty and contains only digits,
+     *         {@code false} otherwise
      */
     private static boolean isNumeric(String s) {
         if (s.isEmpty()) return false;

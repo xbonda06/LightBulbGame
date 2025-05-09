@@ -3,15 +3,31 @@ package game;
 import common.GameNode;
 import common.Position;
 import common.Side;
+import log.GameLogger;
 import ija.ija2024.tool.common.Observable;
 import ija.ija2024.tool.common.ToolEnvironment;
 import ija.ija2024.tool.common.ToolField;
-
 import json.GameSerializer;
-
-
 import java.util.*;
 
+/**
+ * Represents the main game logic and model for the grid-based light puzzle game.
+ * <p>
+ * Handles initialization, user actions (turns, undo/redo), signal propagation,
+ * game generation, state tracking, and interaction with observers and the logger.
+ * </p>
+ *
+ * <p>
+ * Game consists of a grid of {@link common.GameNode} elements that can be connected with power,
+ * bulbs, and wire elements. The goal is to rotate the nodes such that all bulbs are lit.
+ * </p>
+ *
+ * <p>Supports undo/redo functionality, step recording, and multiplayer-friendly structure.</p>
+ *
+ * @author Andrii Bondarenko (xbonda06)
+ * @author Olha Tomylko (xtomylo00)
+ * @author Alina Paliienko (xpaliia00)
+ */
 public class Game implements ToolEnvironment, Observable.Observer {
     private static long nextId = 1;
     private final long gameId;
@@ -30,7 +46,15 @@ public class Game implements ToolEnvironment, Observable.Observer {
     private final Stack<Position> undoStack = new Stack<>();
     private final Stack<Position> redoStack = new Stack<>();
 
+    private final GameLogger logger;
 
+
+    /**
+     * Private constructor, which creates a new game instance with the specified number of rows and columns.
+     *
+     * @param rows the number of rows in the game grid
+     * @param cols the number of columns in the game grid
+     */
     private Game(int rows, int cols) {
         this.gameId = nextId++;
         this.rows = rows;
@@ -42,8 +66,17 @@ public class Game implements ToolEnvironment, Observable.Observer {
                 this.nodes[r - 1][c - 1] = new GameNode(new Position(r, c));
             }
         }
+        this.logger = new GameLogger(gameId);
     }
 
+    /**
+     * Static factory method to create a new game instance.
+     * Creates a new game instance with the specified number of rows and columns.
+     *
+     * @param rows the number of rows in the game grid
+     * @param cols the number of columns in the game grid
+     * @return a new Game instance
+     */
     public static Game create(int rows, int cols) {
 
         if (rows <= 0 || cols <= 0) {
@@ -55,6 +88,10 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return g;
     }
 
+    /**
+     * Initializes the game by finding the power node and propagating light from it.
+     * This method should be called after the game is set up with nodes and connections.
+     */
     public void init() {
         GameNode powerNode = null;
         for (int r = 0; r < rows; r++) {
@@ -71,11 +108,23 @@ public class Game implements ToolEnvironment, Observable.Observer {
         propagateLight(powerNode);
     }
 
+    /**
+     * Propagates light from the starting node to all connected nodes.
+     * This method uses a depth-first search (DFS) algorithm to traverse the grid.
+     *
+     * @param start the starting node from which to propagate light
+     */
     private void propagateLight(GameNode start) {
         boolean[][] visited = new boolean[rows][cols];
         dfs(start.getPosition(), visited);
     }
 
+    /**
+     * Depth-first search (DFS) algorithm to propagate light from the given position.
+     *
+     * @param pos     the current position in the grid
+     * @param visited a 2D array to track visited nodes
+     */
     private void dfs(Position pos, boolean[][] visited) {
         int r = pos.getRow() - 1;
         int c = pos.getCol() - 1;
@@ -115,6 +164,11 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
+    /**
+     * Updates the power propagation in the game.
+     * This method is called when a node changes its state (e.g., when a bulb is turned on/off).
+     * It resets all nodes to unlit and then propagates light from the power node.
+     */
     public void updatePowerPropagation() {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -132,27 +186,61 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
+    /**
+     * Rows getter
+     *
+     * @return the number of rows
+     */
     public int rows() {
         return this.rows;
     }
 
+    /**
+     * Columns getter
+     *
+     * @return the number of columns
+     */
     public int cols() {
         return this.cols;
     }
 
+    /**
+     * Node getter
+     *
+     * @param p the position of the node
+     * @return the node at the specified position
+     */
     public GameNode node(Position p) {
         return this.nodes[p.getRow() - 1][p.getCol() - 1];
     }
 
-    // Is called in GameBoardController when click before turn
+
+    /**
+     * Last turned node setter
+     *
+     * @param p the position of the last turned node
+     */
     public void setLastTurnedNode(Position p) {
         lastTurnedNode = p;
     }
 
+    /**
+     * Last turned node getter
+     *
+     * @return the position of the last turned node
+     */
     public Position getLastTurnedNode() {
         return lastTurnedNode;
     }
 
+    /**
+     * Creates a new bulb node at the specified position and side.
+     *
+     * @param p the position of the new bulb node
+     * @param s the side of the new bulb node
+     *
+     * @return the created bulb node, or null if the position is out of bounds
+     */
     public GameNode createBulbNode(Position p, Side s) {
         if (p.getRow() < 1 || p.getRow() > this.rows || p.getCol() < 1 || p.getCol() > this.cols) {
             return null;
@@ -165,6 +253,14 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return node;
     }
 
+    /**
+     * Creates a new power node at the specified position and sides.
+     *
+     * @param p the position of the new power node
+     * @param sides the sides of the new power node
+     *
+     * @return the created power node, or null if the position is out of bounds or invalid
+     */
     public GameNode createPowerNode(Position p, Side... sides) {
         if (p.getRow() < 1 || p.getRow() > this.rows || p.getCol() < 1 || p.getCol() > this.cols) {
             return null;
@@ -186,6 +282,14 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return node;
     }
 
+    /**
+     * Creates a new power node at the specified position and sides.
+     *
+     * @param p the position of the new power node
+     * @param sides the sides of the new power node
+     *
+     * @return the created power node, or null if the position is out of bounds or invalid
+     */
     public GameNode createLinkNode(Position p, Side... sides) {
         if (p.getRow() < 1 || p.getRow() > this.rows || p.getCol() < 1 || p.getCol() > this.cols) {
             return null;
@@ -202,6 +306,14 @@ public class Game implements ToolEnvironment, Observable.Observer {
         return node;
     }
 
+    /**
+     * Generates a new game with the specified number of rows and columns.
+     * This method creates a game instance, sets up the power node, and generates connections.
+     *
+     * @param rows the number of rows in the game grid
+     * @param cols the number of columns in the game grid
+     * @return a new Game instance with the specified size
+     */
     public static Game generate(int rows, int cols) {
         if (rows <= 0 || cols <= 0)
             throw new IllegalArgumentException("Invalid game size.");
@@ -251,6 +363,31 @@ public class Game implements ToolEnvironment, Observable.Observer {
         throw new IllegalStateException("Unable to generate valid game with at least one bulb after " + maxAttempts + " attempts.");
     }
 
+    /**
+     * Returns the number of turns required to win the game.
+     * This method sums up the hints from all nodes in the game.
+     *
+     * @return the total number of turns required to win
+     */
+    public int turnsToWin() {
+        int sum = 0;
+        for(int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                GameNode node = nodes[r][c];
+                sum += node.getHint();
+            }
+        }
+        return sum;
+    }
+
+    /**
+     * Validates the power connections for the given node.
+     * This method checks if the node is at the edge of the grid and removes any invalid connectors.
+     *
+     * @param node the node to validate
+     * @param rows the total number of rows in the grid
+     * @param cols the total number of columns in the grid
+     */
     private static void validatePowerConnections(GameNode node, int rows, int cols) {
         int row = node.getPosition().getRow();
         int col = node.getPosition().getCol();
@@ -264,6 +401,12 @@ public class Game implements ToolEnvironment, Observable.Observer {
             node.deleteConnector(Side.EAST);
     }
 
+    /**
+     * Generates a full connection tree starting from the given position.
+     * This method uses a depth-first search (DFS) algorithm to create connections between nodes.
+     *
+     * @param start the starting position for generating connections
+     */
     private void generateFullConnections(Position start) {
         Random random = new Random();
         boolean[][] visited = new boolean[rows][cols];
@@ -307,6 +450,10 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
     }
 
+    /**
+     * Randomizes the rotations of all nodes in the game.
+     * This method uses a random number generator to turn each node a random number of times.
+     */
     public void randomizeRotations() {
         suppressRecording = true;
         Random random = new Random();
@@ -325,7 +472,12 @@ public class Game implements ToolEnvironment, Observable.Observer {
         this.serializer.serialize(this, moveCount);
     }
 
-    // Checks whether all bulbs in the game are lit
+    /**
+     * Checks if the player has won the game.
+     * This method iterates through all nodes and checks if all bulbs are lit.
+     *
+     * @return true if the player has won, false otherwise
+     */
     public boolean checkWin() {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -335,9 +487,17 @@ public class Game implements ToolEnvironment, Observable.Observer {
                 }
             }
         }
+        logger.log("Player WON the game!");
         return true;
     }
 
+    /**
+     * Returns the position of the neighbor node in the specified direction.
+     *
+     * @param p    the current position
+     * @param side the direction to check
+     * @return the position of the neighbor node, or null if out of bounds
+     */
     private Position neighbor(Position p, Side side) {
         int r = p.getRow(), c = p.getCol();
         return switch (side) {
@@ -348,6 +508,13 @@ public class Game implements ToolEnvironment, Observable.Observer {
         };
     }
 
+    /**
+     * Connects two nodes in the specified direction.
+     *
+     * @param from      the starting position
+     * @param to        the ending position
+     * @param direction the direction of the connection
+     */
     private void connectNodes(Position from, Position to, Side direction) {
         Side opposite = switch (direction) {
             case NORTH -> Side.SOUTH;
@@ -363,6 +530,12 @@ public class Game implements ToolEnvironment, Observable.Observer {
         toNode.setLink(opposite);
     }
 
+    /**
+     * Returns a list of sides that are connected to the given node.
+     *
+     * @param node the node to check
+     * @return a list of connected sides
+     */
     private List<Side> connectedSides(GameNode node) {
         List<Side> sides = new ArrayList<>();
         for (Side side : Side.values()) {
@@ -372,7 +545,6 @@ public class Game implements ToolEnvironment, Observable.Observer {
         }
         return sides;
     }
-
 
     @Override
     public ToolField fieldAt(int i, int i1) {
@@ -385,6 +557,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
     /**
      * Called when a GameNode changes. Updates light propagation,
      * records the move for undo/redo, and saves the game state.
+     *
+     * @param observable the observable object that changed
      */
     @Override
     public void update(Observable observable) {
@@ -394,6 +568,7 @@ public class Game implements ToolEnvironment, Observable.Observer {
             Position pos = changed.getPosition();
             undoStack.push(pos);
             lastTurnedNode = pos;
+            logger.log("TURN at the position: " + pos.getRow() + "," + pos.getCol());
         }
 
         if (!suppressRecording) {
@@ -405,6 +580,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
     /**
      * Undoes the last player action.
+     *
+     * @return true if the undo was successful, false if there are no moves to undo
      */
     public boolean undo() {
         if (undoStack.isEmpty()) return false;
@@ -420,11 +597,15 @@ public class Game implements ToolEnvironment, Observable.Observer {
         redoStack.push(last);
         serializer.serialize(this, moveCount);
 
+        logger.log("UNDO at the position: " + last.getRow() + "," + last.getCol());
+
         return true;
     }
 
     /**
      * Special undo used in archive replay mode (reverse order).
+     *
+     * @return true if the undo was successful, false if there are no moves to undo
      */
     public boolean undoArchive() {
         if (undoStack.isEmpty()) return false;
@@ -446,6 +627,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
     /**
      * Redoes the last undone move. Applies the next step and updates state.
+     *
+     * @return true if the redo was successful, false if there are no moves to redo
      */
     public boolean redo() {
         if (redoStack.isEmpty()) return false;
@@ -461,11 +644,15 @@ public class Game implements ToolEnvironment, Observable.Observer {
         undoStack.push(next);
         serializer.serialize(this, moveCount);
 
+        logger.log("REDO at the position: " + next.getRow() + "," + next.getCol());
+
         return true;
     }
 
     /**
      * Special redo used in archive replay mode (reverse order).
+     *
+     * @return true if the redo was successful, false if there are no moves to redo
      */
     public boolean redoArchive() {
         if (redoStack.isEmpty()) return false;
@@ -487,6 +674,9 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
     /**
      * Formats a stack of positions as a readable string (e.g., [(1,2),(2,3)]).
+     *
+     * @param stack the stack of positions to format
+     * @return a string representation of the stack
      */
     private String formatStack(Stack<Position> stack) {
         StringBuilder sb = new StringBuilder("[");
@@ -509,10 +699,14 @@ public class Game implements ToolEnvironment, Observable.Observer {
         undoStack.clear();
         redoStack.clear();
         moveCount = 0;
+        logger.log("History cleared");
     }
 
     /**
      * Loads undo and redo history into the game.
+     *
+     * @param undoHistory the list of positions for undo history
+     * @param redoHistory the list of positions for redo history
      */
     public void loadHistory(List<Position> undoHistory, List<Position> redoHistory) {
         undoStack.clear();
@@ -525,6 +719,8 @@ public class Game implements ToolEnvironment, Observable.Observer {
 
     /**
      * Sets the fixed ID for the save file to ensure consistent serialization.
+     *
+     * @param id the ID to set for the save file
      */
     public void setSaveFileId(int id) {
         this.serializer.setFixedFile(id);

@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import game.Game;
 import json.GameSerializer;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -13,6 +12,16 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.JsonArray;
 
+/**
+ * Implements a multiplayer game server using Java Sockets.
+ * <p>
+ * Handles multiple clients, generates a common game board,
+ * and broadcasts messages. Each client is assigned a unique player ID.
+ * Game can only be started by the first connected player.
+ * </p>
+ *
+ * @author Andrii Bondarenko (xbonda06)
+ */
 public class GameServer {
     private final int difficulty;
     private final int port;
@@ -27,6 +36,13 @@ public class GameServer {
     private String gameJson;
     private final AtomicBoolean gameStarted = new AtomicBoolean(false);
 
+
+    /**
+     * Constructs a GameServer listening on the given port and with the specified difficulty.
+     *
+     * @param port       The TCP port to listen on.
+     * @param difficulty The difficulty level of the generated game.
+     */
     public GameServer(int port, int difficulty) {
         this.port = port;
         this.difficulty = difficulty;
@@ -35,6 +51,9 @@ public class GameServer {
         }
     }
 
+    /**
+     * Stops the server, closes all client connections, and shuts down the thread pool.
+     */
     public void stop() {
         try {
             System.out.println("SERVER: Stopping server...");
@@ -50,10 +69,19 @@ public class GameServer {
         }
     }
 
+    /**
+     * Returns the current game instance.
+     *
+     * @return the generated game object
+     */
     public Game getGame () {
         return game;
     }
 
+    /**
+     * Starts the server. Accepts incoming connections,
+     * assigns player IDs, and handles communication between clients.
+     */
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             this.serverSocket = serverSocket;
@@ -94,6 +122,11 @@ public class GameServer {
         }
     }
 
+    /**
+     * Returns the public IPv4 address of the server, if available.
+     *
+     * @return the detected IP address or "127.0.0.1" as fallback
+     */
     public String getIpAddress() {
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -116,6 +149,12 @@ public class GameServer {
         return "127.0.0.1"; // fallback
     }
 
+    /**
+     * Sends a message to all clients except the sender.
+     *
+     * @param message the message to be sent
+     * @param sender  the client who sent the original message
+     */
     public void broadcast(String message, ClientHandler sender) {
         for (ClientHandler client : clients) {
             if (client != sender) {
@@ -124,17 +163,30 @@ public class GameServer {
         }
     }
 
+    /**
+     * Handles communication with a single client in a separate thread.
+     */
     private class ClientHandler implements Runnable {
         private final Socket socket;
         private final int playerId;
         private BufferedReader in;
         private PrintWriter out;
 
+        /**
+         * Constructs a client handler for a connected socket and assigns a player ID.
+         *
+         * @param socket   the client's socket
+         * @param playerId the unique ID assigned to the player
+         */
         public ClientHandler(Socket socket, int playerId) {
             this.socket = socket;
             this.playerId = playerId;
         }
 
+        /**
+         * Starts the message listening loop for this client.
+         * Handles specific types of messages and communicates with other players.
+         */
         @Override
         public void run() {
             try {
@@ -142,8 +194,8 @@ public class GameServer {
                 out = new PrintWriter(socket.getOutputStream(), true);
 
                 out.println(initMessage());
-
                 out.println(playerCountMessage());
+                broadcast(playerCountMessage().toString(), this);
 
                 String line;
                 while ((line = in.readLine()) != null) {
@@ -176,10 +228,20 @@ public class GameServer {
             }
         }
 
+        /**
+         * Sends a message to the client.
+         *
+         * @param message the message to send
+         */
         public void sendMessage(String message) {
             out.println(message);
         }
 
+        /**
+         * Builds and returns the initial message sent to a connected client.
+         *
+         * @return JSON string with player ID and initial game state
+         */
         private String initMessage() {
             JsonObject obj = new JsonObject();
             obj.addProperty("type", "init");
@@ -189,6 +251,11 @@ public class GameServer {
             return obj.toString();
         }
 
+        /**
+         * Constructs and returns a JSON object containing the current player count and their IDs.
+         *
+         * @return JSON object with type, count, and player IDs
+         */
         private JsonObject playerCountMessage() {
             JsonObject resp = new JsonObject();
             resp.addProperty("type", "player_count_response");
@@ -206,6 +273,9 @@ public class GameServer {
             return resp;
         }
 
+        /**
+         * Closes the socket connection for the client.
+         */
         public void close() {
             try {
                 socket.close();

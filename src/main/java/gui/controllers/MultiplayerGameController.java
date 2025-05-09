@@ -1,18 +1,9 @@
-/*
- * Author: Olha Tomylko (xtomylo00)
- *
- * Description:
- * Controller for the multiplayer game screen. Handles UI initialization, player moves,
- * opponent game windows, and interactions between the client and server during gameplay.
- */
-
 package gui.controllers;
 
 import common.GameNode;
 import game.Game;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
-import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -21,9 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -34,6 +23,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller for the multiplayer game screen.
+ * <p>
+ * Handles the game board UI, tracks player moves, displays opponents' game windows,
+ * manages communication with the client/server, and detects game win events.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class MultiplayerGameController implements GameWinListener {
     private static final int FIELD_SIZE = 400;
     private int secondsElapsed = 0;
@@ -47,8 +45,23 @@ public class MultiplayerGameController implements GameWinListener {
     private final int boardSize = 5;
     private final List<Stage> opponentStages = new ArrayList<>();
 
+
+    /**
+     * Sets the primary JavaFX stage.
+     * @param primaryStage main stage for the game screen
+     */
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
+
+    /**
+     * Sets the game server instance.
+     * @param server reference to the server
+     */
     public void setServer(GameServer server) {this.server = server;}
+
+    /**
+     * Sets the game client instance.
+     * @param client reference to the client
+     */
     public void setClient(GameClient client) {this.client = client;}
 
     @FXML public StackPane rootPane;
@@ -57,8 +70,12 @@ public class MultiplayerGameController implements GameWinListener {
     @FXML public Button redoButton;
     @FXML public Label stepsLabel;
     @FXML public Label timerLabel;
-    @FXML public Label PlayerWinId;
 
+    /**
+     * Initializes the game screen after joining a multiplayer session.
+     * Sets up the timer, loads the player's and opponents' game boards.
+     * @throws IOException if FXML loading fails
+     */
     public void showGame() throws IOException {
         this.client.setGameWinListener(this);
         this.game = client.getOwnGame();
@@ -69,6 +86,11 @@ public class MultiplayerGameController implements GameWinListener {
         createGameBoard();
     }
 
+    /**
+     * Callback for when a player wins the game.
+     * Displays a victory dialog with the winner's information.
+     * @param winnerId the ID of the player who won
+     */
     @Override
     public void onGameWin(int winnerId) {
         Platform.runLater(() -> {
@@ -93,6 +115,11 @@ public class MultiplayerGameController implements GameWinListener {
         });
     }
 
+
+    /**
+     * Displays opponents' game windows based on their player IDs and positions them on the screen.
+     * @throws IOException if loading opponent FXML fails
+     */
     private void opponentsGame() throws IOException {
         client.requestPlayerCount();
         int count = client.getLatestPlayerCount();
@@ -130,8 +157,14 @@ public class MultiplayerGameController implements GameWinListener {
         }
     }
 
+    /**
+     * Creates and displays a window with a single opponent's game board.
+     * @param id opponent's player ID
+     * @param x  X position on the screen
+     * @param y  Y position on the screen
+     * @throws IOException if FXML loading fails
+     */
     private void showOpponentWindow(Integer id, double x, double y) throws IOException {
-
         Game gameOpponent = client.getOpponentGame(id);
         if (gameOpponent == null) {
             System.out.println("Opponent game is null");
@@ -158,16 +191,26 @@ public class MultiplayerGameController implements GameWinListener {
         }
     }
 
+    /**
+     * Triggers an undo action for the player and updates the UI.
+     */
     @FXML public void getUndo() {
         client.sendUndo();
         GridHelper.undo(game, boardSize, gameGrid, cellSize, this::handleCellClick, false);
     }
 
+    /**
+     * Triggers a redo action for the player and updates the UI.
+     */
     @FXML public void getRedo() {
         client.sendRedo();
         GridHelper.redo(game, boardSize, gameGrid, cellSize, this::handleCellClick, false);
     }
 
+
+    /**
+     * Returns to the main menu, stops all client/server connections, and closes opponent windows.
+     */
     public void toTheMain() {
         closeOpponents();
         client.stop();
@@ -177,55 +220,36 @@ public class MultiplayerGameController implements GameWinListener {
         GridHelper.loadMainMenu(primaryStage);
     }
 
-    // Initialize a new game with a ready board and randomly rotated connectors
+    /**
+     * Sets up and renders the local player's game board.
+     */
     private void createGameBoard() {
         this.cellSize = FIELD_SIZE / boardSize;
-        clearGameGrid();
-        setupGridConstraints();
+        GridHelper.clearGameGrid(gameGrid);
+        GridHelper.setupGridConstraints(boardSize, gameGrid, FIELD_SIZE);
         GridHelper.loadImages();
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick);
     }
 
-    // Delete game
-    private void clearGameGrid() {
-        gameGrid.getChildren().clear();
-        gameGrid.getColumnConstraints().clear();
-        gameGrid.getRowConstraints().clear();
-    }
-
-    // Configure grid size and set fixed cell dimensions based on the board size
-    private void setupGridConstraints() {
-        int cellSize = FIELD_SIZE / boardSize;
-        gameGrid.setMinSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setPrefSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setMaxSize(FIELD_SIZE, FIELD_SIZE);
-
-        for (int i = 0; i < 5; i++) {
-            ColumnConstraints colConst = new ColumnConstraints(cellSize, cellSize, cellSize);
-            RowConstraints rowConst = new RowConstraints(cellSize, cellSize, cellSize);
-            gameGrid.getColumnConstraints().add(colConst);
-            gameGrid.getRowConstraints().add(rowConst);
-        }
-    }
-
+    /**
+     * Handles a player's click on a game cell, updates the game state, and notifies the server.
+     * @param node the clicked game node
+     */
     private void handleCellClick(GameNode node) {
         game.setLastTurnedNode(node.getPosition());
         node.turn();
         updateStepsDisplay();
         client.sendTurn(node.getPosition());
-        int row = node.getPosition().getRow() - 1;
-        int col = node.getPosition().getCol() - 1;
-        for (int r = 0; r < boardSize; r++) {
-            for (int c = 0; c < boardSize; c++) {
-                boolean animate = (r == row && c == col); //for smooth rotation
-                GridHelper.fillCell(game, gameGrid, cellSize, r, c, this::handleCellClick,
-                        animate, false);
-            }
-        }
-        if(game.checkWin())
+        GridHelper.updateAfterClick(node, boardSize, game, gameGrid, cellSize, this::handleCellClick);
+        if(game.checkWin()) {
+            stopTimer();
             client.sendWin();
+        }
     }
 
+    /**
+     * Initializes the game timer.
+     */
     private void setupTimer() {
         gameTimer = new Timeline(
                 new KeyFrame(Duration.seconds(1), event -> {
@@ -236,6 +260,9 @@ public class MultiplayerGameController implements GameWinListener {
         gameTimer.setCycleCount(Animation.INDEFINITE);
     }
 
+    /**
+     * Starts the game timer and resets the counters.
+     */
     private void startTimer() {
         secondsElapsed = 0;
         stepsTaken = 0;
@@ -243,24 +270,35 @@ public class MultiplayerGameController implements GameWinListener {
         gameTimer.play();
     }
 
+    /**
+     * Stops the game timer.
+     */
     private void stopTimer() {
         if (gameTimer != null) {
             gameTimer.stop();
         }
     }
 
+    /**
+     * Updates the timer label in the format mm:ss.
+     */
     private void updateTimerDisplay() {
         int minutes = secondsElapsed / 60;
         int seconds = secondsElapsed % 60;
         timerLabel.setText(String.format("%d:%02d", minutes, seconds));
     }
 
+    /**
+     * Updates the step counter label.
+     */
     private void updateStepsDisplay() {
         ++stepsTaken;
-        stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
+        stepsLabel.setText(String.format("Steps: %d/%d", stepsTaken, game.turnsToWin()));
     }
 
-
+    /**
+     * Closes all open windows showing opponents' games.
+     */
     public void closeOpponents() {
         for (Stage stage : opponentStages) {
             stage.close();
