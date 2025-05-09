@@ -13,7 +13,7 @@
  *     <li>Manages scene transitions to the waiting or main multiplayer views.</li>
  * </ul>
  *
- * @author Olha Tomylko
+ * @author Olha Tomylko (xtomylo00)
  */
 
 package gui.controllers;

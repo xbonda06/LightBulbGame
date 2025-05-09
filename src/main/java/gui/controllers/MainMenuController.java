@@ -6,7 +6,7 @@
  * and accessing the archive of previously played games.
  * </p>
  *
- * @author Olha Tomylko
+ * @author Olha Tomylko (xtomylo00)
  */
 
 package gui.controllers;

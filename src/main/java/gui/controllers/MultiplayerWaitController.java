@@ -1,9 +1,17 @@
-/*
- * Author: Olha Tomylko (xtomylo00)
- *
- * Description:
+/**
  * Controller for the client-side waiting screen in multiplayer mode.
- * Waits for the game to start and transitions to the main multiplayer game view once it begins.
+ * <p>
+ * This controller is responsible for displaying the current player count,
+ * listening for the game start event from the server, and transitioning
+ * the user to the multiplayer game screen when the game begins.
+ * </p>
+ *
+ * <p>
+ * It also provides a way to return to the main menu and handles resource cleanup
+ * when the window is closed or when the game client is stopped.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
  */
 
 package gui.controllers;
@@ -17,18 +25,38 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import multiplayer.GameClient;
 
+/**
+ * Manages the multiplayer lobby screen and handles the transition to the main game UI.
+ * Implements {@link GameStartListener} and {@link GamePlayerCountListener} to receive updates from the server.
+ */
 public class MultiplayerWaitController implements GameStartListener, GamePlayerCountListener{
     @FXML public Label playerCount;
     private Stage primaryStage;
     private GameClient client;
+
+
+    /**
+     * Sets the primary stage used to switch between scenes.
+     *
+     * @param primaryStage the main JavaFX window
+     */
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
 
+    /**
+     * Sets the game client and registers this controller as a listener
+     * for game start and player count change events.
+     *
+     * @param gameClient the client used to communicate with the game server
+     */
     public void setGameClient(GameClient gameClient) {
         this.client = gameClient;
         this.client.setGameStartListener(this);
         this.client.setPlayerCountListener(this);
     }
 
+    /**
+     * Returns to the main menu and stops the multiplayer client.
+     */
     public void toTheMain() {
         if (client != null) {
             client.stop();
@@ -36,6 +64,10 @@ public class MultiplayerWaitController implements GameStartListener, GamePlayerC
         GridHelper.loadMainMenu(primaryStage);
     }
 
+    /**
+     * Called when the server notifies that the game has started.
+     * Transitions to the multiplayer game screen.
+     */
     @Override
     public void onGameStarted() {
         Platform.runLater(() -> {
@@ -61,6 +93,11 @@ public class MultiplayerWaitController implements GameStartListener, GamePlayerC
         });
     }
 
+    /**
+     * Updates the player count label when the number of connected players changes.
+     *
+     * @param count the number of connected players
+     */
     @Override
     public void onPlayerCountChanged(int count) {
         Platform.runLater(() -> {
@@ -68,6 +105,9 @@ public class MultiplayerWaitController implements GameStartListener, GamePlayerC
         });
     }
 
+    /**
+     * Cleans up resources and closes the application window.
+     */
     private void closeScene() {
         client.stop();
         primaryStage.close();
