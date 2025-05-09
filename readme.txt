@@ -12,9 +12,24 @@ Additionally, there is a multiplayer mode that allows playing with 1 to 3 oppone
 
 How to Compile and Run:
 1. Compilation:
+To compile the project, navigate to the root directory of the project in your terminal and run the following command:
+
+mvn clean package
+
+You will find the compiled JAR file in the target directory.
+
+2. Documentation:
+The javadoc documentation will be provided in the target directory after running mvn clean package, but you can compile it manually by running the following command:
+
+mvn javadoc:javadoc
 
 2. Execution:
+To run the application use maven by executing the following command in the terminal:
+
+mvn clean javafx:run
 
 Requirements:
+To compile the project, you need to have Maven installed on your machine.
+Make sure you have required version of Java installed (Java SE 21).
 
 Notes:
