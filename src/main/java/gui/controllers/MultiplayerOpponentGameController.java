@@ -1,3 +1,13 @@
+package gui.controllers;
+
+import game.Game;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import multiplayer.GameClient;
+
 /**
  * Controller for displaying the opponent's game board in a multiplayer match.
  * <p>
@@ -11,20 +21,6 @@
  * </p>
  *
  * @author Olha Tomylko (xtomylo00)
- */
-package gui.controllers;
-
-import game.Game;
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import multiplayer.GameClient;
-
-/**
- * Handles the display and live update of a remote player's board in a multiplayer game session.
- * Implements {@link GameUpdateListener} to respond to board changes.
  */
 public class MultiplayerOpponentGameController implements GameUpdateListener {
     @FXML public StackPane rootPane;

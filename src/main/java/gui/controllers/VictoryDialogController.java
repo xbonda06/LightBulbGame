@@ -1,3 +1,9 @@
+package gui.controllers;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
+
 /**
  * Controller for the victory dialog that is displayed when the player wins the game.
  * <p>
@@ -12,13 +18,6 @@
  *
  * @author Olha Tomylko (xtomylo00)
  */
-
-package gui.controllers;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.stage.Stage;
-
 public class VictoryDialogController {
     @FXML
     public Button YesButton;

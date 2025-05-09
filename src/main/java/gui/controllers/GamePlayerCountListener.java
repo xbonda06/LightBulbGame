@@ -1,3 +1,5 @@
+package gui.controllers;
+
 /**
  * Listener interface for receiving notifications when the number of connected players changes.
  *
@@ -6,8 +8,6 @@
  *
  * @author Andrii Bondarenko (xbonda06)
  */
-package gui.controllers;
-
 public interface GamePlayerCountListener {
 
     /**

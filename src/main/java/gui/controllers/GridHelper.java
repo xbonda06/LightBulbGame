@@ -1,14 +1,3 @@
-/**
- * Helper class responsible for managing the game grid and various UI components of the Light Bulb Game.
- * <p>
- * This class handles the loading and caching of image resources, rendering and updating game nodes on
- * the JavaFX {@link GridPane}, managing click handlers, animations for rotating connectors, and transitioning
- * between different UI scenes (main menu, archive, game board). It also includes utility methods for undo and redo actions.
- * </p>
- *
- * @author Olha Tomylko (xtomylo00)
- */
-
 package gui.controllers;
 
 import common.GameNode;
@@ -34,6 +23,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * Helper class responsible for managing the game grid and various UI components of the Light Bulb Game.
+ * <p>
+ * This class handles the loading and caching of image resources, rendering and updating game nodes on
+ * the JavaFX {@link GridPane}, managing click handlers, animations for rotating connectors, and transitioning
+ * between different UI scenes (main menu, archive, game board). It also includes utility methods for undo and redo actions.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class GridHelper {
     /**
      * A cache to store the images used for game elements.

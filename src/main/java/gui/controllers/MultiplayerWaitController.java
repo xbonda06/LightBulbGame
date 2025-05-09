@@ -1,3 +1,14 @@
+package gui.controllers;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
+import multiplayer.GameClient;
+
 /**
  * Controller for the client-side waiting screen in multiplayer mode.
  * <p>
@@ -12,22 +23,6 @@
  * </p>
  *
  * @author Olha Tomylko (xtomylo00)
- */
-
-package gui.controllers;
-
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.stage.Stage;
-import multiplayer.GameClient;
-
-/**
- * Manages the multiplayer lobby screen and handles the transition to the main game UI.
- * Implements {@link GameStartListener} and {@link GamePlayerCountListener} to receive updates from the server.
  */
 public class MultiplayerWaitController implements GameStartListener, GamePlayerCountListener{
     @FXML public Label playerCount;

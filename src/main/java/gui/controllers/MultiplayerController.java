@@ -1,3 +1,21 @@
+package gui.controllers;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import multiplayer.GameClient;
+import multiplayer.GameServer;
+import java.io.IOException;
+import java.util.Random;
+
 /**
  * Controller for handling multiplayer menu interactions.
  * <p>
@@ -15,26 +33,6 @@
  *
  * @author Olha Tomylko (xtomylo00)
  */
-
-package gui.controllers;
-
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import multiplayer.GameClient;
-import multiplayer.GameServer;
-
-import java.io.IOException;
-import java.util.Random;
-
 public class MultiplayerController {
 
     private Stage primaryStage;

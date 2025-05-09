@@ -1,3 +1,12 @@
+package gui;
+
+import gui.controllers.MainMenuController;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
 /**
  * Main entry point for the Light Bulb Game application.
  * <p>
@@ -14,16 +23,6 @@
  *
  * @author Olha Tomylko (xtomylo00)
  */
-
-package gui;
-
-import gui.controllers.MainMenuController;
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-
 public class MainApp extends Application {
     /**
      * Initializes and displays the primary stage with the main menu scene.

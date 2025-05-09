@@ -1,3 +1,5 @@
+package common;
+
 /**
  * Represents a coordinate on the game board using row and column indices.
  * <p>
@@ -6,8 +8,6 @@
  *
  * @author Andrii Bondarenko (xbonda06)
  */
-package common;
-
 public class Position {
 
     private final int row;

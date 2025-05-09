@@ -1,13 +1,3 @@
-/**
- * Controller for the multiplayer game screen.
- * <p>
- * Handles the game board UI, tracks player moves, displays opponents' game windows,
- * manages communication with the client/server, and detects game win events.
- * </p>
- *
- * @author Olha Tomylko (xtomylo00)
- */
-
 package gui.controllers;
 
 import common.GameNode;
@@ -33,6 +23,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller for the multiplayer game screen.
+ * <p>
+ * Handles the game board UI, tracks player moves, displays opponents' game windows,
+ * manages communication with the client/server, and detects game win events.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class MultiplayerGameController implements GameWinListener {
     private static final int FIELD_SIZE = 400;
     private int secondsElapsed = 0;

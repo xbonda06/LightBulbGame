@@ -1,3 +1,12 @@
+package gui.controllers;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
+import multiplayer.GameClient;
+import multiplayer.GameServer;
+import java.util.List;
+
 /**
  * Controller for the multiplayer victory dialog.
  * <p>
@@ -9,17 +18,6 @@
  *
  * @author Olha Tomylko (xtomylo00)
  */
-
-package gui.controllers;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.stage.Stage;
-import multiplayer.GameClient;
-import multiplayer.GameServer;
-
-import java.util.List;
-
 public class MultiplayerWinController {
     @FXML private Label PlayerWinId;
     private Stage primaryStage;

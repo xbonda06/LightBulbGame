@@ -1,3 +1,15 @@
+package gui.controllers;
+
+import common.GameNode;
+import common.Position;
+import game.Game;
+import javafx.fxml.FXML;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
 /**
  * Controller responsible for managing the hints window UI.
  * <p>
@@ -15,19 +27,6 @@
  *
  * @author Olha Tomylko (xtomylo00)
  */
-
-package gui.controllers;
-
-import common.GameNode;
-import common.Position;
-import game.Game;
-import javafx.fxml.FXML;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-
 public class HintsController {
 
     @FXML

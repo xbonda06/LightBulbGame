@@ -1,3 +1,5 @@
+package gui.controllers;
+
 /**
  * Listener interface for receiving a callback when the game starts.
  *
@@ -6,8 +8,6 @@
  *
  * @author Andrii Bondarenko (xbonda06)
  */
-package gui.controllers;
-
 public interface GameStartListener {
 
     /**
