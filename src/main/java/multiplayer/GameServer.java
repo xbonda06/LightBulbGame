@@ -143,6 +143,8 @@ public class GameServer {
 
                 out.println(initMessage());
 
+                out.println(playerCountMessage());
+
                 String line;
                 while ((line = in.readLine()) != null) {
                     JsonObject obj = JsonParser.parseString(line).getAsJsonObject();
@@ -154,19 +156,7 @@ public class GameServer {
                         startMsg.addProperty("type", "start_game");
                         broadcast(startMsg.toString(), null);
                     } else if ("player_count".equals(type)) {
-                        JsonObject resp = new JsonObject();
-                        resp.addProperty("type", "player_count_response");
-
-                        List<Integer> ids = clients.stream()
-                                .map(handler -> handler.playerId)
-                                .toList();
-
-                        resp.addProperty("count", ids.size());
-
-                        JsonArray arr = new JsonArray();
-                        for (int id : ids) arr.add(id);
-                        resp.add("playerIds", arr);
-
+                        JsonObject resp = playerCountMessage();
                         out.println(resp);
                     } else {
                         broadcast(line, this);
@@ -197,6 +187,23 @@ public class GameServer {
             JsonElement gameJsonElement = JsonParser.parseString(gameJson);
             obj.add("gameJson", gameJsonElement);
             return obj.toString();
+        }
+
+        private JsonObject playerCountMessage() {
+            JsonObject resp = new JsonObject();
+            resp.addProperty("type", "player_count_response");
+
+            List<Integer> ids = clients.stream()
+                    .map(handler -> handler.playerId)
+                    .toList();
+
+            resp.addProperty("count", ids.size());
+
+            JsonArray arr = new JsonArray();
+            for (int id : ids) arr.add(id);
+            resp.add("playerIds", arr);
+
+            return resp;
         }
 
         public void close() {

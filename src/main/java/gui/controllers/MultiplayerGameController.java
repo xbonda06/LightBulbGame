@@ -14,6 +14,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -25,6 +26,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import multiplayer.GameClient;
 import multiplayer.GameServer;
@@ -32,7 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiplayerGameController {
+public class MultiplayerGameController implements GameWinListener {
     private static final int FIELD_SIZE = 400;
     private int secondsElapsed = 0;
     private int stepsTaken = 0;
@@ -55,8 +57,10 @@ public class MultiplayerGameController {
     @FXML public Button redoButton;
     @FXML public Label stepsLabel;
     @FXML public Label timerLabel;
+    @FXML public Label PlayerWinId;
 
     public void showGame() throws IOException {
+        this.client.setGameWinListener(this);
         this.game = client.getOwnGame();
         setupTimer();
         startTimer();
@@ -65,13 +69,35 @@ public class MultiplayerGameController {
         createGameBoard();
     }
 
+    @Override
+    public void onGameWin(int winnerId) {
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/win_multiplayer.fxml"));
+                Parent root = loader.load();
+
+                MultiplayerWinController controller = loader.getController();
+                controller.setClient(client);
+                controller.setStages(primaryStage, opponentStages);
+                controller.setServer(server);
+                controller.setWinnerId(winnerId);
+
+                Stage dialogStage = new Stage(StageStyle.UNDECORATED);
+                controller.setDialogStage(dialogStage);
+                dialogStage.setTitle("Victory");
+                GridHelper.openDialog(dialogStage, root, primaryStage);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     private void opponentsGame() throws IOException {
         client.requestPlayerCount();
-        PauseTransition pause = new PauseTransition(Duration.millis(700));
-        pause.play();
         int count = client.getLatestPlayerCount();
-        System.out.println(count);
         List<Integer> ids = client.getLatestPlayerIds();
+        ids.remove(Integer.valueOf(client.getPlayerId()));
 
         double mainWidth = 800;
         double mainHeight = 600;
@@ -88,17 +114,17 @@ public class MultiplayerGameController {
         primaryStage.setY(mainY);
 
         if (count > 1) {
-            showOpponentWindow(ids.get(1),
+            showOpponentWindow(ids.getFirst(),
                     mainX - opponentWidth - spacing,
                     mainY - 50);
         }
         if (count > 2) {
-            showOpponentWindow(ids.get(2),
+            showOpponentWindow(ids.get(1),
                     mainX - opponentWidth - spacing,
                     mainY + (opponentHeight) + spacing);
         }
         if (count > 3) {
-            showOpponentWindow(ids.get(3),
+            showOpponentWindow(ids.get(2),
                     mainX + mainWidth + spacing,
                     mainY - 50);
         }
@@ -107,12 +133,16 @@ public class MultiplayerGameController {
     private void showOpponentWindow(Integer id, double x, double y) throws IOException {
 
         Game gameOpponent = client.getOpponentGame(id);
+        if (gameOpponent == null) {
+            System.out.println("Opponent game is null");
+        }
         if (gameOpponent != null) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/multiplayer_other.fxml"));
             Parent root = loader.load();
 
             MultiplayerOpponentGameController opponentController = loader.getController();
             opponentController.setGame(client.getOpponentGame(id));
+            opponentController.setGameClient(client);
             opponentController.showGame();
             opponentController.playerId.setText("Player " + id);
 
@@ -181,6 +211,7 @@ public class MultiplayerGameController {
     private void handleCellClick(GameNode node) {
         game.setLastTurnedNode(node.getPosition());
         node.turn();
+        updateStepsDisplay();
         client.sendTurn(node.getPosition());
         int row = node.getPosition().getRow() - 1;
         int col = node.getPosition().getCol() - 1;
@@ -191,6 +222,8 @@ public class MultiplayerGameController {
                         animate, false);
             }
         }
+        if(game.checkWin())
+            client.sendWin();
     }
 
     private void setupTimer() {
@@ -221,6 +254,12 @@ public class MultiplayerGameController {
         int seconds = secondsElapsed % 60;
         timerLabel.setText(String.format("%d:%02d", minutes, seconds));
     }
+
+    private void updateStepsDisplay() {
+        ++stepsTaken;
+        stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
+    }
+
 
     public void closeOpponents() {
         for (Stage stage : opponentStages) {
