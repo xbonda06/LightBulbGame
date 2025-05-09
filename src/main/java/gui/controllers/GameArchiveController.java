@@ -54,7 +54,7 @@ public class GameArchiveController {
     }
 
     private void updateStepsDisplay() {
-        stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
+        stepsLabel.setText(String.format("Steps: %d", stepsTaken));
     }
 
     @FXML

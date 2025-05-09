@@ -251,7 +251,7 @@ public class GameBoardController {
     }
 
     private void updateStepsDisplay() {
-        stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
+        stepsLabel.setText(String.format("Steps: %d/%d", stepsTaken, game.turnsToWin()));
     }
 
     private void updateHintsDisplay() {
