@@ -9,13 +9,16 @@
 package gui.controllers;
 
 import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import multiplayer.GameClient;
 
 public class MultiplayerWaitController implements GameStartListener, GamePlayerCountListener{
+    @FXML public Label playerCount;
     private Stage primaryStage;
     private GameClient client;
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
@@ -61,7 +64,7 @@ public class MultiplayerWaitController implements GameStartListener, GamePlayerC
     @Override
     public void onPlayerCountChanged(int count) {
         Platform.runLater(() -> {
-            // TODO: Update the player count label in the UI
+            playerCount.setText("Players: " + count);
         });
     }
 

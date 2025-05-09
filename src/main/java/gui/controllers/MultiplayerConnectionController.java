@@ -31,6 +31,7 @@ public class MultiplayerConnectionController implements GamePlayerCountListener 
     private Stage primaryStage;
     private GameServer server;
     private GameClient client;
+    private int players = 1;
 
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
     public void setServer(GameServer server) {this.server = server;}
@@ -46,10 +47,7 @@ public class MultiplayerConnectionController implements GamePlayerCountListener 
     }
 
     public void startGame() throws IOException {
-        client.requestPlayerCount();
-        int count = client.getLatestPlayerCount();
-        playerCount.setText("Players: " + count); //todo
-        if (count > 1) {
+        if (players > 1) {
             FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/multiplayer_main.fxml"));
             Parent root = loader.load();
 
@@ -83,7 +81,8 @@ public class MultiplayerConnectionController implements GamePlayerCountListener 
     @Override
     public void onPlayerCountChanged(int count) {
         Platform.runLater(() -> {
-            // TODO: Update the player count label in the UI
+            playerCount.setText("Players: " + count);
+            this.players = count;
         });
     }
 
