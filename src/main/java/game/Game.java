@@ -254,6 +254,17 @@ public class Game implements ToolEnvironment, Observable.Observer {
         throw new IllegalStateException("Unable to generate valid game with at least one bulb after " + maxAttempts + " attempts.");
     }
 
+    public int turnsToWin() {
+        int sum = 0;
+        for(int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                GameNode node = nodes[r][c];
+                sum += node.getHint();
+            }
+        }
+        return sum;
+    }
+
     private static void validatePowerConnections(GameNode node, int rows, int cols) {
         int row = node.getPosition().getRow();
         int col = node.getPosition().getCol();
