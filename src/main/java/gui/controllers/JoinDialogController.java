@@ -13,7 +13,7 @@
  *     <li>Closes the dialog window on success or user cancellation.</li>
  * </ul>
  *
- * @author Olha Tomylko
+ * @author Olha Tomylko (xtomylo00)
  */
 package gui.controllers;
 

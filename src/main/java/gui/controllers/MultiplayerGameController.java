@@ -5,7 +5,7 @@
  * manages communication with the client/server, and detects game win events.
  * </p>
  *
- * @author Olha Tomylko
+ * @author Olha Tomylko (xtomylo00)
  */
 
 package gui.controllers;

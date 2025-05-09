@@ -7,7 +7,7 @@
  * or to return to the main menu.
  * </p>
  *
- * @author Olha Tomylko
+ * @author Olha Tomylko (xtomylo00)
  */
 
 package gui.controllers;
