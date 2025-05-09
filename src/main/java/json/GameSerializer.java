@@ -1,12 +1,3 @@
-/**
- * This class is responsible for serializing the state of a game to a JSON file.
- * <p>
- * The serialized output is written to the {@code data/} directory, and formatted
- * using the GSON library for readability.
- * </p>
- *
- * @author Alina Paliienko (xpaliia00)
- */
 package json;
 
 import com.google.gson.Gson;
@@ -24,6 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ * This class is responsible for serializing the state of a game to a JSON file.
+ * <p>
+ * The serialized output is written to the {@code data/} directory, and formatted
+ * using the GSON library for readability.
+ * </p>
+ *
+ * @author Alina Paliienko (xpaliia00)
+ */
 public class GameSerializer {
     private static final Path DATA_DIRECTORY = Paths.get("data");
 

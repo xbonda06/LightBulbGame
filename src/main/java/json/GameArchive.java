@@ -1,18 +1,3 @@
-/**
- * Provides functionality for managing saved games in JSON format.
- * <p>
- * This class supports listing, loading, deleting, and retrieving metadata
- * (such as the saved date) for saved game files stored in the {@code data/} directory.
- * </p>
- *
- * <p>
- * Saved games are expected to be stored as JSON files named by their numeric ID
- * (e.g., {@code 3.json}).
- * </p>
- *
- * @author Alina Paliienko (xpaliia00)
- */
-
 package json;
 
 import com.google.gson.JsonObject;
@@ -29,6 +14,20 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Provides functionality for managing saved games in JSON format.
+ * <p>
+ * This class supports listing, loading, deleting, and retrieving metadata
+ * (such as the saved date) for saved game files stored in the {@code data/} directory.
+ * </p>
+ *
+ * <p>
+ * Saved games are expected to be stored as JSON files named by their numeric ID
+ * (e.g., {@code 3.json}).
+ * </p>
+ *
+ * @author Alina Paliienko (xpaliia00)
+ */
 public class GameArchive {
 
     /**

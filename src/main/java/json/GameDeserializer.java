@@ -1,16 +1,3 @@
-/**
- * This class handles the deserialization of saved game data from a JSON file.
- * <p>
- * The deserialization process reconstructs the game object, initializes its state,
- * and replays all previous moves to restore the game as it was when saved.
- * </p>
- *
- * <p>
- * Additional helper methods allow navigation through move history step by step.
- * </p>
- *
- * @author Alina Paliienko (xpaliia00)
- */
 package json;
 
 import com.google.gson.Gson;
@@ -27,6 +14,19 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class handles the deserialization of saved game data from a JSON file.
+ * <p>
+ * The deserialization process reconstructs the game object, initializes its state,
+ * and replays all previous moves to restore the game as it was when saved.
+ * </p>
+ *
+ * <p>
+ * Additional helper methods allow navigation through move history step by step.
+ * </p>
+ *
+ * @author Alina Paliienko (xpaliia00)
+ */
 public class GameDeserializer {
     private final Game game;
     private final List<Position> fullHistory;
