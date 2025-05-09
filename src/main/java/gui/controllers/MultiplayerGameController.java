@@ -14,6 +14,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -69,20 +70,26 @@ public class MultiplayerGameController implements GameWinListener {
 
     @Override
     public void onGameWin(int winnerId) {
-//        try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/win_multiplayer.fxml"));
-//            Parent root = loader.load();
-//            PlayerWinId.setText("Player " + winnerId + " wins");
-//            Stage dialogStage = new Stage();
-//            dialogStage.setTitle("Victory");
-//            dialogStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
-//            dialogStage.initOwner(primaryStage);
-//            dialogStage.setResizable(false);
-//            dialogStage.setScene(new Scene(root));
-//            dialogStage.showAndWait();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/win_multiplayer.fxml"));
+                Parent root = loader.load();
+
+                MultiplayerWinController controller = loader.getController();
+                controller.setWinnerId(winnerId);
+                controller.setStages(primaryStage, opponentStages);
+                controller.setClient(client);
+                controller.setServer(server);
+
+                Stage dialogStage = new Stage();
+                controller.setDialogStage(dialogStage);
+                dialogStage.setTitle("Victory");
+                GridHelper.openDialog(dialogStage, root, primaryStage);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void opponentsGame() throws IOException {
@@ -214,6 +221,8 @@ public class MultiplayerGameController implements GameWinListener {
                         animate, false);
             }
         }
+        if(game.checkWin())
+            client.sendWin();
     }
 
     private void setupTimer() {
