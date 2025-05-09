@@ -15,7 +15,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import multiplayer.GameClient;
 
-public class MultiplayerWaitController implements GameStartListener{
+public class MultiplayerWaitController implements GameStartListener, GamePlayerCountListener{
     private Stage primaryStage;
     private GameClient client;
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
@@ -23,6 +23,7 @@ public class MultiplayerWaitController implements GameStartListener{
     public void setGameClient(GameClient gameClient) {
         this.client = gameClient;
         gameClient.setGameStartListener(this);
+        gameClient.setPlayerCountListener(this);
     }
 
     public void toTheMain() {
@@ -54,6 +55,13 @@ public class MultiplayerWaitController implements GameStartListener{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        });
+    }
+
+    @Override
+    public void onPlayerCountChanged(int count) {
+        Platform.runLater(() -> {
+            // TODO: Update the player count label in the UI
         });
     }
 

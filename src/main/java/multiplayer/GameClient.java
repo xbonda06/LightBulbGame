@@ -2,6 +2,7 @@ package multiplayer;
 
 import common.Position;
 import game.Game;
+import gui.controllers.GamePlayerCountListener;
 import gui.controllers.GameStartListener;
 import gui.controllers.GameUpdateListener;
 import gui.controllers.GameWinListener;
@@ -34,6 +35,7 @@ public class GameClient {
     private GameStartListener startListener;
     private GameUpdateListener gameUpdateListener;
     private GameWinListener gameWinListener;
+    private GamePlayerCountListener playerCountListener;
 
     private final Gson gson = new Gson();
 
@@ -172,6 +174,10 @@ public class GameClient {
                         for (JsonElement el : obj.getAsJsonArray("playerIds")) {
                             latestPlayerIds.add(el.getAsInt());
                         }
+
+                        if(playerCountListener != null) {
+                            playerCountListener.onPlayerCountChanged(latestPlayerCount);
+                        }
                     }
 
                     case "win" -> {
@@ -260,6 +266,7 @@ public class GameClient {
     public void setGameStartListener(GameStartListener listener) { this.startListener = listener; }
     public void setGameUpdateListener(GameUpdateListener gameUpdateListener) { this.gameUpdateListener = gameUpdateListener; }
     public void setGameWinListener(GameWinListener gameWinListener) { this.gameWinListener = gameWinListener;}
+    public void setPlayerCountListener(GamePlayerCountListener playerCountListener) { this.playerCountListener = playerCountListener; }
 
     public int getLatestPlayerCount() { return latestPlayerCount; }
     public List<Integer> getLatestPlayerIds() { return new ArrayList<>(latestPlayerIds); }

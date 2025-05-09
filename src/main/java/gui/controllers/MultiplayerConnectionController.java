@@ -10,6 +10,7 @@
 package gui.controllers;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,7 +23,7 @@ import multiplayer.GameClient;
 import multiplayer.GameServer;
 import java.io.IOException;
 
-public class MultiplayerConnectionController {
+public class MultiplayerConnectionController implements GamePlayerCountListener {
     @FXML public Button startButton;
     @FXML public Label ipAddress;
     @FXML public Label playerCount;
@@ -33,7 +34,11 @@ public class MultiplayerConnectionController {
 
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
     public void setServer(GameServer server) {this.server = server;}
-    public void setClient(GameClient client) {this.client = client;}
+
+    public void setClient(GameClient client) {
+        this.client = client;
+        client.setPlayerCountListener(this);
+    }
 
     @FXML public void toTheMain() {
         server.stop();
@@ -73,6 +78,13 @@ public class MultiplayerConnectionController {
             });
             resetStyle.play();
         }
+    }
+
+    @Override
+    public void onPlayerCountChanged(int count) {
+        Platform.runLater(() -> {
+            // TODO: Update the player count label in the UI
+        });
     }
 
     private void closeScene(GameServer server){
