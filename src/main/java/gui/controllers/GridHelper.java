@@ -21,7 +21,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
@@ -35,6 +37,7 @@ import java.util.function.Consumer;
 
 public class GridHelper {
     public static final Map<String, Image> imageCache = new HashMap<>();
+    private static final int FIELD_SIZE = 400;
 
     private static final String BULB_OFF_IMAGE = "/images/bulb_off.png";
     private static final String BULB_ON_IMAGE = "/images/bulb_on.png";
@@ -314,6 +317,40 @@ public class GridHelper {
         double centerY = primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2;
         dialogStage.setX(centerX);
         dialogStage.setY(centerY);
+    }
+
+    // Configure grid size and set fixed cell dimensions based on the board size
+    public static void setupGridConstraints(int boardSize, GridPane gameGrid) {
+        int cellSize = FIELD_SIZE / boardSize;
+        gameGrid.setMinSize(FIELD_SIZE, FIELD_SIZE);
+        gameGrid.setPrefSize(FIELD_SIZE, FIELD_SIZE);
+        gameGrid.setMaxSize(FIELD_SIZE, FIELD_SIZE);
+
+        for (int i = 0; i < 5; i++) {
+            ColumnConstraints colConst = new ColumnConstraints(cellSize, cellSize, cellSize);
+            RowConstraints rowConst = new RowConstraints(cellSize, cellSize, cellSize);
+            gameGrid.getColumnConstraints().add(colConst);
+            gameGrid.getRowConstraints().add(rowConst);
+        }
+    }
+
+    // Delete game
+    public static void clearGameGrid(GridPane gameGrid) {
+        gameGrid.getChildren().clear();
+        gameGrid.getColumnConstraints().clear();
+        gameGrid.getRowConstraints().clear();
+    }
+
+    public static void updateAfterClick(GameNode node, int boardSize, Game game, GridPane gameGrid, int cellSize,Consumer<GameNode> clickHandler) {
+        int row = node.getPosition().getRow() - 1;
+        int col = node.getPosition().getCol() - 1;
+        for (int r = 0; r < boardSize; r++) {
+            for (int c = 0; c < boardSize; c++) {
+                boolean animate = (r == row && c == col); //for smooth rotation
+                GridHelper.fillCell(game, gameGrid, cellSize, r, c, clickHandler,
+                        animate, false);
+            }
+        }
     }
 }
 
