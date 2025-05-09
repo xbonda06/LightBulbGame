@@ -225,9 +225,8 @@ public class MultiplayerGameController implements GameWinListener {
 
     private void updateStepsDisplay() {
         ++stepsTaken;
-        stepsLabel.setText(String.format("Steps: %d/25", stepsTaken));
+        stepsLabel.setText(String.format("Steps: %d/%d", stepsTaken, game.turnsToWin()));
     }
-
 
     public void closeOpponents() {
         for (Stage stage : opponentStages) {
