@@ -1,3 +1,17 @@
+package multiplayer;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import game.Game;
+import json.GameSerializer;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import com.google.gson.JsonArray;
+
 /**
  * Implements a multiplayer game server using Java Sockets.
  * <p>
@@ -8,22 +22,6 @@
  *
  * @author Andrii Bondarenko (xbonda06)
  */
-
-package multiplayer;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import game.Game;
-import json.GameSerializer;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import com.google.gson.JsonArray;
-
 public class GameServer {
     private final int difficulty;
     private final int port;

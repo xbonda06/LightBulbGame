@@ -1,3 +1,13 @@
+package log;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.lang.ref.Cleaner;
+
 /**
  * Utility class for logging the progress of a game to a timestamped file.
  * <p>
@@ -12,16 +22,6 @@
  *
  * @author Andrii Bondarenko (xbonda06)
  */
-package log;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.lang.ref.Cleaner;
-
 public class GameLogger {
 
     private static final Cleaner cleaner = Cleaner.create();

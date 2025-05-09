@@ -1,3 +1,9 @@
+package common;
+
+import ija.ija2024.tool.common.AbstractObservableField;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents a single node (tile) on the game board.
  * A node can be a power source, bulb, or connecting wire, and contains connectors on its sides.
@@ -9,13 +15,6 @@
  * @author Olha Tomylko (xtomylo00)
  * @author Alina Paliienko (xpaliia00)
  */
-
-package common;
-
-import ija.ija2024.tool.common.AbstractObservableField;
-import java.util.ArrayList;
-import java.util.List;
-
 public class GameNode extends AbstractObservableField {
     private boolean bulb;
     private boolean power;

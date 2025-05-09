@@ -1,13 +1,3 @@
-/**
- * Represents a multiplayer game client that connects to a game server.
- * <p>
- * Handles game communication, deserialization of game data, and propagates game events
- * to registered listeners. Each client manages its own game state and observes opponents' moves.
- * </p>
- *
- * @author Andrii Bondarenko (xbonda06)
- */
-
 package multiplayer;
 
 import common.Position;
@@ -18,14 +8,21 @@ import gui.controllers.GameUpdateListener;
 import gui.controllers.GameWinListener;
 import json.GameDeserializer;
 import com.google.gson.*;
-
 import java.io.*;
 import java.net.Socket;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * Represents a multiplayer game client that connects to a game server.
+ * <p>
+ * Handles game communication, deserialization of game data, and propagates game events
+ * to registered listeners. Each client manages its own game state and observes opponents' moves.
+ * </p>
+ *
+ * @author Andrii Bondarenko (xbonda06)
+ */
 public class GameClient {
 
     private final String host;

@@ -1,3 +1,12 @@
+package gui.controllers;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+
 /**
  * Controller for the Join Game dialog in multiplayer mode.
  * <p>
@@ -15,15 +24,6 @@
  *
  * @author Olha Tomylko (xtomylo00)
  */
-package gui.controllers;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-
-import java.io.IOException;
-
 public class JoinDialogController {
     public Button joinButton;
     public TextField ipEnter;

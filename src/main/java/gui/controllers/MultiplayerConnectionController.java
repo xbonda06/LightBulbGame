@@ -1,15 +1,3 @@
-/**
- * Controller for the multiplayer connection waiting screen.
- * <p>
- * This controller displays the connection status for a multiplayer session,
- * including IP address, port number, and connected player count.
- * It allows the host to start the game once at least two players are connected
- * or to return to the main menu.
- * </p>
- *
- * @author Olha Tomylko (xtomylo00)
- */
-
 package gui.controllers;
 
 import javafx.animation.PauseTransition;
@@ -26,6 +14,17 @@ import multiplayer.GameClient;
 import multiplayer.GameServer;
 import java.io.IOException;
 
+/**
+ * Controller for the multiplayer connection waiting screen.
+ * <p>
+ * This controller displays the connection status for a multiplayer session,
+ * including IP address, port number, and connected player count.
+ * It allows the host to start the game once at least two players are connected
+ * or to return to the main menu.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class MultiplayerConnectionController implements GamePlayerCountListener {
     @FXML public Button startButton;
     @FXML public Label ipAddress;

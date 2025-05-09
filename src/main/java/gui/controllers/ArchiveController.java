@@ -1,13 +1,3 @@
-/**
- * Controller responsible for managing the archive menu UI.
- * <p>
- * It displays a list of previously played games, grouped by date (from newest to oldest),
- * and allows the user to select a game to view its progress in a read-only mode.
- * </p>
- *
- * @author Olha Tomylko (xtomylo00)
- */
-
 package gui.controllers;
 
 import javafx.fxml.FXML;
@@ -19,11 +9,19 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import json.GameArchive;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Controller responsible for managing the archive menu UI.
+ * <p>
+ * It displays a list of previously played games, grouped by date (from newest to oldest),
+ * and allows the user to select a game to view its progress in a read-only mode.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class ArchiveController {
     private Stage primaryStage;
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}

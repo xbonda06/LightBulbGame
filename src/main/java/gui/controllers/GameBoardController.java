@@ -1,19 +1,3 @@
-/**
- * Controller that manages the main game screen of the Light Bulb puzzle game.
- * Handles game initialization, player interactions, timer updates, win condition logic,
- * undo/redo functionality, hint window management, and transitions to/from the main menu.
- * <p>
- * Core features:
- * - Initializes a new game or continues from an archived state.
- * - Listens to user clicks and rotates connectors accordingly.
- * - Animates cell rotation and tracks game steps and time.
- * - Displays a hint window showing solution suggestions.
- * - Shows a win dialog when the puzzle is completed.
- * </p>
- *
- * @author Olha Tomylko (xtomylo00)
- */
-
 package gui.controllers;
 
 import common.GameNode;
@@ -36,6 +20,21 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Controller that manages the main game screen of the Light Bulb puzzle game.
+ * Handles game initialization, player interactions, timer updates, win condition logic,
+ * undo/redo functionality, hint window management, and transitions to/from the main menu.
+ * <p>
+ * Core features:
+ * - Initializes a new game or continues from an archived state.
+ * - Listens to user clicks and rotates connectors accordingly.
+ * - Animates cell rotation and tracks game steps and time.
+ * - Displays a hint window showing solution suggestions.
+ * - Shows a win dialog when the puzzle is completed.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class GameBoardController {
     // Game constants
     private static final int FIELD_SIZE = 400;

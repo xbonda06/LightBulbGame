@@ -1,3 +1,5 @@
+package gui.controllers;
+
 /**
  * Listener interface for receiving a callback when a player wins the game.
  *
@@ -6,8 +8,6 @@
  *
  * @author Andrii Bondarenko (xbonda06)
  */
-package gui.controllers;
-
 public interface GameWinListener {
 
     /**

@@ -1,13 +1,3 @@
-/**
- * Controller responsible for displaying a previously played game in archive mode.
- * <p>
- * The game is shown in a read-only format with limited interaction: only undo/redo steps are allowed.
- * Users can view the board, inspect the game's progress, and optionally restart the game from its archived state.
- * </p>
- *
- * @author Olha Tomylko (xtomylo00)
- */
-
 package gui.controllers;
 
 import game.Game;
@@ -22,9 +12,17 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import json.GameArchive;
 import json.GameDeserializer;
-
 import java.io.IOException;
 
+/**
+ * Controller responsible for displaying a previously played game in archive mode.
+ * <p>
+ * The game is shown in a read-only format with limited interaction: only undo/redo steps are allowed.
+ * Users can view the board, inspect the game's progress, and optionally restart the game from its archived state.
+ * </p>
+ *
+ * @author Olha Tomylko (xtomylo00)
+ */
 public class GameArchiveController {
     @FXML public GridPane gameGrid;
     @FXML public Button undoButton;

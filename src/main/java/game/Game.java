@@ -1,3 +1,15 @@
+package game;
+
+import common.GameNode;
+import common.Position;
+import common.Side;
+import log.GameLogger;
+import ija.ija2024.tool.common.Observable;
+import ija.ija2024.tool.common.ToolEnvironment;
+import ija.ija2024.tool.common.ToolField;
+import json.GameSerializer;
+import java.util.*;
+
 /**
  * Represents the main game logic and model for the grid-based light puzzle game.
  * <p>
@@ -16,22 +28,6 @@
  * @author Olha Tomylko (xtomylo00)
  * @author Alina Paliienko (xpaliia00)
  */
-
-package game;
-
-import common.GameNode;
-import common.Position;
-import common.Side;
-import log.GameLogger;
-import ija.ija2024.tool.common.Observable;
-import ija.ija2024.tool.common.ToolEnvironment;
-import ija.ija2024.tool.common.ToolField;
-
-import json.GameSerializer;
-
-
-import java.util.*;
-
 public class Game implements ToolEnvironment, Observable.Observer {
     private static long nextId = 1;
     private final long gameId;
