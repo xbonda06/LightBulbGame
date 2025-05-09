@@ -1,10 +1,19 @@
-/*
- * Author: Olha Tomylko (xtomylo00)
- *
- * Description:
+/**
  * Controller for handling multiplayer menu interactions.
- * Allows the user to create or join a multiplayer game,manages transitions to appropriate scenes,
- * and sets up game server and client communication.
+ * <p>
+ * This controller manages the multiplayer menu where users can choose to create or join a game.
+ * It handles transitions between scenes and sets up both the server and client sides of the game connection.
+ * </p>
+ *
+ * Features:
+ * <ul>
+ *     <li>Creates a game server and starts it in a background thread.</li>
+ *     <li>Starts a client for connecting to either local or remote multiplayer servers.</li>
+ *     <li>Opens dialog for IP and port entry when joining a game.</li>
+ *     <li>Manages scene transitions to the waiting or main multiplayer views.</li>
+ * </ul>
+ *
+ * @author Olha Tomylko
  */
 
 package gui.controllers;
@@ -22,12 +31,22 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import multiplayer.GameClient;
 import multiplayer.GameServer;
+
 import java.io.IOException;
 import java.util.Random;
 
 public class MultiplayerController {
+
     private Stage primaryStage;
-    public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
+
+    /**
+     * Sets the main application stage.
+     *
+     * @param primaryStage the main application stage
+     */
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
 
     @FXML public StackPane rootPane;
     @FXML public GridPane gameGrid;
@@ -35,7 +54,12 @@ public class MultiplayerController {
     @FXML public Button joinGame;
     @FXML public Button mainButton;
 
-    // From the menu when choosing CREATE or JOIN -> multiplayer_menu.fxml
+    /**
+     * Called when the user chooses to create a new multiplayer game.
+     * Initializes a server and client, sets up the waiting screen.
+     *
+     * @throws IOException if the FXML scene cannot be loaded
+     */
     @FXML
     public void createGame() throws IOException {
         int portNumber = new Random().nextInt(9000) + 1000;
@@ -64,12 +88,22 @@ public class MultiplayerController {
         primaryStage.setOnCloseRequest(e -> closeScene(server));
     }
 
-    private void closeScene(GameServer server){
+    /**
+     * Gracefully stops the server and closes the application stage.
+     *
+     * @param server the running game server
+     */
+    private void closeScene(GameServer server) {
         server.stop();
         primaryStage.close();
     }
 
-    @FXML public void joinGame() {
+    /**
+     * Called when the user chooses to join an existing multiplayer game.
+     * Opens a dialog for entering the IP and port of the server.
+     */
+    @FXML
+    public void joinGame() {
         try {
             Rectangle overlay = new Rectangle(rootPane.getWidth(), rootPane.getHeight(), Color.rgb(0, 0, 0, 0.7));
             overlay.widthProperty().bind(rootPane.widthProperty());
@@ -99,27 +133,44 @@ public class MultiplayerController {
         }
     }
 
+    /**
+     * Starts the multiplayer client and switches to the waiting screen.
+     *
+     * @param ip   the IP address of the server
+     * @param port the port number to connect to
+     * @throws IOException if loading the FXML scene fails
+     */
     public void startClient(String ip, int port) throws IOException {
         GameClient client = new GameClient(ip, port);
         client.start();
+
         FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/wait_client.fxml"));
         Parent root = loader.load();
+
         MultiplayerWaitController controller = loader.getController();
         controller.setPrimaryStage(primaryStage);
         controller.setGameClient(client);
+
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("Light Bulb Game - Multiplayer");
         primaryStage.setOnCloseRequest(e -> closeClient(client));
     }
 
-    private void closeClient(GameClient client){
+    /**
+     * Gracefully stops the client and closes the application stage.
+     *
+     * @param client the running game client
+     */
+    private void closeClient(GameClient client) {
         client.stop();
         primaryStage.close();
     }
 
-    @FXML public void toTheMain() {
+    /**
+     * Returns to the main menu from the multiplayer menu.
+     */
+    @FXML
+    public void toTheMain() {
         GridHelper.loadMainMenu(primaryStage);
     }
 }
-
-
