@@ -9,7 +9,6 @@
 
 package gui.controllers;
 
-import game.Game;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -28,7 +27,6 @@ public class ArchiveController {
     private Stage primaryStage;
     public void setPrimaryStage(Stage primaryStage) {this.primaryStage = primaryStage;}
     public VBox contentBox;
-    private Game game;
 
     public void showGames() {
         contentBox.getChildren().clear();

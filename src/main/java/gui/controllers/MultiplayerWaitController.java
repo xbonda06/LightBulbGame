@@ -15,8 +15,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import multiplayer.GameClient;
 
-import java.io.IOException;
-
 public class MultiplayerWaitController implements GameStartListener{
     private Stage primaryStage;
     private GameClient client;

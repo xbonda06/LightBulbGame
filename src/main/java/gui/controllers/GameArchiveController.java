@@ -9,7 +9,6 @@
 
 package gui.controllers;
 
-import common.GameNode;
 import game.Game;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

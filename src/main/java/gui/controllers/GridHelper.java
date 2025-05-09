@@ -37,7 +37,6 @@ import java.util.function.Consumer;
 
 public class GridHelper {
     public static final Map<String, Image> imageCache = new HashMap<>();
-    private static final int FIELD_SIZE = 400;
 
     private static final String BULB_OFF_IMAGE = "/images/bulb_off.png";
     private static final String BULB_ON_IMAGE = "/images/bulb_on.png";
