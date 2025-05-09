@@ -1,3 +1,15 @@
+/**
+ * Represents a single node (tile) on the game board.
+ * A node can be a power source, bulb, or connecting wire, and contains connectors on its sides.
+ * <p>
+ * Supports rotation, lighting logic, and is observable via the {@link AbstractObservableField} class.
+ * </p>
+ *
+ * @author Andrii Bondarenko (xbonda06)
+ * @author Olha Tomylko (xtomylo00)
+ * @author Alina Paliienko (xpaliia00)
+ */
+
 package common;
 
 import ija.ija2024.tool.common.AbstractObservableField;
@@ -17,47 +29,88 @@ public class GameNode extends AbstractObservableField {
     private int currentRotation = 0;  // How many times the node has been rotated
 
 
+    /**
+     * Constructs a new GameNode at the specified position.
+     *
+     * @param position the position of the node on the game board
+     */
     public GameNode(Position position) {
         this.position = position;
         this.connectors = new boolean[]{false, false, false, false};
         this.lit = false;
     }
 
+    /**
+     * Sets this node as a bulb with a connector on the given side.
+     *
+     * @param side the side where the bulb is connected
+     */
     public void setBulb(Side side) {
         this.bulb = true;
         setConnectors(side);
     }
 
+    /**
+     * Sets this node as a power source with connectors on the given sides.
+     *
+     * @param sides the sides to set connectors on
+     */
     public void setPower(Side... sides) {
         this.power = true;
         setConnectors(sides);
     }
 
+    /**
+     * Sets this node as a link with connectors on the given sides.
+     *
+     * @param sides the sides to set connectors on
+     */
     public void setLink(Side... sides) {
         this.link = true;
         setConnectors(sides);
     }
 
+    /**
+     * Sets connectors on the specified sides.
+     *
+     * @param sides the sides to set connectors on
+     */
     private void setConnectors(Side... sides){
         for (Side side : sides){
             this.connectors[side.ordinal()] = true;
         }
     }
 
+    /**
+     * Removes the connector from the specified side.
+     *
+     * @param side the side to remove the connector from
+     */
     public void deleteConnector(Side side) {
         this.connectors[side.ordinal()] = false;
     }
 
+    /**
+     * Sets the number of correct clockwise turns needed to solve the node.
+     *
+     * @param turns number of turns modulo 4
+     */
     public void setCorrectRotation(int turns) {
         this.correctRotation = turns % 4;
     }
 
+    /**
+     * Resets the current rotation counter to zero.
+     */
     public void resetCurrentRotation() {
         this.currentRotation = 0;
     }
 
-    /// Returns the number of turns needed to reach the correct rotation
-    /** Returns how many clockwise turns are needed to return to the solved position. */
+    /**
+     * Returns how many clockwise turns are needed to return to the solved position.
+     *
+     * @return the number of necessary rotations (0–3)
+     */
     public int getHint() {
         int delta = (4 + currentRotation - correctRotation) % 4;
 
@@ -71,7 +124,10 @@ public class GameNode extends AbstractObservableField {
         return (4 - delta) % 4;
     }
 
-
+    /**
+     * Rotates the node 90 degrees clockwise.
+     * Updates connector directions and notifies observers.
+     */
     public void turn() {
         boolean[] rotated = new boolean[4];
         for (int i = 0; i < 4; i++) {
@@ -84,6 +140,10 @@ public class GameNode extends AbstractObservableField {
         notifyObservers();
     }
 
+    /**
+     * Rotates the node 90 degrees counter-clockwise.
+     * Updates connector directions and notifies observers.
+     */
     public void turnBack() {
         boolean[] rotated = new boolean[4];
         for (int i = 0; i < 4; i++) {
@@ -93,20 +153,39 @@ public class GameNode extends AbstractObservableField {
         notifyObservers();
     }
 
-
+    /**
+     * Sets whether this node is currently lit.
+     *
+     * @param lit true if lit, false otherwise
+     */
     public void setLit(boolean lit) {
         this.lit = lit;
     }
 
+    /**
+     * Checks if this node has all four connectors (i.e., forms a cross).
+     *
+     * @return true if node is a cross, false otherwise
+     */
     public boolean isCross(){
         return north() && south() && east() && west();
     }
 
+    /**
+     * Checks if this node has three connectors in a T-shape.
+     *
+     * @return true if half-cross (T-link), false otherwise
+     */
     public boolean isHalfCross() {
         return (north() && south() && (east() ^ west())) ||
                 (east() && west() && (north() ^ south()));
     }
 
+    /**
+     * Checks if this node has two connectors in an L-shape.
+     *
+     * @return true if corner (L-link), false otherwise
+     */
     public boolean isCorner() {
         return (north() && east() && !south() && !west()) ||
                 (north() && west() && !south() && !east()) ||
@@ -114,6 +193,11 @@ public class GameNode extends AbstractObservableField {
                 (south() && west() && !north() && !east());
     }
 
+    /**
+     * Checks if this node has two connectors in a straight line.
+     *
+     * @return true if long (I-link), false otherwise
+     */
     public boolean isLong(){
         return (north() && south() && !east() && !west()) ||
                 (east() && west() && !north() && !south());
@@ -127,10 +211,27 @@ public class GameNode extends AbstractObservableField {
     @Override public boolean isBulb() {return this.bulb;}
     @Override public boolean isPower() {return this.power;}
     @Override public boolean isLink() {return this.link;}
+
+    /**
+     * Returns the position of this node.
+     *
+     * @return the node's position
+     */
     public Position getPosition() {return this.position;}
+
+    /**
+     * Checks if this node has a connector on the specified side.
+     *
+     * @param side the side to check
+     * @return true if a connector exists, false otherwise
+     */
     public boolean containsConnector(Side side) {return this.connectors[side.ordinal()];}
 
-    /** Returns a list of sides that have connectors on this node. */
+    /**
+     * Returns a list of sides where this node has connectors.
+     *
+     * @return a list of connected sides
+     */
     public List<Side> getConnectors() {
         List<Side> list = new ArrayList<>();
         for (Side s : Side.values()) {
@@ -141,6 +242,11 @@ public class GameNode extends AbstractObservableField {
         return list;
     }
 
+    /**
+     * Returns a string representation of the node for debugging.
+     *
+     * @return formatted string showing type, position, and connectors
+     */
     @Override
     public String toString() {
         String type;
