@@ -177,7 +177,7 @@ public class MultiplayerGameController implements GameWinListener {
     private void createGameBoard() {
         this.cellSize = FIELD_SIZE / boardSize;
         GridHelper.clearGameGrid(gameGrid);
-        GridHelper.setupGridConstraints(boardSize, gameGrid);
+        GridHelper.setupGridConstraints(boardSize, gameGrid, FIELD_SIZE);
         GridHelper.loadImages();
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick);
     }

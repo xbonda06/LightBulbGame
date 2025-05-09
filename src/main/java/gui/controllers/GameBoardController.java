@@ -114,7 +114,7 @@ public class GameBoardController {
         this.cellSize = FIELD_SIZE / boardSize;
         fromArchive = false;
         GridHelper.clearGameGrid(gameGrid);
-        GridHelper.setupGridConstraints(boardSize, gameGrid);
+        GridHelper.setupGridConstraints(boardSize, gameGrid, FIELD_SIZE);
         GridHelper.createCells(game, gameGrid, cellSize, boardSize, this::handleCellClick);
     }
 

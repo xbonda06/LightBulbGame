@@ -231,9 +231,7 @@ public class GridHelper {
 
         if (connectorView != null) {
             if (clickHandler != null){
-                connectorView.setOnMouseClicked(event -> {
-                    clickHandler.accept(node);
-                });
+                connectorView.setOnMouseClicked(event -> clickHandler.accept(node));
             }
             grid.add(connectorView, col, row);
         }
@@ -320,11 +318,11 @@ public class GridHelper {
     }
 
     // Configure grid size and set fixed cell dimensions based on the board size
-    public static void setupGridConstraints(int boardSize, GridPane gameGrid) {
-        int cellSize = FIELD_SIZE / boardSize;
-        gameGrid.setMinSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setPrefSize(FIELD_SIZE, FIELD_SIZE);
-        gameGrid.setMaxSize(FIELD_SIZE, FIELD_SIZE);
+    public static void setupGridConstraints(int boardSize, GridPane gameGrid, int fiend_size) {
+        int cellSize = fiend_size / boardSize;
+        gameGrid.setMinSize(fiend_size, fiend_size);
+        gameGrid.setPrefSize(fiend_size, fiend_size);
+        gameGrid.setMaxSize(fiend_size, fiend_size);
 
         for (int i = 0; i < 5; i++) {
             ColumnConstraints colConst = new ColumnConstraints(cellSize, cellSize, cellSize);
