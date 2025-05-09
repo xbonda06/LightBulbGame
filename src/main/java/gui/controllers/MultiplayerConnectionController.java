@@ -42,8 +42,6 @@ public class MultiplayerConnectionController {
 
     public void startGame() throws IOException {
         client.requestPlayerCount();
-        PauseTransition pause = new PauseTransition(Duration.millis(700));
-        pause.play();
         int count = client.getLatestPlayerCount();
         playerCount.setText("Players: " + count); //todo
         if (count > 1) {

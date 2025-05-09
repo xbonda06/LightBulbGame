@@ -8,6 +8,7 @@
 
 package gui.controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -34,24 +35,27 @@ public class MultiplayerWaitController implements GameStartListener{
     }
 
     @Override
-    public void onGameStarted() throws IOException {
-        // TODO: Load the multiplayer game view
+    public void onGameStarted() {
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/multiplayer_main.fxml"));
+                Parent root = loader.load();
 
-        FXMLLoader loader = new FXMLLoader(GridHelper.class.getResource("/fxml/multiplayer_main.fxml"));
-        Parent root = loader.load();
+                MultiplayerGameController controller = loader.getController();
+                controller.setServer(null);
+                controller.setClient(client);
+                controller.setPrimaryStage(primaryStage);
+                controller.showGame();
 
-        MultiplayerGameController controller = loader.getController();
-        controller.setServer(null);
-        controller.setClient(client);
-        controller.setPrimaryStage(primaryStage);
-        client.sendStartGame();
-        controller.showGame();
-
-        primaryStage.setScene(new Scene(root, 800, 600));
-        primaryStage.setTitle("Light Bulb Game - ");
-        primaryStage.setOnCloseRequest(e -> {
-            controller.closeOpponents();
-            closeScene();
+                primaryStage.setScene(new Scene(root, 800, 600));
+                primaryStage.setTitle("Light Bulb Game - ");
+                primaryStage.setOnCloseRequest(e -> {
+                    controller.closeOpponents();
+                    closeScene();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 

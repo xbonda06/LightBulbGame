@@ -3,6 +3,8 @@ package multiplayer;
 import common.Position;
 import game.Game;
 import gui.controllers.GameStartListener;
+import gui.controllers.GameUpdateListener;
+import gui.controllers.GameWinListener;
 import json.GameDeserializer;
 import com.google.gson.*;
 
@@ -30,6 +32,8 @@ public class GameClient {
     private volatile boolean gameStarted = false;
 
     private GameStartListener startListener;
+    private GameUpdateListener gameUpdateListener;
+    private GameWinListener gameWinListener;
 
     private final Gson gson = new Gson();
 
@@ -103,6 +107,10 @@ public class GameClient {
                                 opponentUndoStacks.get(sender).push(pos);
                                 opponentRedoStacks.get(sender).clear();
                             }
+
+                            if (gameUpdateListener != null) {
+                                gameUpdateListener.onGameUpdate();
+                            }
                         }
                     }
 
@@ -120,6 +128,10 @@ public class GameClient {
                                     g.updatePowerPropagation();
                                 }
                                 redoStack.push(pos);
+                            }
+
+                            if (gameUpdateListener != null) {
+                                gameUpdateListener.onGameUpdate();
                             }
                         }
                     }
@@ -140,6 +152,10 @@ public class GameClient {
                                 undoStack.push(pos);
                             }
                         }
+
+                        if (gameUpdateListener != null) {
+                            gameUpdateListener.onGameUpdate();
+                        }
                     }
 
                     case "start_game" -> {
@@ -155,6 +171,18 @@ public class GameClient {
                         latestPlayerIds.clear();
                         for (JsonElement el : obj.getAsJsonArray("playerIds")) {
                             latestPlayerIds.add(el.getAsInt());
+                        }
+                    }
+
+                    case "win" -> {
+                        int winnerId = obj.get("winnerId").getAsInt();
+                        if(winnerId == playerId) {
+                            System.out.println("CLIENT: You win!");
+                        } else {
+                            System.out.println("CLIENT: Player " + winnerId + " wins!");
+                        }
+                        if (gameWinListener != null) {
+                            gameWinListener.onGameWin(winnerId);
                         }
                     }
                 }
@@ -210,21 +238,31 @@ public class GameClient {
         out.println(msg);
     }
 
+    public void sendWin() {
+        JsonObject msg = new JsonObject();
+        msg.addProperty("type", "win");
+        msg.addProperty("winnerId", playerId);
+        out.println(msg);
+        if(gameWinListener != null) {
+            gameWinListener.onGameWin(playerId);
+        }
+    }
+
     public void requestPlayerCount() {
         JsonObject msg = new JsonObject();
         msg.addProperty("type", "player_count");
         out.println(msg);
+        System.out.println("CLIENT: Player count requested.");
     }
+
+    public boolean isGameStarted() { return gameStarted; }
 
     public void setGameStartListener(GameStartListener listener) { this.startListener = listener; }
+    public void setGameUpdateListener(GameUpdateListener gameUpdateListener) { this.gameUpdateListener = gameUpdateListener; }
+    public void setGameWinListener(GameWinListener gameWinListener) { this.gameWinListener = gameWinListener;}
 
-    public int getLatestPlayerCount() {
-        return latestPlayerCount;
-    }
-    public List<Integer> getLatestPlayerIds() {
-        return new ArrayList<>(latestPlayerIds);
-    }
-    public boolean isGameStarted() { return gameStarted; }
+    public int getLatestPlayerCount() { return latestPlayerCount; }
+    public List<Integer> getLatestPlayerIds() { return new ArrayList<>(latestPlayerIds); }
     public Game getOwnGame() { return ownGame; }
     public Game getOpponentGame(int id) { return opponentGames.get(id); }
     public Set<Integer> getOpponentIds() { return opponentGames.keySet(); }
