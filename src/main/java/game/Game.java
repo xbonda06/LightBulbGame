@@ -699,7 +699,6 @@ public class Game implements ToolEnvironment, Observable.Observer {
         undoStack.clear();
         redoStack.clear();
         moveCount = 0;
-        logger.log("History cleared");
     }
 
     /**
